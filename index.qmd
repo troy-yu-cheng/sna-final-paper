@@ -31,6 +31,8 @@ highlight-style: nord
 engine: knitr
 ---
 
+Raw dataset download link: <https://data.bristol.ac.uk/data/en_GB/dataset/23yv276we2mll25fjakkfim2ml/resource/e63a98c4-b4d6-4a89-9be9-06875b83ce33?inner_span=True>
+
 # Set up
 
 ```{r}
@@ -40,19 +42,142 @@ library(readr)
 library(haven)
 library(lubridate)
 library(tidymodels)
-library(tidycensus)
-library(janitor)
-library(sf)
-library(plotly)
-library(themis)
-library(vip)
-library(ranger)
-library(xgboost)
-library(rlang)
+library(statnet)
+library(reticulate)
 ```
 
-## Prepare Data Set
+Take a glimpse of data:
 
+```{r}
+# 设置数据路径（请替换为你自己电脑上的路径）
+data_path <- "data/mumin_csv/"
+
+# 定义要读取的文件列表
+files <- c(
+  "claim.csv", "user.csv", "tweet.csv", "reply.csv", "article.csv",
+  "tweet_discusses_claim.csv", "article_discusses_claim.csv",
+  "user_follows_user.csv", "user_retweeted_tweet.csv",
+  "reply_quote_of_tweet.csv", "reply_reply_to_tweet.csv"
+)
+
+# 用lapply预览前几行（避免爆内存）
+previews <- lapply(files, function(fname) {
+  fpath <- file.path(data_path, fname)
+  tryCatch(
+    read_csv(fpath, n_max = 5),
+    error = function(e) tibble::tibble(error = paste("Error:", e$message))
+  )
+})
+names(previews) <- files
+previews$`claim.csv`
+
+previews$`user.csv`                  
+previews$`tweet.csv`
+previews$`reply.csv`                  
+previews$`article.csv`
+previews$`tweet_discusses_claim.csv`  
+previews$`article_discusses_claim.csv` 
+previews$`user_follows_user.csv`      
+previews$`user_retweeted_tweet.csv`
+previews$`reply_quote_of_tweet.csv`   
+previews$`reply_reply_to_tweet.csv` 
+
+```
+
+
+```{r}
+# 读取数据
+tweet_df <- read_csv("data/mumin_csv/tweet.csv")
+tweet_claim_df <- read_csv("data/mumin_csv/tweet_discusses_claim.csv")
+
+# 连接 tweet 和 claim
+tweet_with_claim <- tweet_df |>
+  inner_join(tweet_claim_df, by = c("tweet_id" = "src"))
+
+# 查看前几行
+head(tweet_with_claim)
+
+```
+
+```{r}
+# 1. 读入必要数据
+tweets <- read_csv("data/mumin_csv/tweet.csv")
+claims <- read_csv("data/mumin_csv/claim.csv")
+tweet_claim <- read_csv("data/mumin_csv/tweet_discusses_claim.csv")
+user_retweet <- read_csv("data/mumin_csv/user_retweeted_tweet.csv")
+
+# 2. Tweet 与 Claim join
+tweet_claim_joined <- tweet_claim |> 
+  rename(tweet_id = src, claim_id = tgt) |> 
+  inner_join(tweets, by = "tweet_id") |> 
+  inner_join(claims, by = c("claim_id" = "id"))
+
+# 3. 再与 User-行为 join（举例：retweet）
+user_claim <- user_retweet |> 
+  rename(user_id = src, tweet_id = tgt) |> 
+  inner_join(tweet_claim_joined, by = "tweet_id")
+
+
+table(user_claim$label)
+table(user_claim$cluster_keywords)
+table(user_claim$keywords)
+
+# 现在 user_claim 就有 user_id, tweet_id, claim_id, keywords, label 等字段
+
+
+# 过滤出传播 misinformation 的边
+edges_misinfo <- user_claim |> 
+  filter(label == "misinformation") |> 
+  select(user_id, tweet_id, claim_id, keywords, label)
+
+# 然后构建传播边（例如：用户A转发了含 misinformation 的 tweet）
+edges <- user_retweet |> 
+  inner_join(edges_misinfo, by = c("tgt" = "tweet_id")) |> 
+  rename(from = src, to = tgt) |> 
+  select(from, to, claim_id, keywords, label)
+
+# 去掉loops
+edges <- edges |> filter(from != to)
+
+
+```
+
+```{r}
+edges_follow <- read_csv("data/mumin_csv/user_follows_user.csv") |> 
+  mutate(type = "follow")
+
+edges_retweet <- read_csv("data/mumin_csv/user_retweeted_tweet.csv") |> 
+  mutate(type = "retweet")
+
+edges_reply <- read_csv("data/mumin_csv/reply_reply_to_tweet.csv") |> 
+  mutate(type = "reply")
+
+edges_quote <- read_csv("data/mumin_csv/reply_quote_of_tweet.csv") |> 
+  mutate(type = "quote")
+
+# 统一格式并合并
+user_edges_all <- bind_rows(
+  edges_follow,
+  edges_retweet,
+  edges_reply,
+  edges_quote
+) |> 
+  rename(from = src, to = tgt) |> 
+  select(from, to, type)W
+
+# 过滤掉 from == to 的记录
+user_edges_all_clean <- user_edges_all |> 
+  filter(from != to) |> 
+  distinct(from, to, .keep_all = TRUE)
+
+# 然后再建图
+net <- network(user_edges_all_clean, directed = TRUE, matrix.type = "edgelist")
+set.edge.attribute(net, "type", user_edges_all_clean$type)
+
+
+# 简要可视化
+plot(net, displaylabels = FALSE, edge.col = as.factor(user_edges_all$type))
+```
 
 
 
