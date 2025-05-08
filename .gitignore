@@ -1,5 +1,6 @@
 data/
 literature/
+bearer_token.txt
 
 # History files
 .Rhistory
