@@ -1,6 +1,7 @@
 data/
 literature/
 bearer_token.txt
+surplus.qmd
 
 # History files
 .Rhistory

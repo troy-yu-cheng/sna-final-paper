@@ -1,6 +1,6 @@
 ---
 title: "Social Network Analysis"
-subtitle: "Final Paper"
+subtitle: "Temporal Patterns of Misinformation Diffusion: A Multi-Stage Network Analysis of COVID-19 Origin Narratives on Twitter"
 author: 
   - name: "Troy (Yu) Cheng"
     email: yc1317@georgetown.edu
@@ -32,15 +32,13 @@ engine: knitr
 ---
 # Abstract
 
-This study investigates the dissemination patterns of the misinformation narrative that COVID-19 was deliberately created/manufactured by China or the Wuhan laboratory. Drawing on Diffusion of Innovations Theory and Echo Chamber Theory, the study explores how early misinformation claims shaped subsequent retweeter networks and whether homophily emerged over time. The dataset is drawn from the MuMiN project, focusing on six prominent misinformation claims identified between March 2020 and August 2021. Retweeters are treated as nodes, and their relationships are defined by co-retweet, co-quote, co-reply, and follow ties.
+This study examines the temporal diffusion patterns of the misinformation narrative claiming that COVID-19 originated in China or the Wuhan laboratory. The central research question asks: How did this narrative propagate across Twitter retweeter networks over time, and did early spreaders maintain structural advantages? Drawing on the Diffusion of Innovations Theory and Echo Chamber Theory, the study explores whether ideological homophily emerged as the narrative spread.
 
-The hypothesis posits that retweeters engaged with earlier misinformation claims are more central in the network and sustain higher connectivity over time. Social Network Analysis (SNA) is employed to construct adjacency matrices, visualize network structures, and calculate centrality and modularity measures. Temporal Exponential Random Graph Models (tERGM) are further applied to examine how historical ties and thematic claim categories influence network evolution.
+Using data from the MuMiN project, six prominent misinformation claims between March 2020 and August 2021 were analyzed. Retweeters are treated as nodes, with ties defined by co-retweeting, co-replying, co-quoting, and following behaviors. The hypothesis posits that retweeters involved in earlier misinformation narratives occupy more central positions and retain higher connectivity over time.
 
-This research contributes to understanding how misinformation diffusion evolves and how early spreaders maintain structural advantages, reinforcing the persistence of misinformation narratives in online social networks.
+Social Network Analysis (SNA) is employed to construct adjacency matrices, visualize evolving network structures, and compute centrality and modularity metrics. While temporal network growth is discontinuous across misinformation events, this study explores whether Temporal Exponential Random Graph Models (tERGM) can model these episodic formations by treating thematic similarity as a historical tie.
 
-我现在对covid病毒是在中国/wuhan爆发这条谣言在推特用户间的传播规律（随时间）很感兴趣
-一个misinformation的源头很难确定是具体哪个user/tweet 直接研究这种传播的过程会好一点
-我们以retweeter作为节点，retweeter相互之间的co-retweet，co-reply，co-quote和follow作为边
+This research advances understanding of how misinformation narratives persist in online environments and how early participants shape long-term information diffusion.
 
 # Literature Review
 
@@ -573,14 +571,20 @@ sum(covid_wuhan_misinfo$retweeter_id%in% follow_data$tgt)
 
 ```{r}
 # 读取 co-retweet adjacency matrix
-adj_matrix_co_retweet <- read.csv("data/adj_matrix_co_retweet.csv", row.names = 1)
+adj_matrix_co_retweet <- read.csv(
+  "data/adj_matrix_co_retweet.csv", 
+  row.names = 1, 
+  check.names = FALSE  # 关键参数，禁止自动加 x 前缀
+)
 
 # 构建 network 对象（无向图）
 net_co_retweet <- network(as.matrix(adj_matrix_co_retweet), directed = FALSE, matrix.type = "adjacency")
 
+get.vertex.attribute(net_co_retweet, "vertex.names")
 
 # 获取分组信息
 retweeter_group <- covid_wuhan_misinfo %>%
+  mutate(retweeter_id = as.character(retweeter_id)) %>%
   select(retweeter_id, date, keywords) %>%
   distinct() %>%
   arrange(date) %>%
@@ -593,148 +597,206 @@ set.vertex.attribute(
   retweeter_group$group[match(get.vertex.attribute(net_co_retweet, "vertex.names"), retweeter_group$retweeter_id)]
 )
 
-
-
-for (g in group_stages) {
-  subgraph_nodes <- which(get.vertex.attribute(net_co_retweet, "group") <= g)
-  
-  if (length(subgraph_nodes) == 0) next  # 没有节点直接跳过
-  
-  sub_g <- get.inducedSubgraph(net_co_retweet, v = subgraph_nodes)
-  
-  plot.network(
-    sub_g,
-    displaylabels = FALSE,
-    vertex.cex = 2,
-    vertex.col = "skyblue",
-    main = paste("Co-Retweet Network - Stage", g)
-  )
-  
-  Sys.sleep(1)  # 每张图停留 1 秒
-}
-
-
-# 获取所有 group 阶段
-group_stages <- sort(unique(get.vertex.attribute(net_co_retweet, "group")))
-
-
-```
-
-## Node Attributes  
-
-```{r}
-covid_wuhan_misinfo |>
-  group_by(date, keywords) |>
-  select(keywords, date) |>
-  unique()|>
-  arrange(date)
-
-# 获取每个 retweeter 最早转发的 misinformation claim 的日期和关键词
-# 按日期和关键词组合编码分组
-retweeter_group <- covid_wuhan_misinfo %>%
-  select(retweeter_id, date, keywords) %>%
-  distinct() %>%
-  arrange(date) |>
-  mutate(group = as.numeric(factor(paste(date, keywords), 
-                                   levels = unique(paste(date, keywords)))))
-
-# 把 group 属性添加到 network 对象中
-set.vertex.attribute(net, "group", 
-            retweeter_group$group[match(get.vertex.attribute(net, "vertex.names"),                  retweeter_group$retweeter_id)])
-
-
-
-# 选出 group == 1 的子图
-subgraph_1 <- get.inducedSubgraph(net, 
-                                  which(get.vertex.attribute(net, "group") == 1))
-
-# 作图
-plot.network(subgraph_1, 
-              displaylabels = FALSE, 
-              vertex.cex = 2, 
-              vertex.col = "skyblue", 
-              main = "Subgraph for Group 1")
+get.vertex.attribute(net_co_retweet, "group")
 
 for (g in 1:6) {
-  sub_g <- get.inducedSubgraph(net, 
-                               which(get.vertex.attribute(net, "group") == g))
+  sub_g <- get.inducedSubgraph(net_co_retweet, 
+                               which(get.vertex.attribute(net_co_retweet, "group") == g))
   plot.network(sub_g, 
                 displaylabels = FALSE, 
-                vertex.cex = 2, 
+                vertex.cex = 1, 
                 vertex.col = "skyblue", 
                 main = paste("Subgraph for Group", g))
 }
 
-# 例如，group 1-3 是早期阶段，4-6 是后期阶段
-early_phase <- get.inducedSubgraph(net, 
-                                   which(get.vertex.attribute(net, "group") %in% 1:3))
-
-late_phase <- get.inducedSubgraph(net, 
-                                  which(get.vertex.attribute(net, "group") %in% 4:6))
-
-# 分别作图
-plot.network(early_phase, main = "Early Phase")
-plot.network(late_phase, main = "Late Phase")
 
 ```
 
+```{r}
+# 1. 获取阶段信息
+group_stages <- sort(unique(get.vertex.attribute(net_co_retweet, "group")))
+
+results <- data.frame()  # 清空或初始化
+
+for (g in group_stages) {
+  sub_nodes <- which(get.vertex.attribute(net_co_retweet, "group") <= g)
+  sub_g <- get.inducedSubgraph(net_co_retweet, v = sub_nodes)
+  
+  adj_mat <- as.matrix.network(sub_g, matrix.type = "adjacency")
+  
+  results <- rbind(results, data.frame(
+    Stage = g,
+    Nodes = network.size(sub_g),
+    Edges = network.edgecount(sub_g),
+    Density = gden(sub_g),
+    Degree_Centralization = centralization(adj_mat, FUN = degree, mode = "graph"),
+    Closeness_Centralization = centralization(adj_mat, FUN = closeness, mode = "graph"),
+    Betweenness_Centralization = centralization(adj_mat, FUN = betweenness, mode = "graph"),
+    Transitivity = gtrans(sub_g, mode = "graph")
+  ))
+}
+# 4. 查看结果
+print(results)
+```
+
+
+1️⃣ 密度 (Density) 下降清晰可见
+第一阶段密度 = 1.0，完全图（每个节点都互相关联）。
+
+随着节点增加，密度迅速下降到 0.13 左右。
+
+📌 解释：
+
+最初的核心传播者高度互动，形成了小规模的“精英传播圈”（如密闭小团体）。
+
+随着传播扩散，边缘用户（外围 retweeters）被逐渐吸引进来，但他们之间并没有大量的相互联系，仅与核心传播者或少数用户连接，导致网络越来越稀疏。
+
+2️⃣ Degree Centralization 稍微上升，但始终偏低
+从 0.048 稳定上升到 0.086。
+
+表明：
+
+虽然有部分“超级传播者”节点出现（拥有更多连接），
+
+但整个网络并没有形成强烈的“单一核心控制”现象，还是较为分散的。
+
+📌 对比分析：
+
+这符合谣言传播中的“去中心化特征”：
+
+虽然有影响力大的用户，但也有大量中小节点参与传播，形成了“分布式扩散”。
+
+3️⃣ Closeness 和 Betweenness Centralization 一直为 0
+📌 解释：
+
+这意味着：
+
+没有节点真正承担“中介桥梁”的角色（betweenness = 0）。
+
+没有节点在信息传递路径中占据显著位置（closeness = 0）。
+
+很可能是因为这个网络是 无向图且小团体内部强连接，导致大部分节点路径长度相似，或根本不需要通过中介节点就能直接连接。
+
+📌 洞察：
+
+这是典型的“群团式传播”，不同群体内部连通紧密，但群体之间的桥梁节点稀缺。
+
+符合 Echo Chamber Theory 的描述 —— 信息在群体内部反复传播，很难跨群体传递。
+
+4️⃣ Transitivity (全局聚类系数) 极高
+一直维持在 接近 1.0，哪怕节点数量增加也只有极微弱下降。
+
+📌 解释：
+
+网络中绝大部分三元闭环都存在 —— 换句话说，“朋友的朋友也是朋友”。
+
+再次印证了高度群体化、小圈子强连接的传播模式。
+
+📊 综合洞察总结
+初期核心小团体主导，随着传播演化，网络规模扩大但联系稀疏。
+
+网络保持高度的聚类和局部性，群体之间的传播壁垒强烈。
+
+信息的跨群体扩散能力较弱，符合 回音室效应（Echo Chamber） 和 去中心化的分散传播特征。
+
+没有形成典型的“明星用户主导的中心化扩散”，而是多群体、小圈子在独立传播。
 
 
 ```{r}
+results <- data.frame()  # 清空或初始化
 
-# 逐个作图
-plot.network(
-  net,
-  displaylabels = FALSE,
-  vertex.cex = 0.2,
-  vertex.col = "orange",
-  edge.lwd = 0.5,  # 调小边的宽度
-  edge.col = ifelse(get.edge.attribute(net, "co-retweet"), 
-                    adjustcolor("red", alpha.f = 0.2),  # 更透明的红色
-                    "gray95"),  # 不关注的边几乎看不到
-  main = "Network with co-retweet Edges"
-)
-
-# 2. 换成 co-quote 的边
-plot.network(
-  net,
-  displaylabels = FALSE,
-  vertex.cex = 0.2,
-  vertex.col = "orange",
-  edge.lwd = 1,
-  edge.col = ifelse(get.edge.attribute(net, "co-quote"), 
-                    adjustcolor("blue", alpha.f = 0.3), 
-                    "gray95"),
-  main = "Network with co-quote Edges"
-)
-
-
-# 3. 再换 co-reply-v2
-plot.network(
-  net,
-  displaylabels = FALSE,
-  vertex.cex = 0.2,
-  vertex.col = "orange",
-  edge.lwd = 1,
-  edge.col = ifelse(get.edge.attribute(net, "co-reply-v2"), 
-                    adjustcolor("green", alpha.f = 0.3), 
-                    "gray95"),
-  main = "Network with co-reply-v2 Edges"
-)
-
-plot.network(
-  net,
-  displaylabels = FALSE,
-  vertex.cex = 0.1,  # 调小节点
-  vertex.col = "orange",
-  edge.lwd = 0.5,  # 调细边
-  edge.col = "gray80",
-  edge.transparency = 0.5,  # 增加透明度（statnet中用 adjustcolor() 处理颜色）
-  main = "Network with co-retweet Edges"
-)
+for (g in group_stages) {
+  sub_nodes <- which(get.vertex.attribute(net_co_retweet, "group") == g)
+  sub_g <- get.inducedSubgraph(net_co_retweet, v = sub_nodes)
+  
+  adj_mat <- as.matrix.network(sub_g, matrix.type = "adjacency")
+  
+  results <- rbind(results, data.frame(
+    Stage = g,
+    Nodes = network.size(sub_g),
+    Edges = network.edgecount(sub_g),
+    Density = gden(sub_g),
+    Degree_Centralization = centralization(adj_mat, FUN = degree, mode = "graph"),
+    Closeness_Centralization = centralization(adj_mat, FUN = closeness, mode = "graph"),
+    Betweenness_Centralization = centralization(adj_mat, FUN = betweenness, mode = "graph"),
+    Transitivity = gtrans(sub_g, mode = "graph")
+  ))
+}
+# 4. 查看结果
+print(results)
 
 
 ```
+
+
+1️⃣ 初始阶段 (Stage 1)
+完美的 完全图 (Density=1)，节点之间全连接。
+
+各种中心性为 0 → 权力极度均衡，没有明显的核心节点。
+
+Transitivity = 1 → 完美的三角闭环，这通常发生在小团体、同质性极高的圈子。
+
+2️⃣ 传播爆发 (Stage 2)
+Density 降到 0.51，但网络规模扩大，Edges 增多。
+
+Degree Centralization 开始上升，表明出现了关键传播者（核心节点逐渐形成）。
+
+依然是高闭包（Transitivity=1），说明社群内部联系紧密，但开始显现传播分工。
+
+3️⃣ 短暂收缩 (Stage 3)
+节点数和边数大幅减少，网络再次变成完全图。
+
+可能是信息传播的 短暂停滞 或 小圈层独立传播。
+
+4️⃣ 扩展尝试 (Stage 4)
+节点数再次上升，但 Density 很低（0.24），网络松散。
+
+说明信息扩散到了更广泛的受众，但彼此之间联系不强。
+
+中心性仍低，未形成稳定的信息传播主导者。
+
+5️⃣ 核心扩散 (Stage 5)
+虽然节点数不多，但出现了显著的中心性特征：
+
+Degree Centralization 高达 0.36
+
+Closeness Centralization 达到 0.47
+
+Betweenness Centralization 也有 0.16
+
+这一阶段可能出现了关键意见领袖或超级传播者，对信息扩散起到显著作用。
+
+Transitivity 降低到 0.85 → 网络内闭环减少，更多 桥接型节点 出现。
+
+6️⃣ 最末阶段 (Stage 6)
+网络再次收缩成完全图，群体非常小，但联系非常紧密。
+
+可能是核心群体的余波交流，但未再继续向外传播。
+
+## tERGM sample
+
+```{r}
+
+# Step 1: 准备网络列表（每个时间点一个 network）
+network_list <- list()
+for (g in group_stages) {
+  sub_nodes <- which(get.vertex.attribute(net_co_retweet, "group") <= g)
+  sub_g <- get.inducedSubgraph(net_co_retweet, v = sub_nodes)
+  network_list[[as.character(g)]] <- sub_g
+}
+
+# Step 2: 构建模型
+# 使用简单结构性特征作为例子
+model <- tergm(
+  network_list ~ Form(~edges + gwesp(0.5, fixed = TRUE)) + 
+    Dissolution(~edges), 
+  estimate = "CMLE"
+)
+
+summary(model)
+
+```
+
 
 # Reference
 
@@ -743,12 +805,12 @@ plot.network(
 
 Raw dataset download link: <https://data.bristol.ac.uk/data/en_GB/dataset/23yv276we2mll25fjakkfim2ml/resource/e63a98c4-b4d6-4a89-9be9-06875b83ce33?inner_span=True>
 
-把这些文件下载完之后,创建一个data file,放在这个文件夹中
 
-下载完数据后，我们要到指引处<https://colab.research.google.com/drive/1JCjgg3moGBOuZk4iVjBpQNqgsAYFyNoS#scrollTo=YS1uxj-59UmA>
-按照引导 打开shell 用pip安装相关的文件
+After downloading all files, create a `data` folder in your working directory and place the files inside it.
 
-我们需要打开vs code，在python文件中运行：
+Follow the setup instructions provided [here](https://colab.research.google.com/drive/1JCjgg3moGBOuZk4iVjBpQNqgsAYFyNoS#scrollTo=YS1uxj-59UmA). Use the shell to install required packages via `pip` as directed.
+
+Next, open `VS Code`, and run the following Python script to convert `.pkl` files to `.csv`:
 
 ```{python}
 #| eval: false
@@ -785,20 +847,19 @@ for name in file_names:
     except Exception as e:
         print(f"Failed to convert {name}: {e}")
 
-
 ```
 
-这样我们就能得到csv文件
+This script will generate the corresponding CSV files for further analysis.
 
-Take a glimpse of data:
+Then, preview the Data in R:
 
 ```{r}
 #| eval: false
 #| include: true
-# 设置数据路径（请替换为你自己电脑上的路径）
+# Set the data path 
 data_path <- "data/mumin_csv/"
 
-# 定义要读取的文件列表
+# Define the list of files to read
 files <- c(
   "claim.csv", "user.csv", "tweet.csv", "reply.csv", "article.csv",
   "tweet_discusses_claim.csv", "article_discusses_claim.csv",
@@ -806,7 +867,7 @@ files <- c(
   "reply_quote_of_tweet.csv", "reply_reply_to_tweet.csv"
 )
 
-# 用lapply预览前几行（避免爆内存）
+# Preview the first few rows of each file 
 previews <- lapply(files, function(fname) {
   fpath <- file.path(data_path, fname)
   tryCatch(
