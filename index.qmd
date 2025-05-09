@@ -33,11 +33,13 @@ engine: knitr
 # Abstract
 
 我现在对covid病毒是在中国/wuhan爆发这条谣言在推特用户间的传播规律（随时间）很感兴趣
+一个misinformation的源头很难确定是具体哪个user/tweet 直接研究这种传播的过程会好一点
+我们以retweeter作为节点，retweeter相互之间的co-retweet，co-reply，co-quote和co-follow作为边
 
 # Literature Review
 
 
-# Data Set
+# Dataset
 
 Raw dataset download link: <https://data.bristol.ac.uk/data/en_GB/dataset/23yv276we2mll25fjakkfim2ml/resource/e63a98c4-b4d6-4a89-9be9-06875b83ce33?inner_span=True>
 
@@ -47,50 +49,48 @@ Raw dataset download link: <https://data.bristol.ac.uk/data/en_GB/dataset/23yv27
 #| label: set up packages
 library(tidyverse)
 library(readr)
-library(haven)
-library(lubridate)
-library(tidymodels)
 library(statnet)
+library(intergraph)
 ```
 
 
 ```{r}
-# 1. 读入必要数据
+# Load data
 tweets <- read_csv("data/mumin_csv/tweet.csv")
 claims <- read_csv("data/mumin_csv/claim.csv")
 tweet_claim <- read_csv("data/mumin_csv/tweet_discusses_claim.csv")
 user_retweet <- read_csv("data/mumin_csv/user_retweeted_tweet.csv")
 
-# 2. Tweet 与 Claim join
+# Join tweet & claim via tweet_claim
 tweet_claim_joined <- tweet_claim |> 
   rename(tweet_id = src, claim_id = tgt) |> 
-  inner_join(tweets, by = "tweet_id") |> 
   inner_join(claims, by = c("claim_id" = "id"))
 
-# 3. 再与 User-行为 join（举例：retweet）
+# Join retweeters within users & claim via retweeted tweet
 user_claim <- user_retweet |> 
-  rename(user_id = src, tweet_id = tgt) |> 
+  rename(retweeter_id = src, tweet_id = tgt) |> 
   inner_join(tweet_claim_joined, by = "tweet_id")
 
+retweet_map <- user_claim |> 
+  select(retweeter_id, tweet_id) |> 
+  distinct() 
 
 table(user_claim$label)
 table(user_claim$cluster_keywords)
-table(user_claim$keywords)
-
-
-# 现在 user_claim 就有 user_id, tweet_id, claim_id, keywords, label 等字段
-
 ```
+
+初步整合数据之后，我们进一步筛选我们要研究的特定的misinformation话题
 
 ```{r}
 user_claim_filtered <- user_claim |> 
   filter(str_detect(keywords, "china|wuhan")) 
 
 unique(user_claim_filtered$keywords)
+```
 
-unique(user_claim$language)
+After checking the keywords, 我手动选择了所有跟covid19是中国/Wuhan蓄意制造和散播的misinformation。并把这些内容限制在了英文帖子。
 
-
+```{r}
 covid_wuhan_misinfo <- user_claim_filtered |>
   filter(keywords %in% c(
     "coronavirus comes biological laboratory wuhan",
@@ -118,114 +118,290 @@ covid_wuhan_misinfo <- user_claim_filtered |>
     "air comes china import coronavirus",
     "coronavirus released china"
   )) |>
-  filter(language == "en")
-
+  filter(language == "en") |>
+  filter(label == "misinformation")
 
 table(covid_wuhan_misinfo$keywords)
 table(covid_wuhan_misinfo$cluster_keywords)
 
 ```
+
+## Create SNA data
+
+This network reflects the co-dissemination behavior of misinformation retweeters and their mutual social connections. While the true transmission paths are unknown, this co-spreader network allows us to model the structural properties and potential information diffusion routes among these users.
+
 ```{r}
-# tweet_user_map 事先准备
-tweet_user_map <- user_claim |> 
-  select(tweet_id, user_id) |> 
-  distinct()
 
-# retweet 边
-edges_retweet <- read_csv("data/mumin_csv/user_retweeted_tweet.csv") |>
-  left_join(tweet_user_map, by = c("tgt" = "tweet_id")) |>
-  rename(src_user = src, tgt_user = user_id) |>
-  filter(!is.na(tgt_user)) |>
-  mutate(type = "retweet") |>
-  select(src_user, tgt_user, type)
+# 获取 misinformation tweet ID
+misinfo_tweet_id <- unique(covid_wuhan_misinfo$tweet_id)
 
-# quote 边
-edges_quote <- read_csv("data/mumin_csv/reply_quote_of_tweet.csv") |>
-  left_join(tweet_user_map, by = c("tgt" = "tweet_id")) |>
-  rename(src_user = src, tgt_user = user_id) |>
-  filter(!is.na(tgt_user)) |>
-  mutate(type = "quote") |>
-  select(src_user, tgt_user, type)
+# 保留转发这些 tweet 的所有 retweeter-pair（共传播者）
+co_retweet_edges <- user_retweet |> 
+  filter(tgt %in% misinfo_tweet_id) |> 
+  rename(tweet_id = tgt, retweeter_id = src) |> 
+  group_by(tweet_id) |> 
+  summarise(
+    pairs = list(as.data.frame(t(combn(retweeter_id, 2)))), 
+    .groups = "drop"
+  ) |> 
+  unnest(pairs) |> 
+  mutate(
+    user_1 = pmin(V1, V2),  # 保持小的 ID 在前
+    user_2 = pmax(V1, V2)   # 大的 ID 在后
+  ) |> 
+  select(user_1, user_2) |> 
+  group_by(user_1, user_2) |> 
+  summarise(weight = n(), .groups = "drop") |> 
+  mutate(type = "co-retweet")
 
-# reply 边
-edges_reply <- read_csv("data/mumin_csv/reply_reply_to_tweet.csv") |>
-  left_join(tweet_user_map, by = c("tgt" = "tweet_id")) |>
-  rename(src_user = src, tgt_user = user_id) |>
-  filter(!is.na(tgt_user)) |>
-  mutate(type = "reply") |>
-  select(src_user, tgt_user, type)
+table(co_retweet_edges$weight)
 
-# follow 边（直接是 user-user）
-edges_follow <- read_csv("data/mumin_csv/user_follows_user.csv") |>
-  rename(src_user = src, tgt_user = tgt) |>
-  mutate(type = "follow") |>
-  select(src_user, tgt_user, type)
 
-# 合并全部边
-user_edges_all <- bind_rows(edges_retweet, edges_quote, edges_reply, edges_follow) |>
-  distinct()
+# Co-Quote Edges
+co_quote_edges <- read_csv("data/mumin_csv/reply_quote_of_tweet.csv") |>
+  filter(tgt %in% misinfo_tweet_id | src %in% misinfo_tweet_id) |> 
+  rename(
+    quoted_tweet_id = tgt,    # 被引用的 tweet
+    quoting_tweet_id = src    # 发起引用的 tweet
+  ) |> 
+  # 找 quoting tweet 是谁 retweeted 的（即 quoting user）
+  left_join(retweet_map, by = c("quoting_tweet_id" = "tweet_id")) |> 
+  rename(quoting_user = retweeter_id) |> 
+  # 找 quoted tweet 是谁 retweeted 的（即 quoted user）
+  left_join(retweet_map, by = c("quoted_tweet_id" = "tweet_id")) |> 
+  rename(quoted_user = retweeter_id) |> 
+  filter(!is.na(quoting_user) & !is.na(quoted_user)) |> 
+  mutate(
+    user_1 = pmin(quoting_user, quoted_user),
+    user_2 = pmax(quoting_user, quoted_user)
+  ) |> 
+  select(user_1, user_2) |> 
+  group_by(user_1, user_2) |> 
+  summarise(weight = n(), .groups = "drop") |> 
+  mutate(type = "co-quote")
+
+
+table(co_quote_edges$weight)
+```
+
+
+```{r}
+# Co-reply
+co_reply_edges <- read_csv("data/mumin_csv/reply_reply_to_tweet.csv") |>
+  filter(tgt %in% misinfo_tweet_id | src %in% misinfo_tweet_id) |> 
+  rename(
+    replied_tweet_id = tgt, 
+    replying_tweet_id = src
+  ) |> 
+  # 找出两条 tweet 各自的 retweeter
+  left_join(retweet_map, by = c("replied_tweet_id" = "tweet_id")) |> 
+  rename(user_replied = retweeter_id) |> 
+  left_join(retweet_map, by = c("replying_tweet_id" = "tweet_id")) |> 
+  rename(user_replying = retweeter_id) |> 
+  filter(!is.na(user_replied) & !is.na(user_replying)) |> 
+  mutate(
+    user_1 = pmin(user_replied, user_replying),
+    user_2 = pmax(user_replied, user_replying)
+  ) |> 
+  select(user_1, user_2) |> 
+  group_by(user_1, user_2) |> 
+  summarise(weight = n(), .groups = "drop") |> 
+  mutate(type = "co-reply")
+
+table(co_reply_edges$weight)
+
+reply_data <- read_csv("data/mumin_csv/reply_reply_to_tweet.csv")
+sum(reply_data$src %in% retweet_map$tweet_id)  # 有多少 replying tweets 被 retweeted？
+sum(reply_data$tgt %in% retweet_map$tweet_id)  # 有多少 replied tweets 被 retweeted？
+
+
+```
+
+```{r}
+co_reply_edges_v2 <- read_csv("data/mumin_csv/reply_reply_to_tweet.csv") |>
+  filter(tgt %in% misinfo_tweet_id) |>  # 被 reply 的 tweet 是 misinformation
+  rename(replied_tweet_id = tgt) |> 
+  # 找出这个 misinformation tweet 被谁 retweeted 过
+  left_join(retweet_map, by = c("replied_tweet_id" = "tweet_id")) |>
+  rename(user_replied = retweeter_id) |> 
+  filter(!is.na(user_replied)) |> 
+  group_by(replied_tweet_id) |> 
+  summarise(
+    pairs = list(as.data.frame(t(combn(user_replied, 2)))), 
+    .groups = "drop"
+  ) |> 
+  unnest(pairs) |> 
+  mutate(
+    user_1 = pmin(V1, V2),
+    user_2 = pmax(V1, V2)
+  ) |> 
+  select(user_1, user_2) |> 
+  group_by(user_1, user_2) |> 
+  summarise(weight = n(), .groups = "drop") |> 
+  mutate(type = "co-reply-v2")
+
+table(co_reply_edges_v2$weight)
+unique(co_reply_edges_v2$user_1)
+unique(co_reply_edges_v2$user_2)
+
+setdiff(co_reply_edges_v2$user_2,covid_wuhan_misinfo$retweeter_id)
+setdiff(co_reply_edges_v2$user_1,covid_wuhan_misinfo$retweeter_id)
+```
+
+
+```{r}
+# Follow
+# 获取 retweeter 列表
+retweeter_id_misinfo <- unique(covid_wuhan_misinfo$retweeter_id)
+
+# 构造 Follow 边
+retweeter_follow_edges <- read_csv("data/mumin_csv/user_follows_user.csv") |>
+  rename(user_a = src, user_b = tgt) |> 
+  # 保留两者都在 retweeter 列表中的记录
+  filter(user_a %in% retweeter_id_misinfo & user_b %in% retweeter_id_misinfo) |> 
+  mutate(
+    user_1 = pmin(user_a, user_b),  # 保持小的 ID 在前，去掉方向性
+    user_2 = pmax(user_a, user_b)
+  ) |> 
+  select(user_1, user_2) |> 
+  distinct() |>  # 去重，防止重复记录 A -> B 和 B -> A
+  mutate(weight = 1, type = "follow")
+
+retweeter_follow_edges
+
+```
+
+```{r}
+
+retweeter_follow_edges_directed <- read_csv("data/mumin_csv/user_follows_user.csv") |> 
+  rename(follower = src, followee = tgt) |> 
+  # 只保留 retweeter 之间的关注关系（有方向）
+  filter(follower %in% retweeter_id_misinfo & followee %in% retweeter_id_misinfo) |> 
+  mutate(
+    weight = 1,          # 默认权重为 1
+    type = "follow_directed"      # 明确说明是关注关系
+  ) |> 
+  select(follower, followee, weight, type)
 
 ```
 
 
 ```{r}
+follow_data<-read_csv("data/mumin_csv/user_follows_user.csv") 
+sum(follow_data$src %in% covid_wuhan_misinfo$retweeter_id)
+sum(follow_data$tgt %in% covid_wuhan_misinfo$retweeter_id)
 
-# 过滤出传播 misinformation 的边
-edges_misinfo <- user_claim |> 
-  filter(label == "misinformation") |> 
-  select(user_id, tweet_id, claim_id, keywords, label)
-
-# 然后构建传播边（例如：用户A转发了含 misinformation 的 tweet）
-edges <- user_retweet |> 
-  inner_join(edges_misinfo, by = c("tgt" = "tweet_id")) |> 
-  rename(from = src, to = tgt) |> 
-  select(from, to, claim_id, keywords, label)
-
-# 去掉loops
-edges <- edges |> filter(from != to)
-
-
+sum(covid_wuhan_misinfo$retweeter_id%in% follow_data$src)
+sum(covid_wuhan_misinfo$retweeter_id%in% follow_data$tgt)
 ```
 
+
 ```{r}
-edges_follow <- read_csv("data/mumin_csv/user_follows_user.csv") |> 
-  mutate(type = "follow")
-
-edges_retweet <- read_csv("data/mumin_csv/user_retweeted_tweet.csv") |> 
-  mutate(type = "retweet")
-
-edges_reply <- read_csv("data/mumin_csv/reply_reply_to_tweet.csv") |> 
-  mutate(type = "reply")
-
-edges_quote <- read_csv("data/mumin_csv/reply_quote_of_tweet.csv") |> 
-  mutate(type = "quote")
-
-# 统一格式并合并
-user_edges_all <- bind_rows(
-  edges_follow,
-  edges_retweet,
-  edges_reply,
-  edges_quote
+# 合并所有无向边
+edges_undirected <- bind_rows(
+  co_retweet_edges, 
+  co_quote_edges, 
+  co_reply_edges, 
+  co_reply_edges_v2, 
+  retweeter_follow_edges
 ) |> 
-  rename(from = src, to = tgt) |> 
-  select(from, to, type)W
+  distinct()
 
-# 过滤掉 from == to 的记录
-user_edges_all_clean <- user_edges_all |> 
-  filter(from != to) |> 
-  distinct(from, to, .keep_all = TRUE)
+# 合并所有有向边（如果需要方向性的分析）
+edges_directed <- retweeter_follow_edges_directed |> 
+  distinct()
 
-# 然后再建图
-net <- network(user_edges_all_clean, directed = TRUE, matrix.type = "edgelist")
-set.edge.attribute(net, "type", user_edges_all_clean$type)
+write_csv(edges_undirected, "data/edges_undirected.csv")
+write_csv(edges_directed, "data/edges_directed.csv")
 
 
-# 简要可视化
-plot(net, displaylabels = FALSE, edge.col = as.factor(user_edges_all$type))
 ```
+
+
 
 # Analysis
 
+```{r}
+edges_undirected <- read_csv("data/edges_undirected.csv")
+
+
+edges_undirected <- edges_undirected |> 
+  mutate(user_1 = as.character(user_1),
+         user_2 = as.character(user_2))
+
+edges_clean <- edges_undirected |> 
+  filter(user_1 != user_2) |> 
+  group_by(user_1, user_2) |> 
+  summarise(
+    weight = sum(weight),  # 合并权重
+    type = paste(unique(type), collapse = ";"),  # 合并类型标签
+    .groups = "drop"
+  )
+
+
+net <- network(edges_clean[, c("user_1", "user_2")], directed = FALSE)
+
+# 添加权重属性
+set.edge.attribute(net, "co-retweet", str_detect(edges_clean$type, "co-retweet"))
+set.edge.attribute(net, "co-quote", str_detect(edges_clean$type, "co-quote"))
+set.edge.attribute(net, "co-reply-v2", str_detect(edges_clean$type, "co-reply-v2"))
+
+set.edge.attribute(net, "weight", edges_clean$weight)
+
+
+# 逐个作图
+plot.network(
+  net,
+  displaylabels = FALSE,
+  vertex.cex = 0.2,
+  vertex.col = "orange",
+  edge.lwd = 0.5,  # 调小边的宽度
+  edge.col = ifelse(get.edge.attribute(net, "co-retweet"), 
+                    adjustcolor("red", alpha.f = 0.2),  # 更透明的红色
+                    "gray95"),  # 不关注的边几乎看不到
+  main = "Network with co-retweet Edges"
+)
+
+# 2. 换成 co-quote 的边
+plot.network(
+  net,
+  displaylabels = FALSE,
+  vertex.cex = 0.2,
+  vertex.col = "orange",
+  edge.lwd = 1,
+  edge.col = ifelse(get.edge.attribute(net, "co-quote"), 
+                    adjustcolor("blue", alpha.f = 0.3), 
+                    "gray95"),
+  main = "Network with co-quote Edges"
+)
+
+
+# 3. 再换 co-reply-v2
+plot.network(
+  net,
+  displaylabels = FALSE,
+  vertex.cex = 0.2,
+  vertex.col = "orange",
+  edge.lwd = 1,
+  edge.col = ifelse(get.edge.attribute(net, "co-reply-v2"), 
+                    adjustcolor("green", alpha.f = 0.3), 
+                    "gray95"),
+  main = "Network with co-reply-v2 Edges"
+)
+
+plot.network(
+  net,
+  displaylabels = FALSE,
+  vertex.cex = 0.1,  # 调小节点
+  vertex.col = "orange",
+  edge.lwd = 0.5,  # 调细边
+  edge.col = "gray80",
+  edge.transparency = 0.5,  # 增加透明度（statnet中用 adjustcolor() 处理颜色）
+  main = "Network with co-retweet Edges"
+)
+
+
+```
 
 # Reference
 
@@ -254,7 +430,9 @@ previews <- lapply(files, function(fname) {
     error = function(e) tibble::tibble(error = paste("Error:", e$message))
   )
 })
+
 names(previews) <- files
+
 previews$`claim.csv`
 
 previews$`user.csv`                  
