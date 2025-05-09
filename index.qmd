@@ -32,9 +32,15 @@ engine: knitr
 ---
 # Abstract
 
+This study investigates the dissemination patterns of the misinformation narrative that COVID-19 was deliberately created/manufactured by China or the Wuhan laboratory. Drawing on Diffusion of Innovations Theory and Echo Chamber Theory, the study explores how early misinformation claims shaped subsequent retweeter networks and whether homophily emerged over time. The dataset is drawn from the MuMiN project, focusing on six prominent misinformation claims identified between March 2020 and August 2021. Retweeters are treated as nodes, and their relationships are defined by co-retweet, co-quote, co-reply, and follow ties.
+
+The hypothesis posits that retweeters engaged with earlier misinformation claims are more central in the network and sustain higher connectivity over time. Social Network Analysis (SNA) is employed to construct adjacency matrices, visualize network structures, and calculate centrality and modularity measures. Temporal Exponential Random Graph Models (tERGM) are further applied to examine how historical ties and thematic claim categories influence network evolution.
+
+This research contributes to understanding how misinformation diffusion evolves and how early spreaders maintain structural advantages, reinforcing the persistence of misinformation narratives in online social networks.
+
 我现在对covid病毒是在中国/wuhan爆发这条谣言在推特用户间的传播规律（随时间）很感兴趣
 一个misinformation的源头很难确定是具体哪个user/tweet 直接研究这种传播的过程会好一点
-我们以retweeter作为节点，retweeter相互之间的co-retweet，co-reply，co-quote和co-follow作为边
+我们以retweeter作为节点，retweeter相互之间的co-retweet，co-reply，co-quote和follow作为边
 
 # Literature Review
 
@@ -51,6 +57,7 @@ library(tidyverse)
 library(readr)
 library(statnet)
 library(intergraph)
+library(reshape2)
 ```
 
 
@@ -86,6 +93,8 @@ user_claim_filtered <- user_claim |>
   filter(str_detect(keywords, "china|wuhan")) 
 
 unique(user_claim_filtered$keywords)
+
+
 ```
 
 After checking the keywords, 我手动选择了所有跟covid19是中国/Wuhan蓄意制造和散播的misinformation。并把这些内容限制在了英文帖子。
@@ -130,8 +139,16 @@ table(covid_wuhan_misinfo$cluster_keywords)
 
 This network reflects the co-dissemination behavior of misinformation retweeters and their mutual social connections. While the true transmission paths are unknown, this co-spreader network allows us to model the structural properties and potential information diffusion routes among these users.
 
-```{r}
+边类型	网络层	分析目标
+co-retweet	Layer 1	传播链路，信息扩散路径
+co-reply	Layer 2	互动讨论，情感交流
+co-quote	Layer 3	引用传播，立场表达
 
+### Co-retweet
+
+The `co-retweet` network captures the relationship between users who have both retweeted the same misinformation tweet. In this network, a tie is created between two users if they co-retweeted the same piece of misinformation tweet. The edge weight indicates how many misinformation tweets the two users co-retweeted together. This structure reflects patterns of coordinated or shared interest in misinformation content, and is often used to analyze the spread dynamics and clustering behavior of misinformation propagation.
+
+```{r}
 # 获取 misinformation tweet ID
 misinfo_tweet_id <- unique(covid_wuhan_misinfo$tweet_id)
 
@@ -152,11 +169,79 @@ co_retweet_edges <- user_retweet |>
   select(user_1, user_2) |> 
   group_by(user_1, user_2) |> 
   summarise(weight = n(), .groups = "drop") |> 
-  mutate(type = "co-retweet")
+  mutate(type = "co-retweet") |>
+  filter(user_1 != user_2) |>
+  mutate(
+    user_1 = as.character(user_1),
+    user_2 = as.character(user_2)
+  )
 
-table(co_retweet_edges$weight)
+
+# Step 1: Create initial matrix
+adj_matrix_co_retweet <- acast(
+  co_retweet_edges, 
+  user_1 ~ user_2, 
+  value.var = "weight", 
+  fill = 0
+)
+
+# Step 2: Get full user list
+all_users <- sort(unique(c(co_retweet_edges$user_1, co_retweet_edges$user_2)))
+
+# Step 3: Add missing rows and columns with zeros
+missing_rows <- setdiff(all_users, rownames(adj_matrix_co_retweet))
+missing_cols <- setdiff(all_users, colnames(adj_matrix_co_retweet))
+
+if (length(missing_rows) > 0) {
+  adj_matrix_co_retweet <- rbind(
+    adj_matrix_co_retweet, 
+    matrix(0, nrow = length(missing_rows), ncol = ncol(adj_matrix_co_retweet), 
+           dimnames = list(missing_rows, colnames(adj_matrix_co_retweet)))
+  )
+}
+
+if (length(missing_cols) > 0) {
+  adj_matrix_co_retweet <- cbind(
+    adj_matrix_co_retweet, 
+    matrix(0, nrow = nrow(adj_matrix_co_retweet), ncol = length(missing_cols), 
+           dimnames = list(rownames(adj_matrix_co_retweet), missing_cols))
+  )
+}
+
+# Step 4: Reorder to ensure rows and columns match
+adj_matrix_co_retweet <- adj_matrix_co_retweet[all_users, all_users]
+
+write.csv(adj_matrix_co_retweet, "data/adj_matrix_co_retweet.csv", row.names = TRUE)
+
+ncol(adj_matrix_co_retweet)
+nrow(adj_matrix_co_retweet)
+```
+### Co-quote
+
+The `Co-quote` adjacency matrix captures the relationship between users who co-engaged with misinformation through the quoting function on Twitter. Specifically, two users are connected if one quoted a misinformation-related tweet and the other either quoted the same tweet or was the author of that quoted tweet. This interaction reflects a more deliberate and explicit form of engagement with misinformation content, often involving commentary or amplification.
+
+The matrix is weighted based on the number of times each user pair engaged in co-quoting behavior. Diagonal elements (self-loops) are removed, and the matrix is fully completed to ensure that all users appear in both rows and columns, enabling comprehensive analysis of the co-quote network structure.
 
 
+我们能确定关系的是retweeter of quoting tweet和retweeter of quoted tweet之间的关系
+
+Co-Quote：
+A retweeted 了某个 quoting tweet（引用了一条 misinformation tweet 的 tweet）。
+
+B retweeted 了被引用的那条 misinformation tweet。
+
+→ 连 A 和 B。
+
+现实意义：
+
+A 通过 retweet 了一个引用谣言的内容，参与了围绕谣言的传播和讨论。
+
+B 直接 retweet 了这个谣言。
+
+他们都围绕着同一 misinformation 内容参与了传播，但路径不同。
+
+
+```{r}
 # Co-Quote Edges
 co_quote_edges <- read_csv("data/mumin_csv/reply_quote_of_tweet.csv") |>
   filter(tgt %in% misinfo_tweet_id | src %in% misinfo_tweet_id) |> 
@@ -178,12 +263,92 @@ co_quote_edges <- read_csv("data/mumin_csv/reply_quote_of_tweet.csv") |>
   select(user_1, user_2) |> 
   group_by(user_1, user_2) |> 
   summarise(weight = n(), .groups = "drop") |> 
-  mutate(type = "co-quote")
+  mutate(type = "co-quote") |> 
+  mutate(type = "co-quote") |>
+  filter(user_1 != user_2) |>
+  mutate(
+    user_1 = as.character(user_1),
+    user_2 = as.character(user_2)
+  )
+
+# Step 1: 获取完整 retweeter 列表（包含有无 co-quote 行为的）
+all_retweeters <- unique(c(
+  covid_wuhan_misinfo$retweeter_id,  # 核心传播者
+  co_quote_edges$user_1, 
+  co_quote_edges$user_2
+)) %>% 
+  as.character() %>% 
+  sort()
+
+# Step 2: 创建完整矩阵
+adj_matrix_co_quote <- acast(
+  co_quote_edges, 
+  user_1 ~ user_2, 
+  value.var = "weight", 
+  fill = 0
+)
+
+# Step 3: 添加缺失行和列
+missing_rows <- setdiff(all_retweeters, rownames(adj_matrix_co_quote))
+missing_cols <- setdiff(all_retweeters, colnames(adj_matrix_co_quote))
+
+if (length(missing_rows) > 0) {
+  adj_matrix_co_quote <- rbind(
+    adj_matrix_co_quote, 
+    matrix(0, nrow = length(missing_rows), ncol = ncol(adj_matrix_co_quote), 
+           dimnames = list(missing_rows, colnames(adj_matrix_co_quote)))
+  )
+}
+
+if (length(missing_cols) > 0) {
+  adj_matrix_co_quote <- cbind(
+    adj_matrix_co_quote, 
+    matrix(0, nrow = nrow(adj_matrix_co_quote), ncol = length(missing_cols), 
+           dimnames = list(rownames(adj_matrix_co_quote), missing_cols))
+  )
+}
+
+# Step 4: 确保矩阵对齐
+adj_matrix_co_quote <- adj_matrix_co_quote[all_retweeters, all_retweeters]
+
+# 保存为 CSV
+write.csv(adj_matrix_co_quote, "data/adj_matrix_co_quote.csv", row.names = TRUE)
 
 
-table(co_quote_edges$weight)
+nrow(adj_matrix_co_quote)
+ncol(adj_matrix_co_quote)
+
 ```
 
+### Co-reply
+
+我们能确定关系的是retweeter of replying tweet和retweeter of replyed tweet之间的关系
+
+A retweeted 了一个 replying tweet（对一条 misinformation tweet 进行了 reply 的 tweet）。
+
+B retweeted 了被 reply 的那条 misinformation tweet。
+
+→ 连 A 和 B。
+
+现实意义：
+
+A 通过 retweet 了一个 reply 帖子，参与了围绕 misinformation 的讨论链。
+
+B 是直接的传播者。
+
+他们是围绕相同 misinformation 内容的 间接传播参与者。
+
+#### co_reply_edges Explanation (General Co-Reply Network)
+This adjacency matrix captures the co-reply relationship between users who have engaged with each other via the reply function on Twitter in the context of misinformation.
+In this network, two users are connected if:
+
+One replied to a tweet, and
+
+The other either replied to the same tweet or authored the replied tweet.
+
+However, due to limitations in the dataset (missing tweet author information), this matrix primarily reflects shared engagement with the same tweet rather than direct author-replier relationships.
+
+Note: In this case, no edges were detected, possibly because the retweeters of misinformation tweets did not participate significantly in reply activities.
 
 ```{r}
 # Co-reply
@@ -217,6 +382,14 @@ sum(reply_data$tgt %in% retweet_map$tweet_id)  # 有多少 replied tweets 被 re
 
 ```
 
+#### co_reply_edges_v2 Explanation (Focused Co-Reply on Misinformation Tweets)
+This adjacency matrix focuses exclusively on replies to misinformation tweets.
+It captures the relationship between users who retweeted the same misinformation tweet and also replied to it.
+
+In this network, two users are connected if they both retweeted a misinformation tweet and subsequently replied to that tweet or engaged in discussions around it.
+
+This captures shared attention and engagement specifically around misinformation content, providing insight into how users might form conversational clusters around these topics.
+
 ```{r}
 co_reply_edges_v2 <- read_csv("data/mumin_csv/reply_reply_to_tweet.csv") |>
   filter(tgt %in% misinfo_tweet_id) |>  # 被 reply 的 tweet 是 misinformation
@@ -238,16 +411,81 @@ co_reply_edges_v2 <- read_csv("data/mumin_csv/reply_reply_to_tweet.csv") |>
   select(user_1, user_2) |> 
   group_by(user_1, user_2) |> 
   summarise(weight = n(), .groups = "drop") |> 
-  mutate(type = "co-reply-v2")
+  mutate(type = "co-reply-v2")  |>
+  filter(user_1 != user_2) |>
+  mutate(
+    user_1 = as.character(user_1),
+    user_2 = as.character(user_2)
+  )
 
-table(co_reply_edges_v2$weight)
-unique(co_reply_edges_v2$user_1)
-unique(co_reply_edges_v2$user_2)
+# Step 1: 定义所有 retweeters（包括参与和未参与 reply 的）
+all_retweeters_reply <- unique(c(
+  covid_wuhan_misinfo$retweeter_id,  # 核心传播者
+  co_reply_edges_v2$user_1, 
+  co_reply_edges_v2$user_2
+)) %>% 
+  as.character() %>% 
+  sort()
 
-setdiff(co_reply_edges_v2$user_2,covid_wuhan_misinfo$retweeter_id)
-setdiff(co_reply_edges_v2$user_1,covid_wuhan_misinfo$retweeter_id)
+# Step 2: 创建 Adjacency Matrix
+adj_matrix_co_reply_v2 <- acast(
+  co_reply_edges_v2, 
+  user_1 ~ user_2, 
+  value.var = "weight", 
+  fill = 0
+)
+
+# Step 3: 确保矩阵包含所有 retweeters
+missing_rows <- setdiff(all_retweeters_reply, rownames(adj_matrix_co_reply_v2))
+missing_cols <- setdiff(all_retweeters_reply, colnames(adj_matrix_co_reply_v2))
+
+if (length(missing_rows) > 0) {
+  adj_matrix_co_reply_v2 <- rbind(
+    adj_matrix_co_reply_v2, 
+    matrix(0, nrow = length(missing_rows), ncol = ncol(adj_matrix_co_reply_v2), 
+           dimnames = list(missing_rows, colnames(adj_matrix_co_reply_v2)))
+  )
+}
+
+if (length(missing_cols) > 0) {
+  adj_matrix_co_reply_v2 <- cbind(
+    adj_matrix_co_reply_v2, 
+    matrix(0, nrow = nrow(adj_matrix_co_reply_v2), ncol = length(missing_cols), 
+           dimnames = list(rownames(adj_matrix_co_reply_v2), missing_cols))
+  )
+}
+
+# Step 4: Reorder to ensure rows and columns match
+adj_matrix_co_reply_v2 <- adj_matrix_co_reply_v2[all_retweeters_reply, all_retweeters_reply]
+
+# Step 5: 保存 CSV
+write.csv(adj_matrix_co_reply_v2, "data/adj_matrix_co_reply_v2.csv", row.names = TRUE)
+
+nrow(adj_matrix_co_reply_v2)
+ncol(adj_matrix_co_reply_v2)
+
+
 ```
 
+This step ensures that the adjacency matrix fully represents the social structure by including all users who participated in the retweet network, regardless of their direct involvement in reply behaviors.
+
+Users who did not engage in replying are represented as isolated nodes (zero rows and columns), preserving the completeness of the network for structural analysis.
+
+
+### Follow
+
+#### Undirected follow
+
+This edge represents an undirected tie between any two users who are both retweeters of misinformation tweets and have a recorded follower-followee relationship in either direction. However, the relationship is not necessarily mutual. It simply captures the existence of a connection in the follower network among the misinformation retweeters, regardless of direction.
+
+src（user_a）是follower，tgt（user_b）是followee。
+
+filter(user_a %in% retweeter_id_misinfo & user_b %in% retweeter_id_misinfo)：
+→ 表示这条边仅要求双方都是 retweeters，不要求他们互相关注。
+
+pmin/pmax 是为了去掉方向性，把边转成无向的。
+
+这不是 mutual follow（互相关注），而是只要 follower 和 followee 都是 retweeter，就创建一条无向边。
 
 ```{r}
 # Follow
@@ -271,8 +509,40 @@ retweeter_follow_edges
 
 ```
 
-```{r}
+all 0 matrix:
 
+```{r}
+# 获取所有 retweeters
+all_retweeters <- sort(unique(c(
+  covid_wuhan_misinfo$retweeter_id, 
+  retweeter_follow_edges$user_1, 
+  retweeter_follow_edges$user_2
+))) %>% as.character()
+
+# 创建全 0 矩阵
+adj_matrix_follow <- matrix(
+  0, 
+  nrow = length(all_retweeters), 
+  ncol = length(all_retweeters),
+  dimnames = list(all_retweeters, all_retweeters)
+)
+
+# 转成数据框导出
+write.csv(adj_matrix_follow, "data/adj_matrix_follow.csv", row.names = TRUE)
+
+```
+
+#### Directed follow
+
+This edge preserves the directionality of follower relationships between misinformation retweeters (e.g., User A follows User B). It allows for modeling influence flow and assessing asymmetric structures (e.g., hubs or hierarchies) in the spread of misinformation.
+
+follower → followee 表示单向的关注。
+
+同样地，只要两者都在 retweeter 列表中，就保留这个方向性关系。
+
+这是真正的 directed edge，表示“谁关注了谁”，方向性保留。
+
+```{r}
 retweeter_follow_edges_directed <- read_csv("data/mumin_csv/user_follows_user.csv") |> 
   rename(follower = src, followee = tgt) |> 
   # 只保留 retweeter 之间的关注关系（有方向）
@@ -296,58 +566,121 @@ sum(covid_wuhan_misinfo$retweeter_id%in% follow_data$tgt)
 ```
 
 
+
+# Analysis
+
+## Co-retweet Net
+
 ```{r}
-# 合并所有无向边
-edges_undirected <- bind_rows(
-  co_retweet_edges, 
-  co_quote_edges, 
-  co_reply_edges, 
-  co_reply_edges_v2, 
-  retweeter_follow_edges
-) |> 
-  distinct()
+# 读取 co-retweet adjacency matrix
+adj_matrix_co_retweet <- read.csv("data/adj_matrix_co_retweet.csv", row.names = 1)
 
-# 合并所有有向边（如果需要方向性的分析）
-edges_directed <- retweeter_follow_edges_directed |> 
-  distinct()
+# 构建 network 对象（无向图）
+net_co_retweet <- network(as.matrix(adj_matrix_co_retweet), directed = FALSE, matrix.type = "adjacency")
 
-write_csv(edges_undirected, "data/edges_undirected.csv")
-write_csv(edges_directed, "data/edges_directed.csv")
 
+# 获取分组信息
+retweeter_group <- covid_wuhan_misinfo %>%
+  select(retweeter_id, date, keywords) %>%
+  distinct() %>%
+  arrange(date) %>%
+  mutate(group = as.numeric(factor(paste(date, keywords), levels = unique(paste(date, keywords)))))
+
+# 将 Group 信息添加到节点属性中
+set.vertex.attribute(
+  net_co_retweet, 
+  "group", 
+  retweeter_group$group[match(get.vertex.attribute(net_co_retweet, "vertex.names"), retweeter_group$retweeter_id)]
+)
+
+
+
+for (g in group_stages) {
+  subgraph_nodes <- which(get.vertex.attribute(net_co_retweet, "group") <= g)
+  
+  if (length(subgraph_nodes) == 0) next  # 没有节点直接跳过
+  
+  sub_g <- get.inducedSubgraph(net_co_retweet, v = subgraph_nodes)
+  
+  plot.network(
+    sub_g,
+    displaylabels = FALSE,
+    vertex.cex = 2,
+    vertex.col = "skyblue",
+    main = paste("Co-Retweet Network - Stage", g)
+  )
+  
+  Sys.sleep(1)  # 每张图停留 1 秒
+}
+
+
+# 获取所有 group 阶段
+group_stages <- sort(unique(get.vertex.attribute(net_co_retweet, "group")))
+
+
+```
+
+## Node Attributes  
+
+```{r}
+covid_wuhan_misinfo |>
+  group_by(date, keywords) |>
+  select(keywords, date) |>
+  unique()|>
+  arrange(date)
+
+# 获取每个 retweeter 最早转发的 misinformation claim 的日期和关键词
+# 按日期和关键词组合编码分组
+retweeter_group <- covid_wuhan_misinfo %>%
+  select(retweeter_id, date, keywords) %>%
+  distinct() %>%
+  arrange(date) |>
+  mutate(group = as.numeric(factor(paste(date, keywords), 
+                                   levels = unique(paste(date, keywords)))))
+
+# 把 group 属性添加到 network 对象中
+set.vertex.attribute(net, "group", 
+            retweeter_group$group[match(get.vertex.attribute(net, "vertex.names"),                  retweeter_group$retweeter_id)])
+
+
+
+# 选出 group == 1 的子图
+subgraph_1 <- get.inducedSubgraph(net, 
+                                  which(get.vertex.attribute(net, "group") == 1))
+
+# 作图
+plot.network(subgraph_1, 
+              displaylabels = FALSE, 
+              vertex.cex = 2, 
+              vertex.col = "skyblue", 
+              main = "Subgraph for Group 1")
+
+for (g in 1:6) {
+  sub_g <- get.inducedSubgraph(net, 
+                               which(get.vertex.attribute(net, "group") == g))
+  plot.network(sub_g, 
+                displaylabels = FALSE, 
+                vertex.cex = 2, 
+                vertex.col = "skyblue", 
+                main = paste("Subgraph for Group", g))
+}
+
+# 例如，group 1-3 是早期阶段，4-6 是后期阶段
+early_phase <- get.inducedSubgraph(net, 
+                                   which(get.vertex.attribute(net, "group") %in% 1:3))
+
+late_phase <- get.inducedSubgraph(net, 
+                                  which(get.vertex.attribute(net, "group") %in% 4:6))
+
+# 分别作图
+plot.network(early_phase, main = "Early Phase")
+plot.network(late_phase, main = "Late Phase")
 
 ```
 
 
 
-# Analysis
-
 ```{r}
-edges_undirected <- read_csv("data/edges_undirected.csv")
-
-
-edges_undirected <- edges_undirected |> 
-  mutate(user_1 = as.character(user_1),
-         user_2 = as.character(user_2))
-
-edges_clean <- edges_undirected |> 
-  filter(user_1 != user_2) |> 
-  group_by(user_1, user_2) |> 
-  summarise(
-    weight = sum(weight),  # 合并权重
-    type = paste(unique(type), collapse = ";"),  # 合并类型标签
-    .groups = "drop"
-  )
-
-
-net <- network(edges_clean[, c("user_1", "user_2")], directed = FALSE)
-
-# 添加权重属性
-set.edge.attribute(net, "co-retweet", str_detect(edges_clean$type, "co-retweet"))
-set.edge.attribute(net, "co-quote", str_detect(edges_clean$type, "co-quote"))
-set.edge.attribute(net, "co-reply-v2", str_detect(edges_clean$type, "co-reply-v2"))
-
-set.edge.attribute(net, "weight", edges_clean$weight)
-
 
 # 逐个作图
 plot.network(
@@ -408,9 +741,60 @@ plot.network(
 
 # Appendix
 
+Raw dataset download link: <https://data.bristol.ac.uk/data/en_GB/dataset/23yv276we2mll25fjakkfim2ml/resource/e63a98c4-b4d6-4a89-9be9-06875b83ce33?inner_span=True>
+
+把这些文件下载完之后,创建一个data file,放在这个文件夹中
+
+下载完数据后，我们要到指引处<https://colab.research.google.com/drive/1JCjgg3moGBOuZk4iVjBpQNqgsAYFyNoS#scrollTo=YS1uxj-59UmA>
+按照引导 打开shell 用pip安装相关的文件
+
+我们需要打开vs code，在python文件中运行：
+
+```{python}
+#| eval: false
+#| include: true
+
+import pandas as pd
+import os
+
+input_dir = "data/mumin"
+output_dir = "data/mumin_csv"
+os.makedirs(output_dir, exist_ok=True)
+
+file_names = [
+    "claim",
+    "user",
+    "tweet",
+    "reply",
+    "article",
+    "tweet_discusses_claim",
+    "article_discusses_claim",
+    "user_follows_user",
+    "user_retweeted_tweet",
+    "reply_quote_of_tweet",
+    "reply_reply_to_tweet"
+]
+
+for name in file_names:
+    input_path = os.path.join(input_dir, name)
+    output_path = os.path.join(output_dir, f"{name}.csv")
+    try:
+        df = pd.read_pickle(input_path, compression="xz")
+        df.to_csv(output_path, index=False)
+        print(f"Saved: {output_path}")
+    except Exception as e:
+        print(f"Failed to convert {name}: {e}")
+
+
+```
+
+这样我们就能得到csv文件
+
 Take a glimpse of data:
 
 ```{r}
+#| eval: false
+#| include: true
 # 设置数据路径（请替换为你自己电脑上的路径）
 data_path <- "data/mumin_csv/"
 
@@ -432,19 +816,6 @@ previews <- lapply(files, function(fname) {
 })
 
 names(previews) <- files
-
-previews$`claim.csv`
-
-previews$`user.csv`                  
-previews$`tweet.csv`
-previews$`reply.csv`                  
-previews$`article.csv`
-previews$`tweet_discusses_claim.csv`  
-previews$`article_discusses_claim.csv` 
-previews$`user_follows_user.csv`      
-previews$`user_retweeted_tweet.csv`
-previews$`reply_quote_of_tweet.csv`   
-previews$`reply_reply_to_tweet.csv` 
 
 ```
 
