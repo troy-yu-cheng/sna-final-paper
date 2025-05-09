@@ -40,6 +40,8 @@ Social Network Analysis (SNA) is employed to construct adjacency matrices, visua
 
 This research advances understanding of how misinformation narratives persist in online environments and how early participants shape long-term information diffusion.
 
+# Introduction
+
 # Literature Review
 
 
@@ -103,6 +105,8 @@ This study focuses specifically on misinformation narratives claiming that **COV
 
 3. Restrict the analysis to English-language posts labeled as "misinformation".
 
+**Note: **
+
 ```{r}
 user_claim_filtered <- user_claim |> 
   filter(str_detect(keywords, "china|wuhan")) 
@@ -151,19 +155,7 @@ This network models the co-dissemination behavior of misinformation retweeters. 
 
 ### Co-Retweet Network
 
-The `co-retweet` network captures the relationship between users who have both retweeted the same misinformation tweet. In this network, a tie is created between two users if they co-retweeted the same piece of misinformation tweet. The edge weight indicates how many misinformation tweets the two users co-retweeted together. This structure reflects patterns of coordinated or shared interest in misinformation content, and is often used to analyze the spread dynamics and clustering behavior of misinformation propagation.
-
-A tie is created between two users only if they both retweeted the same specific misinformation tweet (i.e., identical tweet_id).
-
-The co-retweet network constructed in this study represents precise co-dissemination behavior. A tie is established between two users only if they both retweeted the exact same misinformation tweet, identified by a shared `tweet_id`. Each edge is weighted by the number of such co-retweeting events, reflecting how often the same pair of users jointly retweeted the same pieces of misinformation. 
-
-This formulation does not infer shared opinion or indirect coordination, but rather captures direct and synchronous amplification of specific misinformation artifacts. As such, this network is especially useful for identifying tightly connected retweeter clusters that may act as echo chambers or exhibit signs of coordinated behavior.
-
-
-
-The co-retweet network captures the relational structure among users who have collectively engaged in disseminating the same pieces of misinformation. In this network, a tie is established between two users if they both retweeted the same misinformation tweet. The weight of the edge represents the frequency of such co-retweet behavior, indicating how many distinct misinformation tweets the two users jointly amplified. This network structure is particularly relevant for identifying patterns of coordinated information spread and examining the formation of tightly connected user clusters that facilitate the persistence and reinforcement of misinformation narratives.
-
-In the context of this study, the co-retweet network offers critical insights into the underlying social mechanisms that support the diffusion of the COVID-19 origin conspiracy narrative. By analyzing the weighted connections, this network reveals which users are central to the dissemination process and whether specific communities emerge around the repeated propagation of misinformation. Such patterns are indicative of potential echo chambers and coordinated amplification efforts, both of which are crucial for understanding how misinformation sustains its visibility and influence over time.
+The `co-retweet` network represents precise co-dissemination behavior. A tie is created between two users only if they both retweeted the same specific misinformation tweet, which is identified by a shared `tweet_id`. Each edge is weighted by the number of such co-retweeting events, reflecting how often the same pair of users jointly retweeted the same pieces of misinformation. Though this relationship does not suggest that the paired users share the same opinion, it captures direct and synchronous amplification of specific misinformation artifacts. Therefore, by analyzing the weighted connections among pairs of retweeters, this network reveals which users are central to the misinformation dissemination process and whether specific communities form around the repeated propagation of misinformation. Such patterns are indicative of potential echo chambers and coordinated amplification efforts, both of which are crucial for understanding how misinformation sustains its visibility and influence over time.
 
 ```{r}
 # Extract misinformation-related tweets id
@@ -196,8 +188,8 @@ co_retweet_edges <- user_retweet |>
 # Obtain the full list of unique users involved
 all_users <- unique(c(
   covid_wuhan_misinfo$retweeter_id,  
-  co_quote_edges$user_1, 
-  co_quote_edges$user_2
+  co_retweet_edges$user_1, 
+  co_retweet_edges$user_2
 )) %>% 
   as.character() %>% 
   sort()
