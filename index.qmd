@@ -32,9 +32,9 @@ engine: knitr
 ---
 # Abstract
 
-This study examines the temporal diffusion patterns of the misinformation narrative claiming that COVID-19 originated in China or the Wuhan laboratory. The central research question asks: How did this narrative propagate across Twitter retweeter networks over time, and did early spreaders maintain structural advantages? Drawing on the Diffusion of Innovations Theory and Echo Chamber Theory, the study explores whether ideological homophily emerged as the narrative spread.
+This study examines the temporal diffusion patterns of the misinformation narrative claiming that [COVID-19 was deliberately created/manufactured by China or the Wuhan laboratory](https://en.wikipedia.org/wiki/COVID-19_lab_leak_theory). The central research question asks: How did this narrative propagate across Twitter retweeter networks over time, and did early spreaders maintain structural advantages? Drawing on the Diffusion of Innovations Theory and Echo Chamber Theory, the study explores whether ideological homophily emerged as the narrative spread.
 
-Using data from the MuMiN project, six prominent misinformation claims between March 2020 and August 2021 were analyzed. Retweeters are treated as nodes, with ties defined by co-retweeting, co-replying, co-quoting, and following behaviors. The hypothesis posits that retweeters involved in earlier misinformation narratives occupy more central positions and retain higher connectivity over time.
+Using data from the [MuMiN](https://mumin-dataset.github.io/) project, six prominent misinformation claims between March 2020 and August 2021 were analyzed. Retweeters are treated as nodes, with ties defined by co-retweeting, co-replying, co-quoting, and following behaviors. The hypothesis posits that retweeters involved in earlier misinformation narratives occupy more central positions and retain higher connectivity over time.
 
 Social Network Analysis (SNA) is employed to construct adjacency matrices, visualize evolving network structures, and compute centrality and modularity metrics. While temporal network growth is discontinuous across misinformation events, this study explores whether Temporal Exponential Random Graph Models (tERGM) can model these episodic formations by treating thematic similarity as a historical tie.
 
@@ -43,11 +43,17 @@ This research advances understanding of how misinformation narratives persist in
 # Literature Review
 
 
-# Dataset
+# Data Collection & Graph
 
-Raw dataset download link: <https://data.bristol.ac.uk/data/en_GB/dataset/23yv276we2mll25fjakkfim2ml/resource/e63a98c4-b4d6-4a89-9be9-06875b83ce33?inner_span=True>
+## Dataset
 
-## Set up
+This study uses secondary data from the **MuMiN Project** (Multi-platform Misinformation Influence Network), publicly available at: <https://data.bristol.ac.uk/data/en_GB/dataset/23yv276we2mll25fjakkfim2ml/resource/e63a98c4-b4d6-4a89-9be9-06875b83ce33?inner_span=True>
+
+The dataset includes information about social media users, tweets, misinformation claims, and their relational behaviors across various platforms.
+
+## Data Preparation
+
+### Loading Required Packages
 
 ```{r}
 #| label: set up packages
@@ -58,6 +64,7 @@ library(intergraph)
 library(reshape2)
 ```
 
+### Loading and Merging Data
 
 ```{r}
 # Load data
@@ -76,28 +83,33 @@ user_claim <- user_retweet |>
   rename(retweeter_id = src, tweet_id = tgt) |> 
   inner_join(tweet_claim_joined, by = "tweet_id")
 
+# Create a mapping of retweeters and tweets
 retweet_map <- user_claim |> 
   select(retweeter_id, tweet_id) |> 
   distinct() 
 
+# Basic data overview
 table(user_claim$label)
-table(user_claim$cluster_keywords)
+head(table(user_claim$cluster_keywords))
 ```
 
-初步整合数据之后，我们进一步筛选我们要研究的特定的misinformation话题
+### Filtering for Target Misinformation Narratives
+
+This study focuses specifically on misinformation narratives claiming that **COVID-19 was deliberately created or spread by China or the Wuhan laboratory**. The following filtering steps were applied:
+
+1. Filter keywords containing "china" or "wuhan".
+
+2. Manually select misinformation topics directly related to the COVID-19 origin narrative.
+
+3. Restrict the analysis to English-language posts labeled as "misinformation".
 
 ```{r}
 user_claim_filtered <- user_claim |> 
   filter(str_detect(keywords, "china|wuhan")) 
 
-unique(user_claim_filtered$keywords)
+head(unique(user_claim_filtered$keywords))
 
-
-```
-
-After checking the keywords, 我手动选择了所有跟covid19是中国/Wuhan蓄意制造和散播的misinformation。并把这些内容限制在了英文帖子。
-
-```{r}
+# Final filtered dataset
 covid_wuhan_misinfo <- user_claim_filtered |>
   filter(keywords %in% c(
     "coronavirus comes biological laboratory wuhan",
@@ -128,29 +140,36 @@ covid_wuhan_misinfo <- user_claim_filtered |>
   filter(language == "en") |>
   filter(label == "misinformation")
 
+# Distribution of final misinformation topics
 table(covid_wuhan_misinfo$keywords)
 table(covid_wuhan_misinfo$cluster_keywords)
-
 ```
 
-## Create SNA data
+## Social Network Construction
 
-This network reflects the co-dissemination behavior of misinformation retweeters and their mutual social connections. While the true transmission paths are unknown, this co-spreader network allows us to model the structural properties and potential information diffusion routes among these users.
+This network models the co-dissemination behavior of misinformation retweeters. While the exact paths of information transmission are unknown, this co-spreader network captures the structural relationships that may facilitate misinformation diffusion.
 
-边类型	网络层	分析目标
-co-retweet	Layer 1	传播链路，信息扩散路径
-co-reply	Layer 2	互动讨论，情感交流
-co-quote	Layer 3	引用传播，立场表达
-
-### Co-retweet
+### Co-Retweet Network
 
 The `co-retweet` network captures the relationship between users who have both retweeted the same misinformation tweet. In this network, a tie is created between two users if they co-retweeted the same piece of misinformation tweet. The edge weight indicates how many misinformation tweets the two users co-retweeted together. This structure reflects patterns of coordinated or shared interest in misinformation content, and is often used to analyze the spread dynamics and clustering behavior of misinformation propagation.
 
+A tie is created between two users only if they both retweeted the same specific misinformation tweet (i.e., identical tweet_id).
+
+The co-retweet network constructed in this study represents precise co-dissemination behavior. A tie is established between two users only if they both retweeted the exact same misinformation tweet, identified by a shared `tweet_id`. Each edge is weighted by the number of such co-retweeting events, reflecting how often the same pair of users jointly retweeted the same pieces of misinformation. 
+
+This formulation does not infer shared opinion or indirect coordination, but rather captures direct and synchronous amplification of specific misinformation artifacts. As such, this network is especially useful for identifying tightly connected retweeter clusters that may act as echo chambers or exhibit signs of coordinated behavior.
+
+
+
+The co-retweet network captures the relational structure among users who have collectively engaged in disseminating the same pieces of misinformation. In this network, a tie is established between two users if they both retweeted the same misinformation tweet. The weight of the edge represents the frequency of such co-retweet behavior, indicating how many distinct misinformation tweets the two users jointly amplified. This network structure is particularly relevant for identifying patterns of coordinated information spread and examining the formation of tightly connected user clusters that facilitate the persistence and reinforcement of misinformation narratives.
+
+In the context of this study, the co-retweet network offers critical insights into the underlying social mechanisms that support the diffusion of the COVID-19 origin conspiracy narrative. By analyzing the weighted connections, this network reveals which users are central to the dissemination process and whether specific communities emerge around the repeated propagation of misinformation. Such patterns are indicative of potential echo chambers and coordinated amplification efforts, both of which are crucial for understanding how misinformation sustains its visibility and influence over time.
+
 ```{r}
-# 获取 misinformation tweet ID
+# Extract misinformation-related tweets id
 misinfo_tweet_id <- unique(covid_wuhan_misinfo$tweet_id)
 
-# 保留转发这些 tweet 的所有 retweeter-pair（共传播者）
+# Identify pairs of users who co-retweeted the same misinformation tweet
 co_retweet_edges <- user_retweet |> 
   filter(tgt %in% misinfo_tweet_id) |> 
   rename(tweet_id = tgt, retweeter_id = src) |> 
@@ -161,8 +180,8 @@ co_retweet_edges <- user_retweet |>
   ) |> 
   unnest(pairs) |> 
   mutate(
-    user_1 = pmin(V1, V2),  # 保持小的 ID 在前
-    user_2 = pmax(V1, V2)   # 大的 ID 在后
+    user_1 = pmin(V1, V2), # Ensure lower ID comes first
+    user_2 = pmax(V1, V2) # Ensure higher ID comes second
   ) |> 
   select(user_1, user_2) |> 
   group_by(user_1, user_2) |> 
@@ -174,8 +193,16 @@ co_retweet_edges <- user_retweet |>
     user_2 = as.character(user_2)
   )
 
+# Obtain the full list of unique users involved
+all_users <- unique(c(
+  covid_wuhan_misinfo$retweeter_id,  
+  co_quote_edges$user_1, 
+  co_quote_edges$user_2
+)) %>% 
+  as.character() %>% 
+  sort()
 
-# Step 1: Create initial matrix
+# Create initial matrix
 adj_matrix_co_retweet <- acast(
   co_retweet_edges, 
   user_1 ~ user_2, 
@@ -183,10 +210,7 @@ adj_matrix_co_retweet <- acast(
   fill = 0
 )
 
-# Step 2: Get full user list
-all_users <- sort(unique(c(co_retweet_edges$user_1, co_retweet_edges$user_2)))
-
-# Step 3: Add missing rows and columns with zeros
+# Ensure matrix completeness by adding missing rows and columns
 missing_rows <- setdiff(all_users, rownames(adj_matrix_co_retweet))
 missing_cols <- setdiff(all_users, colnames(adj_matrix_co_retweet))
 
@@ -206,11 +230,13 @@ if (length(missing_cols) > 0) {
   )
 }
 
-# Step 4: Reorder to ensure rows and columns match
+# Reorder the matrix to align rows and columns
 adj_matrix_co_retweet <- adj_matrix_co_retweet[all_users, all_users]
 
+# Export the adjacency matrix for further analysis
 write.csv(adj_matrix_co_retweet, "data/adj_matrix_co_retweet.csv", row.names = TRUE)
 
+# Check dimensions of the final matrix
 ncol(adj_matrix_co_retweet)
 nrow(adj_matrix_co_retweet)
 ```
@@ -316,6 +342,7 @@ write.csv(adj_matrix_co_quote, "data/adj_matrix_co_quote.csv", row.names = TRUE)
 nrow(adj_matrix_co_quote)
 ncol(adj_matrix_co_quote)
 
+
 ```
 
 ### Co-reply
@@ -381,6 +408,7 @@ sum(reply_data$tgt %in% retweet_map$tweet_id)  # 有多少 replied tweets 被 re
 ```
 
 #### co_reply_edges_v2 Explanation (Focused Co-Reply on Misinformation Tweets)
+
 This adjacency matrix focuses exclusively on replies to misinformation tweets.
 It captures the relationship between users who retweeted the same misinformation tweet and also replied to it.
 
@@ -561,6 +589,13 @@ sum(follow_data$tgt %in% covid_wuhan_misinfo$retweeter_id)
 
 sum(covid_wuhan_misinfo$retweeter_id%in% follow_data$src)
 sum(covid_wuhan_misinfo$retweeter_id%in% follow_data$tgt)
+
+covid_wuhan_misinfo |>
+  group_by(date, keywords) |>
+  select(date, keywords) |>
+  arrange(date)|>
+  unique()
+
 ```
 
 
@@ -777,23 +812,23 @@ Transitivity 降低到 0.85 → 网络内闭环减少，更多 桥接型节点 �
 
 ```{r}
 
-# Step 1: 准备网络列表（每个时间点一个 network）
-network_list <- list()
-for (g in group_stages) {
-  sub_nodes <- which(get.vertex.attribute(net_co_retweet, "group") <= g)
-  sub_g <- get.inducedSubgraph(net_co_retweet, v = sub_nodes)
-  network_list[[as.character(g)]] <- sub_g
-}
-
-# Step 2: 构建模型
-# 使用简单结构性特征作为例子
-model <- tergm(
-  network_list ~ Form(~edges + gwesp(0.5, fixed = TRUE)) + 
-    Dissolution(~edges), 
-  estimate = "CMLE"
-)
-
-summary(model)
+# # Step 1: 准备网络列表（每个时间点一个 network）
+# network_list <- list()
+# for (g in group_stages) {
+#   sub_nodes <- which(get.vertex.attribute(net_co_retweet, "group") <= g)
+#   sub_g <- get.inducedSubgraph(net_co_retweet, v = sub_nodes)
+#   network_list[[as.character(g)]] <- sub_g
+# }
+# 
+# # Step 2: 构建模型
+# # 使用简单结构性特征作为例子
+# model <- tergm(
+#   network_list ~ Form(~edges + gwesp(0.5, fixed = TRUE)) + 
+#     Dissolution(~edges), 
+#   estimate = "CMLE"
+# )
+# 
+# summary(model)
 
 ```
 
