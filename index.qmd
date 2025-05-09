@@ -30,10 +30,18 @@ include-in-header:
 highlight-style: nord       
 engine: knitr
 ---
+# Abstract
+
+我现在对covid病毒是在中国/wuhan爆发这条谣言在推特用户间的传播规律（随时间）很感兴趣
+
+# Literature Review
+
+
+# Data Set
 
 Raw dataset download link: <https://data.bristol.ac.uk/data/en_GB/dataset/23yv276we2mll25fjakkfim2ml/resource/e63a98c4-b4d6-4a89-9be9-06875b83ce33?inner_span=True>
 
-# Set up
+## Set up
 
 ```{r}
 #| label: set up packages
@@ -43,61 +51,8 @@ library(haven)
 library(lubridate)
 library(tidymodels)
 library(statnet)
-library(reticulate)
 ```
 
-Take a glimpse of data:
-
-```{r}
-# 设置数据路径（请替换为你自己电脑上的路径）
-data_path <- "data/mumin_csv/"
-
-# 定义要读取的文件列表
-files <- c(
-  "claim.csv", "user.csv", "tweet.csv", "reply.csv", "article.csv",
-  "tweet_discusses_claim.csv", "article_discusses_claim.csv",
-  "user_follows_user.csv", "user_retweeted_tweet.csv",
-  "reply_quote_of_tweet.csv", "reply_reply_to_tweet.csv"
-)
-
-# 用lapply预览前几行（避免爆内存）
-previews <- lapply(files, function(fname) {
-  fpath <- file.path(data_path, fname)
-  tryCatch(
-    read_csv(fpath, n_max = 5),
-    error = function(e) tibble::tibble(error = paste("Error:", e$message))
-  )
-})
-names(previews) <- files
-previews$`claim.csv`
-
-previews$`user.csv`                  
-previews$`tweet.csv`
-previews$`reply.csv`                  
-previews$`article.csv`
-previews$`tweet_discusses_claim.csv`  
-previews$`article_discusses_claim.csv` 
-previews$`user_follows_user.csv`      
-previews$`user_retweeted_tweet.csv`
-previews$`reply_quote_of_tweet.csv`   
-previews$`reply_reply_to_tweet.csv` 
-
-```
-
-
-```{r}
-# 读取数据
-tweet_df <- read_csv("data/mumin_csv/tweet.csv")
-tweet_claim_df <- read_csv("data/mumin_csv/tweet_discusses_claim.csv")
-
-# 连接 tweet 和 claim
-tweet_with_claim <- tweet_df |>
-  inner_join(tweet_claim_df, by = c("tweet_id" = "src"))
-
-# 查看前几行
-head(tweet_with_claim)
-
-```
 
 ```{r}
 # 1. 读入必要数据
@@ -122,8 +77,98 @@ table(user_claim$label)
 table(user_claim$cluster_keywords)
 table(user_claim$keywords)
 
+
 # 现在 user_claim 就有 user_id, tweet_id, claim_id, keywords, label 等字段
 
+```
+
+```{r}
+user_claim_filtered <- user_claim |> 
+  filter(str_detect(keywords, "china|wuhan")) 
+
+unique(user_claim_filtered$keywords)
+
+unique(user_claim$language)
+
+
+covid_wuhan_misinfo <- user_claim_filtered |>
+  filter(keywords %in% c(
+    "coronavirus comes biological laboratory wuhan",
+    "including corona virus manufactured wuhan",
+    "china created spread coronavirus",
+    "announced coronavirus artificially created china",
+    "china created coronavirus",
+    "coronavirus created laboratory china",
+    "honjo said china manufactured coronavirus",
+    "said new coronavirus manufactured wuhan",
+    "coronavirus tested biological weapon china",
+    "china testing coronavirus biological weapon",
+    "covid 19 lab china",
+    "coronavirus natural worked wuhan laboratory",
+    "coronavirus manufactured laboratory wuhan specifically",
+    "doctor claimed coronavirus china create",
+    "corona virus manufactured china",
+    "says current coronavirus manufactured wuhan",
+    "wuhan coronavirus created patented",
+    "covid 19 disease manufactured china",
+    "pandemic caused artificial virus china",
+    "collaborator assures coronavirus manufactured wuhan",
+    "concluded covid leaked wuhan lab",
+    "coronavirus created united states china",
+    "air comes china import coronavirus",
+    "coronavirus released china"
+  )) |>
+  filter(language == "en")
+
+
+table(covid_wuhan_misinfo$keywords)
+table(covid_wuhan_misinfo$cluster_keywords)
+
+```
+```{r}
+# tweet_user_map 事先准备
+tweet_user_map <- user_claim |> 
+  select(tweet_id, user_id) |> 
+  distinct()
+
+# retweet 边
+edges_retweet <- read_csv("data/mumin_csv/user_retweeted_tweet.csv") |>
+  left_join(tweet_user_map, by = c("tgt" = "tweet_id")) |>
+  rename(src_user = src, tgt_user = user_id) |>
+  filter(!is.na(tgt_user)) |>
+  mutate(type = "retweet") |>
+  select(src_user, tgt_user, type)
+
+# quote 边
+edges_quote <- read_csv("data/mumin_csv/reply_quote_of_tweet.csv") |>
+  left_join(tweet_user_map, by = c("tgt" = "tweet_id")) |>
+  rename(src_user = src, tgt_user = user_id) |>
+  filter(!is.na(tgt_user)) |>
+  mutate(type = "quote") |>
+  select(src_user, tgt_user, type)
+
+# reply 边
+edges_reply <- read_csv("data/mumin_csv/reply_reply_to_tweet.csv") |>
+  left_join(tweet_user_map, by = c("tgt" = "tweet_id")) |>
+  rename(src_user = src, tgt_user = user_id) |>
+  filter(!is.na(tgt_user)) |>
+  mutate(type = "reply") |>
+  select(src_user, tgt_user, type)
+
+# follow 边（直接是 user-user）
+edges_follow <- read_csv("data/mumin_csv/user_follows_user.csv") |>
+  rename(src_user = src, tgt_user = tgt) |>
+  mutate(type = "follow") |>
+  select(src_user, tgt_user, type)
+
+# 合并全部边
+user_edges_all <- bind_rows(edges_retweet, edges_quote, edges_reply, edges_follow) |>
+  distinct()
+
+```
+
+
+```{r}
 
 # 过滤出传播 misinformation 的边
 edges_misinfo <- user_claim |> 
@@ -179,7 +224,51 @@ set.edge.attribute(net, "type", user_edges_all_clean$type)
 plot(net, displaylabels = FALSE, edge.col = as.factor(user_edges_all$type))
 ```
 
+# Analysis
 
+
+# Reference
+
+
+# Appendix
+
+Take a glimpse of data:
+
+```{r}
+# 设置数据路径（请替换为你自己电脑上的路径）
+data_path <- "data/mumin_csv/"
+
+# 定义要读取的文件列表
+files <- c(
+  "claim.csv", "user.csv", "tweet.csv", "reply.csv", "article.csv",
+  "tweet_discusses_claim.csv", "article_discusses_claim.csv",
+  "user_follows_user.csv", "user_retweeted_tweet.csv",
+  "reply_quote_of_tweet.csv", "reply_reply_to_tweet.csv"
+)
+
+# 用lapply预览前几行（避免爆内存）
+previews <- lapply(files, function(fname) {
+  fpath <- file.path(data_path, fname)
+  tryCatch(
+    read_csv(fpath, n_max = 5),
+    error = function(e) tibble::tibble(error = paste("Error:", e$message))
+  )
+})
+names(previews) <- files
+previews$`claim.csv`
+
+previews$`user.csv`                  
+previews$`tweet.csv`
+previews$`reply.csv`                  
+previews$`article.csv`
+previews$`tweet_discusses_claim.csv`  
+previews$`article_discusses_claim.csv` 
+previews$`user_follows_user.csv`      
+previews$`user_retweeted_tweet.csv`
+previews$`reply_quote_of_tweet.csv`   
+previews$`reply_reply_to_tweet.csv` 
+
+```
 
 ```{=html}
 <script>
