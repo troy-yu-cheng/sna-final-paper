@@ -1347,7 +1347,7 @@ The analysis of basic network metrics across the six stages reveals a highly clu
 
 ## Data Collection
 
-This study uses secondary data from the **MuMiN Project** (Multi-platform Misinformation Influence Network), publicly available at: <https://data.bristol.ac.uk/data/en_GB/dataset/23yv276we2mll25fjakkfim2ml/resource/e63a98c4-b4d6-4a89-9be9-06875b83ce33?inner_span=True>
+This study uses secondary data from the **MuMiN Project** (Multi-platform Misinformation Influence Network), publicly available at: <https://data.bris.ac.uk/datasets/23yv276we2mll25fjakkfim2ml/mumin.zip>
 
 The dataset includes information about retweeter ids, tweets ids, misinformation claims, and the date of specific misinformation claim uttered etc.
 
