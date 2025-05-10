@@ -155,7 +155,7 @@ This network models the co-dissemination behavior of misinformation retweeters. 
 
 ### Co-Retweet Network
 
-The `co-retweet` network represents precise co-dissemination behavior. A tie is created between two users only if they both retweeted the same specific misinformation tweet, which is identified by a shared `tweet_id`. Each edge is weighted by the number of such co-retweeting events, reflecting how often the same pair of users jointly retweeted the same pieces of misinformation. Though this relationship does not suggest that the paired users share the same opinion, it captures direct and synchronous amplification of specific misinformation artifacts. Therefore, by analyzing the weighted connections among pairs of retweeters, this network reveals which users are central to the misinformation dissemination process and whether specific communities form around the repeated propagation of misinformation. Such patterns are indicative of potential echo chambers and coordinated amplification efforts, both of which are crucial for understanding how misinformation sustains its visibility and influence over time.
+The `co-retweet` network represents a co-dissemination behavior among retweeters. A tie is created between two users only if they both retweeted the same specific misinformation tweet, which is identified by a shared `tweet_id` in `user_retweeted_tweet.csv` file. Each edge is weighted by the number of such co-retweeting events, reflecting how often the same pair of users jointly retweeted the same pieces of misinformation. Though this relationship does not suggest that a paired users share the same opinion, it captures direct and synchronous amplification of specific misinformation claim in tweets. Therefore, by analyzing the weighted connections among pairs of retweeters, this network checks which retweeters are central to the misinformation amplification/dissemination process, and whether specific communities or cliques form around the repeated propagation of misinformation. 
 
 ```{r}
 # Extract misinformation-related tweets id
@@ -186,7 +186,7 @@ co_retweet_edges <- user_retweet |>
   )
 
 # Obtain the full list of unique users involved
-all_users <- unique(c(
+all_retweeters <- unique(c(
   covid_wuhan_misinfo$retweeter_id,  
   co_retweet_edges$user_1, 
   co_retweet_edges$user_2
@@ -203,8 +203,8 @@ adj_matrix_co_retweet <- acast(
 )
 
 # Ensure matrix completeness by adding missing rows and columns
-missing_rows <- setdiff(all_users, rownames(adj_matrix_co_retweet))
-missing_cols <- setdiff(all_users, colnames(adj_matrix_co_retweet))
+missing_rows <- setdiff(all_retweeters, rownames(adj_matrix_co_retweet))
+missing_cols <- setdiff(all_retweeters, colnames(adj_matrix_co_retweet))
 
 if (length(missing_rows) > 0) {
   adj_matrix_co_retweet <- rbind(
@@ -223,7 +223,7 @@ if (length(missing_cols) > 0) {
 }
 
 # Reorder the matrix to align rows and columns
-adj_matrix_co_retweet <- adj_matrix_co_retweet[all_users, all_users]
+adj_matrix_co_retweet <- adj_matrix_co_retweet[all_retweeters, all_retweeters]
 
 # Export the adjacency matrix for further analysis
 write.csv(adj_matrix_co_retweet, "data/adj_matrix_co_retweet.csv", row.names = TRUE)
@@ -231,110 +231,223 @@ write.csv(adj_matrix_co_retweet, "data/adj_matrix_co_retweet.csv", row.names = T
 # Check dimensions of the final matrix
 ncol(adj_matrix_co_retweet)
 nrow(adj_matrix_co_retweet)
+
+table(co_retweet_edges$weight)
 ```
-### Co-quote
+### Co-Retweet (Quote Pathway)
 
-The `Co-quote` adjacency matrix captures the relationship between users who co-engaged with misinformation through the quoting function on Twitter. Specifically, two users are connected if one quoted a misinformation-related tweet and the other either quoted the same tweet or was the author of that quoted tweet. This interaction reflects a more deliberate and explicit form of engagement with misinformation content, often involving commentary or amplification.
+The **Co-Retweet (Quote Pathway)** Network captures relational ties between users who both engaged in the dissemination (i.e., retweeting) of misinformation content either by a) retweeting original misinformation tweets, or b) retweeting tweets that explicitly quoting misinformation tweets. In this network, a tie is formed between two users if they each retweeted at least one tweet that is either a misinformation tweet or a tweet quoting misinformation pieces. This approach treats both direct and indirect engagement through the quoting mechanism as part of the broader misinformation propagation process, enabling analyzing how users contribute to narrative amplification across different dissemination paths. The weight of each edge represents the number of times two users jointly engaged in this form of retweet behavior.
 
-The matrix is weighted based on the number of times each user pair engaged in co-quoting behavior. Diagonal elements (self-loops) are removed, and the matrix is fully completed to ensure that all users appear in both rows and columns, enabling comprehensive analysis of the co-quote network structure.
+```{r}
+# Load quote relationships between tweets (quoting tweet & quoted tweet)
+
+quote_relations <- read_csv("data/mumin_csv/reply_quote_of_tweet.csv") |>
+  filter(tgt %in% misinfo_tweet_id | src %in% misinfo_tweet_id) |> 
+  rename(
+    quoted_tweet_id = tgt, # The misinformation tweet being quoted
+    quoting_tweet_id = src # The tweet that quotes the misinformation tweet
+  )
+
+# Create the complete set of tweets relevant to the quote pathway
+quote_path_tweet_ids <- unique(c(
+  quote_relations$quoted_tweet_id , # Original misinformation tweets
+  quote_relations$quoting_tweet_id # Tweets that quoted misinformation
+))
+
+# Find all users who retweeted these tweets
+quote_path_retweets <- covid_wuhan_misinfo |> 
+  filter(tweet_id %in% quote_path_tweet_ids) 
+
+# Generate co-retweet edges based on shared retweeting of these tweets
+co_retweet_quote_path_edges <- quote_path_retweets |>
+  group_by(tweet_id) |>
+  summarise(
+    pairs = list(as.data.frame(t(combn(retweeter_id, 2)))), 
+    .groups = "drop"
+  ) |>
+  unnest(pairs) |>
+  mutate(
+    user_1 = pmin(V1, V2),
+    user_2 = pmax(V1, V2)
+  ) |>
+  select(user_1, user_2) |>
+  group_by(user_1, user_2) |>
+  summarise(weight = n(), .groups = "drop") |>
+  mutate(type = "co-retweet-quote-path") |>
+  filter(user_1 != user_2) |> 
+  mutate(
+    user_1 = as.character(user_1),
+    user_2 = as.character(user_2)
+  )
+
+# Prepare full user list
+all_retweeters_quote <- unique(c(
+  covid_wuhan_misinfo$retweeter_id, 
+  co_retweet_quote_path_edges$user_1, 
+  co_retweet_quote_path_edges$user_2
+)) %>% 
+  as.character() %>% 
+  sort()
+
+# Create the adjacency matrix
+adj_matrix_co_retweet_quote_path <- acast(
+  co_retweet_quote_path_edges, 
+  user_1 ~ user_2, 
+  value.var = "weight", 
+  fill = 0
+)
+
+# Add missing rows and columns to complete the matrix
+missing_rows <- setdiff(all_retweeters_quote, rownames(adj_matrix_co_retweet_quote_path))
+missing_cols <- setdiff(all_retweeters_quote, colnames(adj_matrix_co_retweet_quote_path))
+
+if (length(missing_rows) > 0) {
+  adj_matrix_co_retweet_quote_path <- rbind(
+    adj_matrix_co_retweet_quote_path, 
+    matrix(0, nrow = length(missing_rows), ncol = ncol(adj_matrix_co_retweet_quote_path), 
+           dimnames = list(missing_rows, colnames(adj_matrix_co_retweet_quote_path)))
+  )
+}
+
+if (length(missing_cols) > 0) {
+  adj_matrix_co_retweet_quote_path <- cbind(
+    adj_matrix_co_retweet_quote_path, 
+    matrix(0, nrow = nrow(adj_matrix_co_retweet_quote_path), ncol = length(missing_cols), 
+           dimnames = list(rownames(adj_matrix_co_retweet_quote_path), missing_cols))
+  )
+}
+
+# Ensure matrix symmetry and proper ordering
+adj_matrix_co_retweet_quote_path <- adj_matrix_co_retweet_quote_path[all_retweeters_quote, all_retweeters_quote]
+
+# Save the matrix for further analysis
+write.csv(adj_matrix_co_retweet_quote_path, "data/adj_matrix_co_retweet_quote_path.csv", row.names = TRUE)
+
+# Output matrix dimensions for verification
+nrow(adj_matrix_co_retweet_quote_path)
+ncol(adj_matrix_co_retweet_quote_path)
+
+table(co_retweet_quote_path_edges$weight)
+
+```
+```{r}
+quote_data <-read_csv("data/mumin_csv/reply_quote_of_tweet.csv")
+
+sum(quote_data$src %in% misinfo_tweet_id)
+
+sum(quote_data$tgt %in% misinfo_tweet_id)
+
+sum(misinfo_tweet_id %in% quote_data$tgt)
+
+sum(misinfo_tweet_id %in% c(quote_data$src,quote_data$tgt))
+
+covid_wuhan_misinfo
+```
 
 
-我们能确定关系的是retweeter of quoting tweet和retweeter of quoted tweet之间的关系
+### Co-Retweet (Reply Pathway)
 
-Co-Quote：
-A retweeted 了某个 quoting tweet（引用了一条 misinformation tweet 的 tweet）。
+A tie is created between two users if they both retweeted tweets that are either:
 
-B retweeted 了被引用的那条 misinformation tweet。
+A misinformation tweet (replied tweet), or
 
-→ 连 A 和 B。
+A tweet that replied to a misinformation tweet (replying tweet).
 
-现实意义：
 
-A 通过 retweet 了一个引用谣言的内容，参与了围绕谣言的传播和讨论。
+The **Co-Retweet (Reply Pathway)** Network captures relational ties between users who both retweeted tweets directly involved in misinformation discussions, either by retweeting misinformation tweets themselves or tweets that explicitly replied to such misinformation content.
 
-B 直接 retweet 了这个谣言。
-
-他们都围绕着同一 misinformation 内容参与了传播，但路径不同。
+This network reflects shared participation in the discourse and propagation surrounding misinformation narratives, regardless of whether users directly spread the misinformation or amplified discussions around it. The weight of each edge reflects the frequency of this shared engagement, providing insight into how conversations and content amplification coalesce to sustain misinformation diffusion.
 
 
 ```{r}
-# Co-Quote Edges
-co_quote_edges <- read_csv("data/mumin_csv/reply_quote_of_tweet.csv") |>
+# Load reply relationships to identify reply chains around misinformation
+reply_relations <- read_csv("data/mumin_csv/reply_reply_to_tweet.csv") |>
   filter(tgt %in% misinfo_tweet_id | src %in% misinfo_tweet_id) |> 
   rename(
-    quoted_tweet_id = tgt,    # 被引用的 tweet
-    quoting_tweet_id = src    # 发起引用的 tweet
-  ) |> 
-  # 找 quoting tweet 是谁 retweeted 的（即 quoting user）
-  left_join(retweet_map, by = c("quoting_tweet_id" = "tweet_id")) |> 
-  rename(quoting_user = retweeter_id) |> 
-  # 找 quoted tweet 是谁 retweeted 的（即 quoted user）
-  left_join(retweet_map, by = c("quoted_tweet_id" = "tweet_id")) |> 
-  rename(quoted_user = retweeter_id) |> 
-  filter(!is.na(quoting_user) & !is.na(quoted_user)) |> 
+    replied_tweet_id = tgt, # The misinformation tweet being replied to
+    replying_tweet_id = src # The tweet that replies to the misinformation tweet
+  )
+
+# Step 1: Create complete set of tweets involved in reply chains related to misinformation
+reply_path_tweet_ids <- unique(c(
+  reply_relations$replied_tweet_id, 
+  reply_relations$replying_tweet_id
+))
+
+# Step 2: Find all users who retweeted these tweets (participating in the reply pathway)
+reply_path_retweets <- covid_wuhan_misinfo |> 
+  filter(tweet_id %in% reply_path_tweet_ids)
+
+# Step 3: Generate Co-Reply Edges based on shared retweeting of reply-path tweets
+co_retweet_reply_path_edges <- reply_path_retweets |>
+  group_by(tweet_id) |>
+  summarise(
+    pairs = list(as.data.frame(t(combn(retweeter_id, 2)))), 
+    .groups = "drop"
+  ) |>
+  unnest(pairs) |>
   mutate(
-    user_1 = pmin(quoting_user, quoted_user),
-    user_2 = pmax(quoting_user, quoted_user)
-  ) |> 
-  select(user_1, user_2) |> 
-  group_by(user_1, user_2) |> 
-  summarise(weight = n(), .groups = "drop") |> 
-  mutate(type = "co-quote") |> 
-  mutate(type = "co-quote") |>
+    user_1 = pmin(V1, V2), 
+    user_2 = pmax(V1, V2)
+  ) |>
+  select(user_1, user_2) |>
+  group_by(user_1, user_2) |>
+  summarise(weight = n(), .groups = "drop") |>
+  mutate(type = "co-retweet-reply-path") |>
   filter(user_1 != user_2) |>
   mutate(
     user_1 = as.character(user_1),
     user_2 = as.character(user_2)
   )
 
-# Step 1: 获取完整 retweeter 列表（包含有无 co-quote 行为的）
-all_retweeters <- unique(c(
-  covid_wuhan_misinfo$retweeter_id,  # 核心传播者
-  co_quote_edges$user_1, 
-  co_quote_edges$user_2
+# Prepare full user list
+all_retweeters_reply <- unique(c(
+  covid_wuhan_misinfo$retweeter_id, 
+  co_retweet_reply_path_edges$user_1, 
+  co_retweet_reply_path_edges$user_2
 )) %>% 
   as.character() %>% 
   sort()
 
-# Step 2: 创建完整矩阵
-adj_matrix_co_quote <- acast(
-  co_quote_edges, 
+# Create the adjacency matrix
+adj_matrix_co_retweet_reply_path <- acast(
+  co_retweet_reply_path_edges, 
   user_1 ~ user_2, 
   value.var = "weight", 
   fill = 0
 )
 
-# Step 3: 添加缺失行和列
-missing_rows <- setdiff(all_retweeters, rownames(adj_matrix_co_quote))
-missing_cols <- setdiff(all_retweeters, colnames(adj_matrix_co_quote))
+# Add missing rows and columns to complete the matrix
+missing_rows <- setdiff(all_retweeters_reply, rownames(adj_matrix_co_retweet_reply_path))
+missing_cols <- setdiff(all_retweeters_reply, colnames(adj_matrix_co_retweet_reply_path))
 
 if (length(missing_rows) > 0) {
-  adj_matrix_co_quote <- rbind(
-    adj_matrix_co_quote, 
-    matrix(0, nrow = length(missing_rows), ncol = ncol(adj_matrix_co_quote), 
-           dimnames = list(missing_rows, colnames(adj_matrix_co_quote)))
+  adj_matrix_co_retweet_reply_path <- rbind(
+    adj_matrix_co_retweet_reply_path, 
+    matrix(0, nrow = length(missing_rows), ncol = ncol(adj_matrix_co_retweet_reply_path), 
+           dimnames = list(missing_rows, colnames(adj_matrix_co_retweet_reply_path)))
   )
 }
 
 if (length(missing_cols) > 0) {
-  adj_matrix_co_quote <- cbind(
-    adj_matrix_co_quote, 
-    matrix(0, nrow = nrow(adj_matrix_co_quote), ncol = length(missing_cols), 
-           dimnames = list(rownames(adj_matrix_co_quote), missing_cols))
+  adj_matrix_co_retweet_reply_path <- cbind(
+    adj_matrix_co_retweet_reply_path, 
+    matrix(0, nrow = nrow(adj_matrix_co_retweet_reply_path), ncol = length(missing_cols), 
+           dimnames = list(rownames(adj_matrix_co_retweet_reply_path), missing_cols))
   )
 }
 
-# Step 4: 确保矩阵对齐
-adj_matrix_co_quote <- adj_matrix_co_quote[all_retweeters, all_retweeters]
+# Ensure matrix symmetry and proper ordering
+adj_matrix_co_retweet_reply_path <- adj_matrix_co_retweet_reply_path[all_retweeters_reply, all_retweeters_reply]
 
-# 保存为 CSV
-write.csv(adj_matrix_co_quote, "data/adj_matrix_co_quote.csv", row.names = TRUE)
+# Save the matrix for further analysis
+write.csv(adj_matrix_co_retweet_reply_path, "data/adj_matrix_co_retweet_reply_path.csv", row.names = TRUE)
 
+# Output matrix dimensions for verification
+nrow(adj_matrix_co_retweet_reply_path)
+ncol(adj_matrix_co_retweet_reply_path)
 
-nrow(adj_matrix_co_quote)
-ncol(adj_matrix_co_quote)
-
-
+table(co_retweet_reply_path_edges$weight)
 ```
 
 ### Co-reply
