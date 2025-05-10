@@ -64,6 +64,7 @@ library(readr)
 library(statnet)
 library(intergraph)
 library(reshape2)
+library(btergm)
 ```
 
 ### Loading and Merging Data
@@ -190,8 +191,8 @@ all_retweeters <- unique(c(
   covid_wuhan_misinfo$retweeter_id,  
   co_retweet_edges$user_1, 
   co_retweet_edges$user_2
-)) %>% 
-  as.character() %>% 
+)) |> 
+  as.character() |> 
   sort()
 
 # Create initial matrix
@@ -285,8 +286,8 @@ all_retweeters_quote <- unique(c(
   covid_wuhan_misinfo$retweeter_id, 
   co_retweet_quote_path_edges$user_1, 
   co_retweet_quote_path_edges$user_2
-)) %>% 
-  as.character() %>% 
+)) |> 
+  as.character() |> 
   sort()
 
 # Create the adjacency matrix
@@ -354,10 +355,9 @@ A misinformation tweet (replied tweet), or
 A tweet that replied to a misinformation tweet (replying tweet).
 
 
-The **Co-Retweet (Reply Pathway)** Network captures relational ties between users who both retweeted tweets directly involved in misinformation discussions, either by retweeting misinformation tweets themselves or tweets that explicitly replied to such misinformation content.
+The **Co-Retweet (Reply Pathway)** Network captures relational ties between users who both retweeted tweets directly involved in misinformation discussions, either by a) retweeting misinformation tweets themselves, or b) retweeting the tweets that explicitly replied to such misinformation content.
 
 This network reflects shared participation in the discourse and propagation surrounding misinformation narratives, regardless of whether users directly spread the misinformation or amplified discussions around it. The weight of each edge reflects the frequency of this shared engagement, providing insight into how conversations and content amplification coalesce to sustain misinformation diffusion.
-
 
 ```{r}
 # Load reply relationships to identify reply chains around misinformation
@@ -405,8 +405,8 @@ all_retweeters_reply <- unique(c(
   covid_wuhan_misinfo$retweeter_id, 
   co_retweet_reply_path_edges$user_1, 
   co_retweet_reply_path_edges$user_2
-)) %>% 
-  as.character() %>% 
+)) |> 
+  as.character() |> 
   sort()
 
 # Create the adjacency matrix
@@ -450,264 +450,912 @@ ncol(adj_matrix_co_retweet_reply_path)
 table(co_retweet_reply_path_edges$weight)
 ```
 
-### Co-reply
-
-我们能确定关系的是retweeter of replying tweet和retweeter of replyed tweet之间的关系
-
-A retweeted 了一个 replying tweet（对一条 misinformation tweet 进行了 reply 的 tweet）。
-
-B retweeted 了被 reply 的那条 misinformation tweet。
-
-→ 连 A 和 B。
-
-现实意义：
-
-A 通过 retweet 了一个 reply 帖子，参与了围绕 misinformation 的讨论链。
-
-B 是直接的传播者。
-
-他们是围绕相同 misinformation 内容的 间接传播参与者。
-
-#### co_reply_edges Explanation (General Co-Reply Network)
-This adjacency matrix captures the co-reply relationship between users who have engaged with each other via the reply function on Twitter in the context of misinformation.
-In this network, two users are connected if:
-
-One replied to a tweet, and
-
-The other either replied to the same tweet or authored the replied tweet.
-
-However, due to limitations in the dataset (missing tweet author information), this matrix primarily reflects shared engagement with the same tweet rather than direct author-replier relationships.
-
-Note: In this case, no edges were detected, possibly because the retweeters of misinformation tweets did not participate significantly in reply activities.
-
-```{r}
-# Co-reply
-co_reply_edges <- read_csv("data/mumin_csv/reply_reply_to_tweet.csv") |>
-  filter(tgt %in% misinfo_tweet_id | src %in% misinfo_tweet_id) |> 
-  rename(
-    replied_tweet_id = tgt, 
-    replying_tweet_id = src
-  ) |> 
-  # 找出两条 tweet 各自的 retweeter
-  left_join(retweet_map, by = c("replied_tweet_id" = "tweet_id")) |> 
-  rename(user_replied = retweeter_id) |> 
-  left_join(retweet_map, by = c("replying_tweet_id" = "tweet_id")) |> 
-  rename(user_replying = retweeter_id) |> 
-  filter(!is.na(user_replied) & !is.na(user_replying)) |> 
-  mutate(
-    user_1 = pmin(user_replied, user_replying),
-    user_2 = pmax(user_replied, user_replying)
-  ) |> 
-  select(user_1, user_2) |> 
-  group_by(user_1, user_2) |> 
-  summarise(weight = n(), .groups = "drop") |> 
-  mutate(type = "co-reply")
-
-table(co_reply_edges$weight)
-
-reply_data <- read_csv("data/mumin_csv/reply_reply_to_tweet.csv")
-sum(reply_data$src %in% retweet_map$tweet_id)  # 有多少 replying tweets 被 retweeted？
-sum(reply_data$tgt %in% retweet_map$tweet_id)  # 有多少 replied tweets 被 retweeted？
-
-
-```
-
-#### co_reply_edges_v2 Explanation (Focused Co-Reply on Misinformation Tweets)
-
-This adjacency matrix focuses exclusively on replies to misinformation tweets.
-It captures the relationship between users who retweeted the same misinformation tweet and also replied to it.
-
-In this network, two users are connected if they both retweeted a misinformation tweet and subsequently replied to that tweet or engaged in discussions around it.
-
-This captures shared attention and engagement specifically around misinformation content, providing insight into how users might form conversational clusters around these topics.
-
-```{r}
-co_reply_edges_v2 <- read_csv("data/mumin_csv/reply_reply_to_tweet.csv") |>
-  filter(tgt %in% misinfo_tweet_id) |>  # 被 reply 的 tweet 是 misinformation
-  rename(replied_tweet_id = tgt) |> 
-  # 找出这个 misinformation tweet 被谁 retweeted 过
-  left_join(retweet_map, by = c("replied_tweet_id" = "tweet_id")) |>
-  rename(user_replied = retweeter_id) |> 
-  filter(!is.na(user_replied)) |> 
-  group_by(replied_tweet_id) |> 
-  summarise(
-    pairs = list(as.data.frame(t(combn(user_replied, 2)))), 
-    .groups = "drop"
-  ) |> 
-  unnest(pairs) |> 
-  mutate(
-    user_1 = pmin(V1, V2),
-    user_2 = pmax(V1, V2)
-  ) |> 
-  select(user_1, user_2) |> 
-  group_by(user_1, user_2) |> 
-  summarise(weight = n(), .groups = "drop") |> 
-  mutate(type = "co-reply-v2")  |>
-  filter(user_1 != user_2) |>
-  mutate(
-    user_1 = as.character(user_1),
-    user_2 = as.character(user_2)
-  )
-
-# Step 1: 定义所有 retweeters（包括参与和未参与 reply 的）
-all_retweeters_reply <- unique(c(
-  covid_wuhan_misinfo$retweeter_id,  # 核心传播者
-  co_reply_edges_v2$user_1, 
-  co_reply_edges_v2$user_2
-)) %>% 
-  as.character() %>% 
-  sort()
-
-# Step 2: 创建 Adjacency Matrix
-adj_matrix_co_reply_v2 <- acast(
-  co_reply_edges_v2, 
-  user_1 ~ user_2, 
-  value.var = "weight", 
-  fill = 0
-)
-
-# Step 3: 确保矩阵包含所有 retweeters
-missing_rows <- setdiff(all_retweeters_reply, rownames(adj_matrix_co_reply_v2))
-missing_cols <- setdiff(all_retweeters_reply, colnames(adj_matrix_co_reply_v2))
-
-if (length(missing_rows) > 0) {
-  adj_matrix_co_reply_v2 <- rbind(
-    adj_matrix_co_reply_v2, 
-    matrix(0, nrow = length(missing_rows), ncol = ncol(adj_matrix_co_reply_v2), 
-           dimnames = list(missing_rows, colnames(adj_matrix_co_reply_v2)))
-  )
-}
-
-if (length(missing_cols) > 0) {
-  adj_matrix_co_reply_v2 <- cbind(
-    adj_matrix_co_reply_v2, 
-    matrix(0, nrow = nrow(adj_matrix_co_reply_v2), ncol = length(missing_cols), 
-           dimnames = list(rownames(adj_matrix_co_reply_v2), missing_cols))
-  )
-}
-
-# Step 4: Reorder to ensure rows and columns match
-adj_matrix_co_reply_v2 <- adj_matrix_co_reply_v2[all_retweeters_reply, all_retweeters_reply]
-
-# Step 5: 保存 CSV
-write.csv(adj_matrix_co_reply_v2, "data/adj_matrix_co_reply_v2.csv", row.names = TRUE)
-
-nrow(adj_matrix_co_reply_v2)
-ncol(adj_matrix_co_reply_v2)
-
-
-```
-
-This step ensures that the adjacency matrix fully represents the social structure by including all users who participated in the retweet network, regardless of their direct involvement in reply behaviors.
-
-Users who did not engage in replying are represented as isolated nodes (zero rows and columns), preserving the completeness of the network for structural analysis.
-
-
 ### Follow
 
-#### Undirected follow
-
-This edge represents an undirected tie between any two users who are both retweeters of misinformation tweets and have a recorded follower-followee relationship in either direction. However, the relationship is not necessarily mutual. It simply captures the existence of a connection in the follower network among the misinformation retweeters, regardless of direction.
-
-src（user_a）是follower，tgt（user_b）是followee。
-
-filter(user_a %in% retweeter_id_misinfo & user_b %in% retweeter_id_misinfo)：
-→ 表示这条边仅要求双方都是 retweeters，不要求他们互相关注。
-
-pmin/pmax 是为了去掉方向性，把边转成无向的。
-
-这不是 mutual follow（互相关注），而是只要 follower 和 followee 都是 retweeter，就创建一条无向边。
+A directed edge from User A to User B indicates that User A follows User B. This network captures the potential flow of influence among misinformation retweeters and allows for the identification of opinion leaders and hierarchical structures in misinformation diffusion.
 
 ```{r}
-# Follow
-# 获取 retweeter 列表
+# Load retweeter list
 retweeter_id_misinfo <- unique(covid_wuhan_misinfo$retweeter_id)
 
-# 构造 Follow 边
-retweeter_follow_edges <- read_csv("data/mumin_csv/user_follows_user.csv") |>
-  rename(user_a = src, user_b = tgt) |> 
-  # 保留两者都在 retweeter 列表中的记录
-  filter(user_a %in% retweeter_id_misinfo & user_b %in% retweeter_id_misinfo) |> 
-  mutate(
-    user_1 = pmin(user_a, user_b),  # 保持小的 ID 在前，去掉方向性
-    user_2 = pmax(user_a, user_b)
-  ) |> 
-  select(user_1, user_2) |> 
-  distinct() |>  # 去重，防止重复记录 A -> B 和 B -> A
-  mutate(weight = 1, type = "follow")
-
-retweeter_follow_edges
-
-```
-
-all 0 matrix:
-
-```{r}
-# 获取所有 retweeters
-all_retweeters <- sort(unique(c(
-  covid_wuhan_misinfo$retweeter_id, 
-  retweeter_follow_edges$user_1, 
-  retweeter_follow_edges$user_2
-))) %>% as.character()
-
-# 创建全 0 矩阵
-adj_matrix_follow <- matrix(
-  0, 
-  nrow = length(all_retweeters), 
-  ncol = length(all_retweeters),
-  dimnames = list(all_retweeters, all_retweeters)
-)
-
-# 转成数据框导出
-write.csv(adj_matrix_follow, "data/adj_matrix_follow.csv", row.names = TRUE)
-
-```
-
-#### Directed follow
-
-This edge preserves the directionality of follower relationships between misinformation retweeters (e.g., User A follows User B). It allows for modeling influence flow and assessing asymmetric structures (e.g., hubs or hierarchies) in the spread of misinformation.
-
-follower → followee 表示单向的关注。
-
-同样地，只要两者都在 retweeter 列表中，就保留这个方向性关系。
-
-这是真正的 directed edge，表示“谁关注了谁”，方向性保留。
-
-```{r}
+# Load and filter directed follow edges
 retweeter_follow_edges_directed <- read_csv("data/mumin_csv/user_follows_user.csv") |> 
   rename(follower = src, followee = tgt) |> 
-  # 只保留 retweeter 之间的关注关系（有方向）
   filter(follower %in% retweeter_id_misinfo & followee %in% retweeter_id_misinfo) |> 
-  mutate(
-    weight = 1,          # 默认权重为 1
-    type = "follow_directed"      # 明确说明是关注关系
-  ) |> 
+  mutate(weight = 1, type = "follow_directed") |> 
   select(follower, followee, weight, type)
 
+# Check if any edges exist
+if (nrow(retweeter_follow_edges_directed) == 0) {
+  message("No directed follow relationships found among misinformation retweeters.")
+} else {
+  # Create adjacency matrix
+  all_retweeters <- sort(unique(c(
+    covid_wuhan_misinfo$retweeter_id, 
+    retweeter_follow_edges_directed$follower, 
+    retweeter_follow_edges_directed$followee
+  ))) |> as.character()
+
+  adj_matrix_follow_directed <- matrix(
+    0, 
+    nrow = length(all_retweeters), 
+    ncol = length(all_retweeters),
+    dimnames = list(all_retweeters, all_retweeters)
+  )
+
+  # Fill matrix with edges
+  apply(retweeter_follow_edges_directed, 1, function(row) {
+    adj_matrix_follow_directed[row["follower"], row["followee"]] <<- 1
+  })
+
+  # Save matrix
+  write.csv(adj_matrix_follow_directed, "data/adj_matrix_follow_directed.csv", row.names = TRUE)
+}
+
+
+
 ```
 
-
-```{r}
-follow_data<-read_csv("data/mumin_csv/user_follows_user.csv") 
-sum(follow_data$src %in% covid_wuhan_misinfo$retweeter_id)
-sum(follow_data$tgt %in% covid_wuhan_misinfo$retweeter_id)
-
-sum(covid_wuhan_misinfo$retweeter_id%in% follow_data$src)
-sum(covid_wuhan_misinfo$retweeter_id%in% follow_data$tgt)
-
-covid_wuhan_misinfo |>
-  group_by(date, keywords) |>
-  select(date, keywords) |>
-  arrange(date)|>
-  unique()
-
-```
-
+Analysis of the follower network among misinformation retweeters revealed no recorded follower-followee relationships within this group. This indicates that users involved in the dissemination of COVID-19 origin misinformation acted largely as isolated agents rather than as members of a tightly connected social network. Such a pattern suggests that the spread of misinformation in this case was driven primarily by content virality and opportunistic engagement, rather than through established social ties or influencer-led dissemination.
 
 
 # Analysis
 
-## Co-retweet Net
+## Visualization
+
+### Co-retweet Net
+
+#### Co-retweet Net 1st version
+
+```{r}
+# Load adjacency matrix
+adj_matrix_co_retweet <- read.csv(
+  "data/adj_matrix_co_retweet.csv", 
+  row.names = 1, 
+  check.names = FALSE
+)
+
+# Ensure all 112 nodes are included
+all_retweeters <- as.character(sort(unique(c(
+  rownames(adj_matrix_co_retweet), 
+  colnames(adj_matrix_co_retweet), 
+  covid_wuhan_misinfo$retweeter_id
+))))
+
+# Add missing rows/columns to adjacency matrix
+missing_nodes <- setdiff(all_retweeters, rownames(adj_matrix_co_retweet))
+
+if (length(missing_nodes) > 0) {
+  adj_matrix_co_retweet <- rbind(
+    adj_matrix_co_retweet, 
+    matrix(0, nrow = length(missing_nodes), ncol = ncol(adj_matrix_co_retweet), 
+           dimnames = list(missing_nodes, colnames(adj_matrix_co_retweet)))
+  )
+  adj_matrix_co_retweet <- cbind(
+    adj_matrix_co_retweet, 
+    matrix(0, nrow = nrow(adj_matrix_co_retweet), ncol = length(missing_nodes), 
+           dimnames = list(rownames(adj_matrix_co_retweet), missing_nodes))
+  )
+}
+
+# Ensure matrix is correctly ordered
+adj_matrix_co_retweet <- adj_matrix_co_retweet[all_retweeters, all_retweeters]
+
+# Build network object (undirected)
+net_co_retweet <- network(as.matrix(adj_matrix_co_retweet), directed = FALSE, matrix.type = "adjacency")
+
+# Assign group information
+retweeter_group <- covid_wuhan_misinfo |>
+  mutate(retweeter_id = as.character(retweeter_id)) |>
+  select(retweeter_id, date, keywords) |>
+  distinct() |>
+  arrange(date) |>
+  mutate(group = as.numeric(factor(paste(date, keywords), levels = unique(paste(date, keywords)))))
+
+# Map group to all nodes, assign 0 to those without a group
+node_groups <- retweeter_group$group[match(
+  get.vertex.attribute(net_co_retweet, "vertex.names"), 
+  retweeter_group$retweeter_id
+)]
+node_groups[is.na(node_groups)] <- 0  # Assign group 0 to unclassified nodes
+
+set.vertex.attribute(net_co_retweet, "group", node_groups)
+
+# Assign colors based on group
+group_colors <- c("grey", "skyblue", "tomato", "orange", "forestgreen", "purple", "gold")  # Extend if needed
+vertex_colors <- group_colors[pmin(node_groups + 1, length(group_colors))]  # +1 because group 0 is "grey"
+
+# Final Network Plot - Full Graph
+plot.network(
+  net_co_retweet, 
+  displaylabels = FALSE, 
+  vertex.cex = 2, 
+  vertex.col = vertex_colors, 
+  main = "Co-Retweet Network (Including Isolated Nodes)"
+)
+
+# Optional: Plot Subgraphs by Group (if meaningful)
+for (g in unique(node_groups)) {
+  sub_g <- get.inducedSubgraph(
+    net_co_retweet, 
+    which(get.vertex.attribute(net_co_retweet, "group") == g)
+  )
+  plot.network(
+    sub_g, 
+    displaylabels = FALSE, 
+    vertex.cex = 2, 
+    vertex.col = group_colors[pmin(g + 1, length(group_colors))], 
+    main = paste("Subgraph for Group", g)
+  )
+}
+
+
+```
+
+
+
+
+```{r}
+# Load adjacency matrix
+adj_matrix_co_retweet <- read.csv(
+  "data/adj_matrix_co_retweet.csv", 
+  row.names = 1, 
+  check.names = FALSE
+)
+
+# Ensure all 112 nodes are included
+all_retweeters <- as.character(sort(unique(c(
+  rownames(adj_matrix_co_retweet), 
+  colnames(adj_matrix_co_retweet), 
+  covid_wuhan_misinfo$retweeter_id
+))))
+
+missing_nodes <- setdiff(all_retweeters, rownames(adj_matrix_co_retweet))
+
+if (length(missing_nodes) > 0) {
+  adj_matrix_co_retweet <- rbind(
+    adj_matrix_co_retweet, 
+    matrix(0, nrow = length(missing_nodes), ncol = ncol(adj_matrix_co_retweet), 
+           dimnames = list(missing_nodes, colnames(adj_matrix_co_retweet)))
+  )
+  adj_matrix_co_retweet <- cbind(
+    adj_matrix_co_retweet, 
+    matrix(0, nrow = nrow(adj_matrix_co_retweet), ncol = length(missing_nodes), 
+           dimnames = list(rownames(adj_matrix_co_retweet), missing_nodes))
+  )
+}
+
+adj_matrix_co_retweet <- adj_matrix_co_retweet[all_retweeters, all_retweeters]
+
+# Build network object
+net_co_retweet <- network(as.matrix(adj_matrix_co_retweet), directed = FALSE, matrix.type = "adjacency")
+
+# Assign Stage using (date, keywords) combinations
+retweeter_stage <- covid_wuhan_misinfo |>
+  mutate(retweeter_id = as.character(retweeter_id)) |>
+  select(retweeter_id, date, keywords) |>
+  distinct() |>
+  arrange(date) |>
+  mutate(
+    combined_group = paste(date, keywords),
+    stage = as.numeric(factor(combined_group, levels = unique(combined_group)))
+  ) |>
+  select(retweeter_id, stage)
+
+# Map stage to nodes
+node_stages <- retweeter_stage$stage[match(
+  get.vertex.attribute(net_co_retweet, "vertex.names"), 
+  retweeter_stage$retweeter_id
+)]
+node_stages[is.na(node_stages)] <- 0  # Assign "0" for undefined stage
+
+set.vertex.attribute(net_co_retweet, "stage", node_stages)
+
+# Assign colors based on stage (0-6)
+stage_colors <- c("grey", "skyblue", "tomato", "orange", "forestgreen", "purple", "gold")  
+vertex_colors <- stage_colors[pmin(node_stages + 1, length(stage_colors))]  # "+1" for stage 0
+
+# Plot full network with stage-based coloring
+plot.network(
+  net_co_retweet, 
+  displaylabels = FALSE, 
+  vertex.cex = 2, 
+  vertex.col = vertex_colors, 
+  main = "Co-Retweet Network Colored by Stage"
+)
+
+```
+
+
+#### Stage 1 Plot (Co-retweet Net)
+
+```{r}
+# Load Data and Build Full Network
+adj_matrix <- read.csv("data/adj_matrix_co_retweet.csv", row.names = 1, check.names = FALSE)
+
+net_full <- network(as.matrix(adj_matrix), directed = FALSE, matrix.type = "adjacency")
+
+retweeter_stage <- covid_wuhan_misinfo |>
+  mutate(retweeter_id = as.character(retweeter_id)) |>
+  select(retweeter_id, date, keywords) |>
+  distinct() |>
+  arrange(date) |>
+  mutate(
+    group = as.numeric(factor(paste(date, keywords), levels = unique(paste(date, keywords))))
+  ) |>
+  select(retweeter_id, group, date, keywords)
+
+node_names <- net_full %v% "vertex.names"
+
+assigned_groups <- retweeter_stage$group[match(node_names, retweeter_stage$retweeter_id)]
+
+set.vertex.attribute(net_full, "group", assigned_groups)
+
+# Assign Current Stage Info
+target_group <- 1  
+
+stage_info <- retweeter_stage |> 
+  filter(group == target_group) |> 
+  distinct(date, keywords)
+
+stage_date <- unique(stage_info$date)
+
+stage_keywords <- unique(stage_info$keywords)
+
+# Get Edge List and Filter Edges for Current Stage
+edgelist <- as.edgelist(net_full)
+v1 <- edgelist[, 1]
+v2 <- edgelist[, 2]
+
+group_v1 <- assigned_groups[v1]
+group_v2 <- assigned_groups[v2]
+keep_edges <- which(group_v1 == target_group & group_v2 == target_group)
+
+# Build Stage Adjacency Matrix
+adj_stage1 <- matrix(0, nrow = length(node_names), ncol = length(node_names))
+rownames(adj_stage1) <- colnames(adj_stage1) <- node_names
+
+if (length(keep_edges) > 0) {
+  for (idx in keep_edges) {
+    adj_stage1[v1[idx], v2[idx]] <- 1
+    adj_stage1[v2[idx], v1[idx]] <- 1
+  }
+}
+
+# Save Stage 1 Adjacency Matrix
+write.csv(adj_stage1, "data/adj_matrix_stage1.csv", row.names = TRUE)
+
+# Build Network Object for Stage 1
+net_stage1 <- network(adj_stage1, directed = FALSE, matrix.type = "adjacency")
+
+# Visualization Settings
+plot_title <- paste0("Co-Retweet Network: Stage ", target_group)
+
+plot_subtitle <- paste0("Misinformation Claim: ", stage_keywords, " | Claim Utterd on: ", stage_date)
+
+edge_alpha <- 0.1 
+edge_width <- 0.2  
+
+set.seed(42)
+layout_coords <- gplot(
+  net_stage1, 
+  gmode = "graph", 
+  mode = "kamadakawai"
+)
+
+vertex_colors <- ifelse(
+  assigned_groups == target_group, 
+  "steelblue", 
+  "gray"
+)
+
+# Save PNG
+png("data/Co-Retweet-Stage1.png", width = 2200, height = 2100, res = 300)
+par(family = "serif", mar = c(6, 0, 3, 1))
+
+plot.network(
+  net_stage1,
+  displaylabels = FALSE,
+  vertex.cex = 1,
+  vertex.col = vertex_colors,
+  coord = layout_coords,
+  edge.lwd = edge_width,
+  edge.col = adjustcolor("black", alpha.f = edge_alpha),
+  main = plot_title
+)
+
+# Add Subtitle
+mtext(
+  text = plot_subtitle,
+  side = 1, 
+  line = 3, 
+  cex = 0.8, 
+  family = "serif"
+)
+
+# Add Legend
+legend(
+  "right",
+  legend = c("Stage 1 Retweeters", "Other Retweeters"), 
+  col = c("steelblue", "gray"), 
+  pch = 19, 
+  pt.cex = 1,  
+  cex = 0.6,                    
+  text.col = "black", 
+  bty = "n",                    
+  y.intersp = 1.5                      
+)
+```
+
+#### Stage 2 Plot (Co-retweet Net)
+
+```{r}
+# Assign Current Stage Info
+target_group <- 2  
+
+stage_info <- retweeter_stage |> 
+  filter(group == target_group) |> 
+  distinct(date, keywords)
+
+stage_date <- unique(stage_info$date)
+stage_keywords <- unique(stage_info$keywords)
+
+# Get Edge List and Filter Edges for Current Stage
+group_v1 <- assigned_groups[v1]
+group_v2 <- assigned_groups[v2]
+keep_edges <- which(group_v1 == target_group & group_v2 == target_group)
+
+# Build Stage 2 Adjacency Matrix
+adj_stage2 <- matrix(0, nrow = length(node_names), ncol = length(node_names))
+rownames(adj_stage2) <- colnames(adj_stage2) <- node_names
+
+if (length(keep_edges) > 0) {
+  for (idx in keep_edges) {
+    adj_stage2[v1[idx], v2[idx]] <- 1
+    adj_stage2[v2[idx], v1[idx]] <- 1
+  }
+}
+
+# Save Stage 2 Adjacency Matrix
+write.csv(adj_stage2, "data/adj_matrix_stage2.csv", row.names = TRUE)
+
+# Build Network Object for Stage 2
+net_stage2 <- network(adj_stage2, directed = FALSE, matrix.type = "adjacency")
+
+# Visualization Settings
+plot_title <- paste0("Co-Retweet Network: Stage ", target_group)
+plot_subtitle <- paste0("Misinformation Claim: ", stage_keywords, " | Claim Utterd on: ", stage_date)
+
+edge_alpha <- 0.1 
+edge_width <- 0.2  
+
+set.seed(42)
+layout_coords <- gplot(
+  net_stage2, 
+  gmode = "graph", 
+  mode = "kamadakawai"
+)
+
+vertex_colors <- ifelse(
+  assigned_groups == target_group, 
+  "steelblue", 
+  "gray"
+)
+
+# Save PNG for Stage 2
+png("data/Co-Retweet-Stage2.png", width = 2200, height = 2100, res = 300)
+par(family = "serif", mar = c(6, 0, 3, 1))
+
+plot.network(
+  net_stage2,
+  displaylabels = FALSE,
+  vertex.cex = 1,
+  vertex.col = vertex_colors,
+  coord = layout_coords,
+  edge.lwd = edge_width,
+  edge.col = adjustcolor("black", alpha.f = edge_alpha),
+  main = plot_title
+)
+
+# Add Subtitle
+mtext(
+  text = plot_subtitle,
+  side = 1, 
+  line = 3, 
+  cex = 0.8, 
+  family = "serif"
+)
+
+# Add Legend
+legend(
+  "right",
+  legend = c("Stage 2 Retweeters", "Other Retweeters"), 
+  col = c("steelblue", "gray"), 
+  pch = 19, 
+  pt.cex = 1,  
+  cex = 0.6,                    
+  text.col = "black", 
+  bty = "n",                    
+  y.intersp = 1.5                      
+)
+
+```
+
+#### Stage 3 Plot (Co-retweet Net)
+
+```{r}
+# Assign Current Stage Info
+target_group <- 3  
+
+stage_info <- retweeter_stage |> 
+  filter(group == target_group) |> 
+  distinct(date, keywords)
+
+stage_date <- unique(stage_info$date)
+stage_keywords <- unique(stage_info$keywords)
+
+# Get Edge List and Filter Edges for Current Stage
+group_v1 <- assigned_groups[v1]
+group_v2 <- assigned_groups[v2]
+keep_edges <- which(group_v1 == target_group & group_v2 == target_group)
+
+# Build Stage 3 Adjacency Matrix
+adj_stage3 <- matrix(0, nrow = length(node_names), ncol = length(node_names))
+rownames(adj_stage3) <- colnames(adj_stage3) <- node_names
+
+if (length(keep_edges) > 0) {
+  for (idx in keep_edges) {
+    adj_stage3[v1[idx], v2[idx]] <- 1
+    adj_stage3[v2[idx], v1[idx]] <- 1
+  }
+}
+
+# Save Stage 3 Adjacency Matrix
+write.csv(adj_stage3, "data/adj_matrix_stage3.csv", row.names = TRUE)
+
+# Build Network Object for Stage 3
+net_stage3 <- network(adj_stage3, directed = FALSE, matrix.type = "adjacency")
+
+# Visualization Settings
+plot_title <- paste0("Co-Retweet Network: Stage ", target_group)
+plot_subtitle <- paste0("Misinformation Claim: ", stage_keywords, " | Claim Utterd on: ", stage_date)
+
+edge_alpha <- 0.1 
+edge_width <- 0.2  
+
+set.seed(42)
+layout_coords <- gplot(
+  net_stage3, 
+  gmode = "graph", 
+  mode = "kamadakawai"
+)
+
+vertex_colors <- ifelse(
+  assigned_groups == target_group, 
+  "steelblue", 
+  "gray"
+)
+
+# Save PNG for Stage 3
+png("data/Co-Retweet-Stage3.png", width = 2200, height = 2100, res = 300)
+par(family = "serif", mar = c(6, 0, 3, 1))
+
+plot.network(
+  net_stage3,
+  displaylabels = FALSE,
+  vertex.cex = 1,
+  vertex.col = vertex_colors,
+  coord = layout_coords,
+  edge.lwd = edge_width,
+  edge.col = adjustcolor("black", alpha.f = edge_alpha),
+  main = plot_title
+)
+
+# Add Subtitle
+mtext(
+  text = plot_subtitle,
+  side = 1, 
+  line = 3, 
+  cex = 0.8, 
+  family = "serif"
+)
+
+# Add Legend
+legend(
+  "right",
+  legend = c("Stage 3 Retweeters", "Other Retweeters"), 
+  col = c("steelblue", "gray"), 
+  pch = 19, 
+  pt.cex = 1,  
+  cex = 0.6,                    
+  text.col = "black", 
+  bty = "n",                    
+  y.intersp = 1.5                      
+)
+
+dev.off()  # Close the PNG device
+
+```
+
+#### Stage 4 Plot (Co-retweet Net)
+
+```{r}
+# Assign Current Stage Info
+target_group <- 4  
+
+stage_info <- retweeter_stage |> 
+  filter(group == target_group) |> 
+  distinct(date, keywords)
+
+stage_date <- unique(stage_info$date)
+stage_keywords <- unique(stage_info$keywords)
+
+# Get Edge List and Filter Edges for Current Stage
+group_v1 <- assigned_groups[v1]
+group_v2 <- assigned_groups[v2]
+keep_edges <- which(group_v1 == target_group & group_v2 == target_group)
+
+# Build Stage 4 Adjacency Matrix
+adj_stage4 <- matrix(0, nrow = length(node_names), ncol = length(node_names))
+rownames(adj_stage4) <- colnames(adj_stage4) <- node_names
+
+if (length(keep_edges) > 0) {
+  for (idx in keep_edges) {
+    adj_stage4[v1[idx], v2[idx]] <- 1
+    adj_stage4[v2[idx], v1[idx]] <- 1
+  }
+}
+
+# Save Stage 4 Adjacency Matrix
+write.csv(adj_stage4, "data/adj_matrix_stage4.csv", row.names = TRUE)
+
+# Build Network Object for Stage 4
+net_stage4 <- network(adj_stage4, directed = FALSE, matrix.type = "adjacency")
+
+# Visualization Settings
+plot_title <- paste0("Co-Retweet Network: Stage ", target_group)
+plot_subtitle <- paste0("Misinformation Claim: ", stage_keywords, " | Claim Utterd on: ", stage_date)
+
+edge_alpha <- 0.1 
+edge_width <- 0.2  
+
+set.seed(42)
+layout_coords <- gplot(
+  net_stage4, 
+  gmode = "graph", 
+  mode = "kamadakawai"
+)
+
+vertex_colors <- ifelse(
+  assigned_groups == target_group, 
+  "steelblue", 
+  "gray"
+)
+
+# Save PNG for Stage 4
+png("data/Co-Retweet-Stage4.png", width = 2200, height = 2100, res = 300)
+par(family = "serif", mar = c(6, 0, 3, 1))
+
+plot.network(
+  net_stage4,
+  displaylabels = FALSE,
+  vertex.cex = 1,
+  vertex.col = vertex_colors,
+  coord = layout_coords,
+  edge.lwd = edge_width,
+  edge.col = adjustcolor("black", alpha.f = edge_alpha),
+  main = plot_title
+)
+
+# Add Subtitle
+mtext(
+  text = plot_subtitle,
+  side = 1, 
+  line = 3, 
+  cex = 0.8, 
+  family = "serif"
+)
+
+# Add Legend
+legend(
+  "right",
+  legend = c("Stage 4 Retweeters", "Other Retweeters"), 
+  col = c("steelblue", "gray"), 
+  pch = 19, 
+  pt.cex = 1,  
+  cex = 0.6,                    
+  text.col = "black", 
+  bty = "n",                    
+  y.intersp = 1.5                      
+)
+
+```
+
+#### Stage 5 Plot (Co-retweet Net)
+
+```{r}
+# Assign Current Stage Info
+target_group <- 5  
+
+stage_info <- retweeter_stage |> 
+  filter(group == target_group) |> 
+  distinct(date, keywords)
+
+stage_date <- unique(stage_info$date)
+stage_keywords <- unique(stage_info$keywords)
+
+# Get Edge List and Filter Edges for Current Stage
+group_v1 <- assigned_groups[v1]
+group_v2 <- assigned_groups[v2]
+keep_edges <- which(group_v1 == target_group & group_v2 == target_group)
+
+# Build Stage 5 Adjacency Matrix
+adj_stage5 <- matrix(0, nrow = length(node_names), ncol = length(node_names))
+rownames(adj_stage5) <- colnames(adj_stage5) <- node_names
+
+if (length(keep_edges) > 0) {
+  for (idx in keep_edges) {
+    adj_stage5[v1[idx], v2[idx]] <- 1
+    adj_stage5[v2[idx], v1[idx]] <- 1
+  }
+}
+
+# Save Stage 5 Adjacency Matrix
+write.csv(adj_stage5, "data/adj_matrix_stage5.csv", row.names = TRUE)
+
+# Build Network Object for Stage 5
+net_stage5 <- network(adj_stage5, directed = FALSE, matrix.type = "adjacency")
+
+# Visualization Settings
+plot_title <- paste0("Co-Retweet Network: Stage ", target_group)
+plot_subtitle <- paste0("Misinformation Claim: ", stage_keywords, " | Claim Utterd on: ", stage_date)
+
+edge_alpha <- 0.1 
+edge_width <- 0.2  
+
+set.seed(42)
+layout_coords <- gplot(
+  net_stage5, 
+  gmode = "graph", 
+  mode = "kamadakawai"
+)
+
+vertex_colors <- ifelse(
+  assigned_groups == target_group, 
+  "steelblue", 
+  "gray"
+)
+
+# Save PNG for Stage 5
+png("data/Co-Retweet-Stage5.png", width = 2200, height = 2100, res = 300)
+par(family = "serif", mar = c(6, 0, 3, 1))
+
+plot.network(
+  net_stage5,
+  displaylabels = FALSE,
+  vertex.cex = 1,
+  vertex.col = vertex_colors,
+  coord = layout_coords,
+  edge.lwd = edge_width,
+  edge.col = adjustcolor("black", alpha.f = edge_alpha),
+  main = plot_title
+)
+
+# Add Subtitle
+mtext(
+  text = plot_subtitle,
+  side = 1, 
+  line = 3, 
+  cex = 0.8, 
+  family = "serif"
+)
+
+# Add Legend
+legend(
+  "right",
+  legend = c("Stage 5 Retweeters", "Other Retweeters"), 
+  col = c("steelblue", "gray"), 
+  pch = 19, 
+  pt.cex = 1,  
+  cex = 0.6,                    
+  text.col = "black", 
+  bty = "n",                    
+  y.intersp = 1.5                      
+)
+
+```
+
+#### Stage 6 Plot (Co-retweet Net)
+
+```{r}
+# Assign Current Stage Info
+target_group <- 6  
+
+stage_info <- retweeter_stage |> 
+  filter(group == target_group) |> 
+  distinct(date, keywords)
+
+stage_date <- unique(stage_info$date)
+stage_keywords <- unique(stage_info$keywords)
+
+group_v1 <- assigned_groups[v1]
+group_v2 <- assigned_groups[v2]
+keep_edges <- which(group_v1 == target_group & group_v2 == target_group)
+
+adj_stage6 <- matrix(0, nrow = length(node_names), ncol = length(node_names))
+rownames(adj_stage6) <- colnames(adj_stage6) <- node_names
+
+if (length(keep_edges) > 0) {
+  for (idx in keep_edges) {
+    adj_stage6[v1[idx], v2[idx]] <- 1
+    adj_stage6[v2[idx], v1[idx]] <- 1
+  }
+}
+
+write.csv(adj_stage6, "data/adj_matrix_stage6.csv", row.names = TRUE)
+
+net_stage6 <- network(adj_stage6, directed = FALSE, matrix.type = "adjacency")
+
+plot_title <- paste0("Co-Retweet Network: Stage ", target_group)
+plot_subtitle <- paste0("Misinformation Claim: ", stage_keywords, " | Claim Utterd on: ", stage_date)
+
+edge_alpha <- 0.1 
+edge_width <- 0.2  
+
+set.seed(42)
+layout_coords <- gplot(
+  net_stage6, 
+  gmode = "graph", 
+  mode = "kamadakawai"
+)
+
+vertex_colors <- ifelse(
+  assigned_groups == target_group, 
+  "steelblue", 
+  "gray"
+)
+
+png("data/Co-Retweet-Stage6.png", width = 2200, height = 2100, res = 300)
+par(family = "serif", mar = c(6, 0, 3, 1))
+
+plot.network(
+  net_stage6,
+  displaylabels = FALSE,
+  vertex.cex = 1,
+  vertex.col = vertex_colors,
+  coord = layout_coords,
+  edge.lwd = edge_width,
+  edge.col = adjustcolor("black", alpha.f = edge_alpha),
+  main = plot_title
+)
+
+mtext(
+  text = plot_subtitle,
+  side = 1, 
+  line = 3, 
+  cex = 0.8, 
+  family = "serif"
+)
+
+legend(
+  "right",
+  legend = c("Stage 6 Retweeters", "Other Retweeters"), 
+  col = c("steelblue", "gray"), 
+  pch = 19, 
+  pt.cex = 1,  
+  cex = 0.6,                    
+  text.col = "black", 
+  bty = "n",                    
+  y.intersp = 1.5                      
+)
+
+```
+
+
+
+## Basic Network Metrics
+
+### Co-retweet Net
+
+```{r}
+# Load 6 Stage Net
+co_retweet_stage_networks <- list(
+  Stage1 = read.csv("data/adj_matrix_stage1.csv", row.names = 1) |> 
+    as.matrix() |> 
+    network(directed = FALSE, matrix.type = "adjacency"),
+  
+  Stage2 = read.csv("data/adj_matrix_stage2.csv", row.names = 1) |> 
+    as.matrix() |> 
+    network(directed = FALSE, matrix.type = "adjacency"),
+  
+  Stage3 = read.csv("data/adj_matrix_stage3.csv", row.names = 1) |> 
+    as.matrix() |> 
+    network(directed = FALSE, matrix.type = "adjacency"),
+  
+  Stage4 = read.csv("data/adj_matrix_stage4.csv", row.names = 1) |> 
+    as.matrix() |> 
+    network(directed = FALSE, matrix.type = "adjacency"),
+  
+  Stage5 = read.csv("data/adj_matrix_stage5.csv", row.names = 1) |> 
+    as.matrix() |> 
+    network(directed = FALSE, matrix.type = "adjacency"),
+  
+  Stage6 = read.csv("data/adj_matrix_stage6.csv", row.names = 1) |> 
+    as.matrix() |> 
+    network(directed = FALSE, matrix.type = "adjacency")
+)
+
+```
+
+```{r}
+
+compute_local_clustering <- function(net) {
+  adj_mat <- as.matrix.network.adjacency(net)
+  n <- nrow(adj_mat)
+  
+  clustering_vals <- numeric(n)
+  
+  for (i in 1:n) {
+    neighbors <- which(adj_mat[i, ] == 1)
+    k <- length(neighbors)
+    if (k < 2) {
+      clustering_vals[i] <- NA  # 无法形成三角形，设为 NA
+    } else {
+      subgraph <- adj_mat[neighbors, neighbors]
+      actual_edges <- sum(subgraph) / 2  # 无向图
+      possible_edges <- k * (k - 1) / 2
+      clustering_vals[i] <- actual_edges / possible_edges
+    }
+  }
+  
+  return(clustering_vals)
+}
+
+
+compute_metrics <- function(net) {
+  data.frame(
+    Nodes = network.size(net),
+    Edges = network.edgecount(net),
+    Density = gden(net),
+    Average_Degree = mean(degree(net), na.rm = TRUE),
+    Degree_Centralization = centralization(net, degree, mode = "freeman"),
+    Closeness_Centralization = centralization(net, closeness, mode = "freeman"),
+    Betweenness_Centralization = centralization(net, betweenness, mode = "freeman"),
+    Transitivity_Global = gtrans(net, mode = "graph"),
+    Transitivity_Local = mean(compute_local_clustering(net), na.rm = TRUE)  # 替代 clustering.coefficient
+  )
+}
+
+
+```
+
+
+```{r}
+metrics_results <- lapply(co_retweet_stage_networks, compute_metrics)
+metrics_df <- do.call(rbind, metrics_results)
+metrics_df$Stage <- rownames(metrics_df)
+
+# reorder columns
+metrics_df <- metrics_df[, c("Stage", setdiff(names(metrics_df), "Stage"))]
+
+print(metrics_df)
+
+```
+
+The analysis of basic network metrics across the six stages reveals a highly clustered network structure with consistently high global and local transitivity values, suggesting that misinformation retweet activities predominantly occurred within tightly-knit groups. Notably, Stage 2 exhibits the highest average degree and network density, indicating peak activity and diffusion potential at this stage. Conversely, low centralization scores across closeness and betweenness measures imply the absence of prominent gatekeepers or highly influential intermediaries within the network.
+
+
+## tERGM
+
+
+```{r}
+
+```
+
+
+```{r}
+
+```
 
 ```{r}
 # 读取 co-retweet adjacency matrix
@@ -723,11 +1371,11 @@ net_co_retweet <- network(as.matrix(adj_matrix_co_retweet), directed = FALSE, ma
 get.vertex.attribute(net_co_retweet, "vertex.names")
 
 # 获取分组信息
-retweeter_group <- covid_wuhan_misinfo %>%
-  mutate(retweeter_id = as.character(retweeter_id)) %>%
-  select(retweeter_id, date, keywords) %>%
-  distinct() %>%
-  arrange(date) %>%
+retweeter_group <- covid_wuhan_misinfo |>
+  mutate(retweeter_id = as.character(retweeter_id)) |>
+  select(retweeter_id, date, keywords) |>
+  distinct() |>
+  arrange(date) |>
   mutate(group = as.numeric(factor(paste(date, keywords), levels = unique(paste(date, keywords)))))
 
 # 将 Group 信息添加到节点属性中
