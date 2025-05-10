@@ -559,7 +559,7 @@ net_stage1 <- network(adj_stage1, directed = FALSE, matrix.type = "adjacency")
 # Visualization Settings
 plot_title <- paste0("Co-Retweet Network: Stage ", target_group)
 
-plot_subtitle <- paste0("Misinformation Claim: ", stage_keywords, " | Claim Utterd on: ", stage_date)
+plot_subtitle <- paste0("Misinformation Claim: ", stage_keywords, " | Claim Uttered on: ", stage_date)
 
 edge_alpha <- 0.1 
 edge_width <- 0.2  
@@ -579,7 +579,7 @@ vertex_colors <- ifelse(
 )
 
 # Save PNG
-# png("plot/co_retweet_net/Co-Retweet-Stage1.png", width = 2200, height = 2100, res = 300)
+png("plot/co_retweet_net/Co-Retweet-Stage1.png", width = 2200, height = 2100, res = 300)
 par(family = "serif", mar = c(6, 0, 3, 1))
 
 plot.network(
@@ -663,7 +663,7 @@ net_stage2 <- network(adj_stage2, directed = FALSE, matrix.type = "adjacency")
 
 # Visualization Settings
 plot_title <- paste0("Co-Retweet Network: Stage ", target_group)
-plot_subtitle <- paste0("Misinformation Claim: ", stage_keywords, " | Claim Utterd on: ", stage_date)
+plot_subtitle <- paste0("Misinformation Claim: ", stage_keywords, " | Claim Uttered on: ", stage_date)
 
 edge_alpha <- 0.1 
 edge_width <- 0.2  
@@ -683,7 +683,7 @@ vertex_colors <- ifelse(
 )
 
 # Save PNG for Stage 2
-# png("plot/co_retweet_net/Co-Retweet-Stage2.png", width = 2200, height = 2100, res = 300)
+png("plot/co_retweet_net/Co-Retweet-Stage2.png", width = 2200, height = 2100, res = 300)
 par(family = "serif", mar = c(6, 0, 3, 1))
 
 plot.network(
@@ -768,7 +768,7 @@ net_stage3 <- network(adj_stage3, directed = FALSE, matrix.type = "adjacency")
 
 # Visualization Settings
 plot_title <- paste0("Co-Retweet Network: Stage ", target_group)
-plot_subtitle <- paste0("Misinformation Claim: ", stage_keywords, " | Claim Utterd on: ", stage_date)
+plot_subtitle <- paste0("Misinformation Claim: ", stage_keywords, " | Claim Uttered on: ", stage_date)
 
 edge_alpha <- 0.1 
 edge_width <- 0.2  
@@ -788,7 +788,7 @@ vertex_colors <- ifelse(
 )
 
 # Save PNG for Stage 3
-# png("plot/co_retweet_net/Co-Retweet-Stage3.png", width = 2200, height = 2100, res = 300)
+png("plot/co_retweet_net/Co-Retweet-Stage3.png", width = 2200, height = 2100, res = 300)
 par(family = "serif", mar = c(6, 0, 3, 1))
 
 plot.network(
@@ -875,7 +875,7 @@ net_stage4 <- network(adj_stage4, directed = FALSE, matrix.type = "adjacency")
 
 # Visualization Settings
 plot_title <- paste0("Co-Retweet Network: Stage ", target_group)
-plot_subtitle <- paste0("Misinformation Claim: ", stage_keywords, " | Claim Utterd on: ", stage_date)
+plot_subtitle <- paste0("Misinformation Claim: ", stage_keywords, " | Claim Uttered on: ", stage_date)
 
 edge_alpha <- 0.1 
 edge_width <- 0.2  
@@ -895,7 +895,7 @@ vertex_colors <- ifelse(
 )
 
 # Save PNG for Stage 4
-# png("plot/co_retweet_net/Co-Retweet-Stage4.png", width = 2200, height = 2100, res = 300)
+png("plot/co_retweet_net/Co-Retweet-Stage4.png", width = 2200, height = 2100, res = 300)
 par(family = "serif", mar = c(6, 0, 3, 1))
 
 plot.network(
@@ -980,7 +980,7 @@ net_stage5 <- network(adj_stage5, directed = FALSE, matrix.type = "adjacency")
 
 # Visualization Settings
 plot_title <- paste0("Co-Retweet Network: Stage ", target_group)
-plot_subtitle <- paste0("Misinformation Claim: ", stage_keywords, " | Claim Utterd on: ", stage_date)
+plot_subtitle <- paste0("Misinformation Claim: ", stage_keywords, " | Claim Uttered on: ", stage_date)
 
 edge_alpha <- 0.1 
 edge_width <- 0.2  
@@ -1001,7 +1001,7 @@ vertex_colors <- ifelse(
 )
 
 # Save PNG for Stage 5
-# png("plot/co_retweet_net/Co-Retweet-Stage5.png", width = 2200, height = 2100, res = 300)
+png("plot/co_retweet_net/Co-Retweet-Stage5.png", width = 2200, height = 2100, res = 300)
 par(family = "serif", mar = c(6, 0, 3, 1))
 
 plot.network(
@@ -1081,7 +1081,7 @@ write.csv(adj_stage6, "data/adj_matrix_stage6.csv", row.names = TRUE)
 net_stage6 <- network(adj_stage6, directed = FALSE, matrix.type = "adjacency")
 
 plot_title <- paste0("Co-Retweet Network: Stage ", target_group)
-plot_subtitle <- paste0("Misinformation Claim: ", stage_keywords, " | Claim Utterd on: ", stage_date)
+plot_subtitle <- paste0("Misinformation Claim: ", stage_keywords, " | Claim Uttered on: ", stage_date)
 
 edge_alpha <- 0.1 
 edge_width <- 0.2  
@@ -1100,7 +1100,7 @@ vertex_colors <- ifelse(
   "gray"
 )
 
-# png("plot/co_retweet_net/Co-Retweet-Stage6.png", width = 2200, height = 2100, res = 300)
+png("plot/co_retweet_net/Co-Retweet-Stage6.png", width = 2200, height = 2100, res = 300)
 par(family = "serif", mar = c(6, 0, 3, 1))
 
 plot.network(
@@ -1394,7 +1394,7 @@ for name in file_names:
 
 This script will generate the corresponding CSV files for further analysis.
 
-**Note:** *If you have a [X Developer API Pro Account](https://developer.x.com/en/portal/products/pro), you can directly follow the dataset's authors' [MuMiN Tutorial](https://colab.research.google.com/drive/1JCjgg3moGBOuZk4iVjBpQNqgsAYFyNoS#scrollTo=YS1uxj-59UmA) and conduct a deeper analysis with more enriched variables when [rehydrating the original datasets](https://colab.research.google.com/drive/1JCjgg3moGBOuZk4iVjBpQNqgsAYFyNoS#scrollTo=SCJ5UogLvUXb).*
+**Note:** *If you have a [X Developer API Pro Account](https://developer.x.com/en/portal/products/pro), you can directly follow the dataset's authors' [MuMiN Tutorial](https://colab.research.google.com/drive/1JCjgg3moGBOuZk4iVjBpQNqgsAYFyNoS#scrollTo=YS1uxj-59UmA) and conduct a deeper analysis with more enriched variables when [rehydrating the original datasets](https://colab.research.google.com/drive/1JCjgg3moGBOuZk4iVjBpQNqgsAYFyNoS#scrollTo=bOQqaJOa_PbF&line=1&uniqifier=1).*
 
 After all steps above done, you can review the data in R:
 
@@ -1672,7 +1672,7 @@ net_stage1 <- network(adj_stage1, directed = FALSE, matrix.type = "adjacency")
 # Visualization Settings
 plot_title <- paste0("Co-Retweet Network: Stage ", target_group)
 
-plot_subtitle <- paste0("Misinformation Claim: ", stage_keywords, " | Claim Utterd on: ", stage_date)
+plot_subtitle <- paste0("Misinformation Claim: ", stage_keywords, " | Claim Uttered on: ", stage_date)
 
 edge_alpha <- 0.1 
 edge_width <- 0.2  
@@ -1776,7 +1776,7 @@ net_stage2 <- network(adj_stage2, directed = FALSE, matrix.type = "adjacency")
 
 # Visualization Settings
 plot_title <- paste0("Co-Retweet Network: Stage ", target_group)
-plot_subtitle <- paste0("Misinformation Claim: ", stage_keywords, " | Claim Utterd on: ", stage_date)
+plot_subtitle <- paste0("Misinformation Claim: ", stage_keywords, " | Claim Uttered on: ", stage_date)
 
 edge_alpha <- 0.1 
 edge_width <- 0.2  
@@ -1881,7 +1881,7 @@ net_stage3 <- network(adj_stage3, directed = FALSE, matrix.type = "adjacency")
 
 # Visualization Settings
 plot_title <- paste0("Co-Retweet Network: Stage ", target_group)
-plot_subtitle <- paste0("Misinformation Claim: ", stage_keywords, " | Claim Utterd on: ", stage_date)
+plot_subtitle <- paste0("Misinformation Claim: ", stage_keywords, " | Claim Uttered on: ", stage_date)
 
 edge_alpha <- 0.1 
 edge_width <- 0.2  
@@ -1988,7 +1988,7 @@ net_stage4 <- network(adj_stage4, directed = FALSE, matrix.type = "adjacency")
 
 # Visualization Settings
 plot_title <- paste0("Co-Retweet Network: Stage ", target_group)
-plot_subtitle <- paste0("Misinformation Claim: ", stage_keywords, " | Claim Utterd on: ", stage_date)
+plot_subtitle <- paste0("Misinformation Claim: ", stage_keywords, " | Claim Uttered on: ", stage_date)
 
 edge_alpha <- 0.1 
 edge_width <- 0.2  
@@ -2093,7 +2093,7 @@ net_stage5 <- network(adj_stage5, directed = FALSE, matrix.type = "adjacency")
 
 # Visualization Settings
 plot_title <- paste0("Co-Retweet Network: Stage ", target_group)
-plot_subtitle <- paste0("Misinformation Claim: ", stage_keywords, " | Claim Utterd on: ", stage_date)
+plot_subtitle <- paste0("Misinformation Claim: ", stage_keywords, " | Claim Uttered on: ", stage_date)
 
 edge_alpha <- 0.1 
 edge_width <- 0.2  
@@ -2194,7 +2194,7 @@ write.csv(adj_stage6, "data/adj_matrix_stage6.csv", row.names = TRUE)
 net_stage6 <- network(adj_stage6, directed = FALSE, matrix.type = "adjacency")
 
 plot_title <- paste0("Co-Retweet Network: Stage ", target_group)
-plot_subtitle <- paste0("Misinformation Claim: ", stage_keywords, " | Claim Utterd on: ", stage_date)
+plot_subtitle <- paste0("Misinformation Claim: ", stage_keywords, " | Claim Uttered on: ", stage_date)
 
 edge_alpha <- 0.1 
 edge_width <- 0.2  
