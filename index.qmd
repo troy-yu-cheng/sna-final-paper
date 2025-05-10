@@ -1347,19 +1347,13 @@ The analysis of basic network metrics across the six stages reveals a highly clu
 
 ## Data Collection
 
-This study uses secondary data from the **MuMiN Project** (Multi-platform Misinformation Influence Network), publicly available at: <https://data.bris.ac.uk/datasets/23yv276we2mll25fjakkfim2ml/mumin.zip>
-
-The dataset includes information about retweeter ids, tweets ids, misinformation claims, and the date of specific misinformation claim uttered etc.
+This study uses secondary data from the **MuMiN Project** (Multi-platform Misinformation Influence Network), publicly available at: <https://data.bris.ac.uk/datasets/23yv276we2mll25fjakkfim2ml/mumin.zip> The dataset includes information about retweeter ids, tweets ids, misinformation claims, and the date of specific misinformation claim uttered etc.
 
 **Note: About the `date`, [the explanation of dataset's authours](https://arxiv.org/abs/2202.11684):** 
 
 *"`date`: The date the claim was uttered. If this date was not available then the date of the review was used. If neither of those two were available then we extracted a potential date from the URL of the fact-checking article using the regular expression [0-9]{4}-[0-9]{2}-[0-9]{2}."*
 
-After downloading all files, create a `data` folder in your working directory and place the files inside it.
-
-Follow the setup instructions provided [here](https://colab.research.google.com/drive/1JCjgg3moGBOuZk4iVjBpQNqgsAYFyNoS#scrollTo=YS1uxj-59UmA). Use the shell to install required packages via `pip` as directed.
-
-Next, open `VS Code`, and run the following Python script to convert `.pkl` files to `.csv`:
+After downloading all files, create a `data` folder in your working directory and place the files inside it. Then, follow the setup instructions provided [here](https://colab.research.google.com/drive/1JCjgg3moGBOuZk4iVjBpQNqgsAYFyNoS#scrollTo=YS1uxj-59UmA). Use the shell to install required packages via `pip` as directed. Next, open `VS Code`, and run the following Python script to convert `.pkl` files to `.csv`:
 
 ```{python}
 #| eval: false
@@ -1400,7 +1394,9 @@ for name in file_names:
 
 This script will generate the corresponding CSV files for further analysis.
 
-Then, preview the Data in R:
+**Note:** *If you have a [X Developer API Pro Account](https://developer.x.com/en/portal/products/pro), you can directly follow the dataset's authors' [MuMiN Tutorial](https://colab.research.google.com/drive/1JCjgg3moGBOuZk4iVjBpQNqgsAYFyNoS#scrollTo=YS1uxj-59UmA) and conduct a deeper analysis with more enriched variables when [rehydrating the original datasets](https://colab.research.google.com/drive/1JCjgg3moGBOuZk4iVjBpQNqgsAYFyNoS#scrollTo=SCJ5UogLvUXb).*
+
+After all steps above done, you can review the data in R:
 
 ```{r}
 #| eval: false

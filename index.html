@@ -4616,13 +4616,10 @@ Stage6          1.0000000</code></pre>
 <h1 data-number="7"><span class="header-section-number">7</span> Appendix</h1>
 <section id="data-collection" class="level2" data-number="7.1">
 <h2 data-number="7.1" class="anchored" data-anchor-id="data-collection"><span class="header-section-number">7.1</span> Data Collection</h2>
-<p>This study uses secondary data from the <strong>MuMiN Project</strong> (Multi-platform Misinformation Influence Network), publicly available at: <a href="https://data.bris.ac.uk/datasets/23yv276we2mll25fjakkfim2ml/mumin.zip" class="uri">https://data.bris.ac.uk/datasets/23yv276we2mll25fjakkfim2ml/mumin.zip</a></p>
-<p>The dataset includes information about retweeter ids, tweets ids, misinformation claims, and the date of specific misinformation claim uttered etc.</p>
+<p>This study uses secondary data from the <strong>MuMiN Project</strong> (Multi-platform Misinformation Influence Network), publicly available at: <a href="https://data.bris.ac.uk/datasets/23yv276we2mll25fjakkfim2ml/mumin.zip" class="uri">https://data.bris.ac.uk/datasets/23yv276we2mll25fjakkfim2ml/mumin.zip</a> The dataset includes information about retweeter ids, tweets ids, misinformation claims, and the date of specific misinformation claim uttered etc.</p>
 <p><strong>Note: About the <code>date</code>, <a href="https://arxiv.org/abs/2202.11684">the explanation of dataset’s authours</a>:</strong></p>
 <p><em>“<code>date</code>: The date the claim was uttered. If this date was not available then the date of the review was used. If neither of those two were available then we extracted a potential date from the URL of the fact-checking article using the regular expression [0-9]{4}-[0-9]{2}-[0-9]{2}.”</em></p>
-<p>After downloading all files, create a <code>data</code> folder in your working directory and place the files inside it.</p>
-<p>Follow the setup instructions provided <a href="https://colab.research.google.com/drive/1JCjgg3moGBOuZk4iVjBpQNqgsAYFyNoS#scrollTo=YS1uxj-59UmA">here</a>. Use the shell to install required packages via <code>pip</code> as directed.</p>
-<p>Next, open <code>VS Code</code>, and run the following Python script to convert <code>.pkl</code> files to <code>.csv</code>:</p>
+<p>After downloading all files, create a <code>data</code> folder in your working directory and place the files inside it. Then, follow the setup instructions provided <a href="https://colab.research.google.com/drive/1JCjgg3moGBOuZk4iVjBpQNqgsAYFyNoS#scrollTo=YS1uxj-59UmA">here</a>. Use the shell to install required packages via <code>pip</code> as directed. Next, open <code>VS Code</code>, and run the following Python script to convert <code>.pkl</code> files to <code>.csv</code>:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb57"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb57-2"><a href="#cb57-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
@@ -4656,7 +4653,8 @@ Stage6          1.0000000</code></pre>
 <span id="cb57-30"><a href="#cb57-30" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f&quot;Failed to convert </span><span class="sc">{</span>name<span class="sc">}</span><span class="ss">: </span><span class="sc">{</span>e<span class="sc">}</span><span class="ss">&quot;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>This script will generate the corresponding CSV files for further analysis.</p>
-<p>Then, preview the Data in R:</p>
+<p><strong>Note:</strong> <em>If you have a <a href="https://developer.x.com/en/portal/products/pro">X Developer API Pro Account</a>, you can directly follow the dataset’s authors’ <a href="https://colab.research.google.com/drive/1JCjgg3moGBOuZk4iVjBpQNqgsAYFyNoS#scrollTo=YS1uxj-59UmA">MuMiN Tutorial</a> and conduct a deeper analysis with more enriched variables when <a href="https://colab.research.google.com/drive/1JCjgg3moGBOuZk4iVjBpQNqgsAYFyNoS#scrollTo=SCJ5UogLvUXb">rehydrating the original datasets</a>.</em></p>
+<p>After all steps above done, you can review the data in R:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb58"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Set the data path </span></span>
 <span id="cb58-2"><a href="#cb58-2" aria-hidden="true" tabindex="-1"></a>data_path <span class="ot">&lt;-</span> <span class="st">&quot;data/mumin_csv/&quot;</span></span>
