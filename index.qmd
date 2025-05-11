@@ -31,6 +31,16 @@ highlight-style: nord
 engine: knitr
 ---
 
+```{r}
+#| include: false
+library(tidyverse)
+library(readr)
+library(statnet)
+library(intergraph)
+library(reshape2)
+library(btergm)
+```
+
 ------------------------------------------------------------------------
 
 # Abstract
@@ -41,6 +51,18 @@ This study focuses on retweeters of misinformation claims as the core agents of 
 
 By investigating the density, transitivity, and centralization of these networks, this research explores how distinct retweeter behaviors reflect patterns of collective amplification in misinformation networks. The research question guiding this analysis is: How do different co-dissemination behaviors, which are operationalized through direct, quote, and reply co-retweeting, shape the structural characteristics and potential amplification patterns of misinformation retweeter networks?
 
+
+这些“集线器”之间存在合作关系还是竞争关系？
+
+是否形成了主干传播路径，导致某些错误信息极易被快速广泛传播？
+
+是否有“桥梁节点”（像计算机网络的 backbone router）起到跨社群扩散的作用？
+
+这些集线器（retweeters）是否基于特定议题聚集？形成了所谓的“信息联盟”？
+
+Retweeter Amplification Backbone Network
+
+Meta-Units of Amplification（Amplification Hubs）
 ------------------------------------------------------------------------
 
 # Introduction
@@ -95,19 +117,44 @@ Despite growing attention to these behaviors, much of the existing literature te
 
 ## Data Source and Collection
 
-The data utilized in this research are derived from the [MuMiN (Multilingual Misinformation Network) dataset](https://mumin-dataset.github.io/), which comprises large-scale misinformation diffusion events on Twitter (now X) occurring between March 2020 and August 2021. Specifically, we focus on a set of six prominent misinformation claims related to the narrative asserting that [COVID-19 was deliberately created or manufactured by China or a laboratory in Wuhan](https://en.wikipedia.org/wiki/COVID-19_lab_leak_theory). Each misinformation claim represents a distinct temporal event, thus allowing for comparisons across different stages of misinformation dissemination.
+The data utilized in this research are collected from the [MuMiN (Multilingual Misinformation Network) dataset](https://mumin-dataset.github.io/), which comprises large-scale misinformation diffusion events on Twitter (now X). Specifically, we focus on a set of six prominent misinformation claims related to the narrative asserting that [COVID-19 was deliberately created or manufactured by China or a laboratory in Wuhan](https://en.wikipedia.org/wiki/COVID-19_lab_leak_theory) across a time span from March 2020 to August 2021. Each misinformation claim represents a distinct temporal event under the same topic, thus allowing for comparisons across different stages of misinformation dissemination.
 
 ## Nodes and Edges Definition
 
-The analytical unit in this study is individual retweeters, Twitter users who actively engaged in disseminating misinformation claims by retweeting relevant content. Each retweeter is represented as a network node, and relationships (edges) between these nodes are operationalized through three distinct co-retweeting behaviors: The relationships between retweeters (edges) are defined by three distinct co-retweeting behaviors:
+This study conceptualizes individual retweeters—users actively involved in the redistribution of misinformation—as foundational units within larger meta-networks of amplification. These retweeter-centric networks, or amplification backbones, capture how collective user behaviors create structural conditions that facilitate or constrain the amplification potential of misinformation, independent of the content itself (Barabási, 2016). Each retweeter is represented as a network node, and relational ties (edges) are defined through three distinct co-retweeting behaviors. To interpret the structural and functional characteristics of the resulting networks, a cross-disciplinary heuristic framework is applied, drawing specifically from principles in computer network engineering. In this framework, the study analogizes retweeter networks to the organizational patterns found in physical network infrastructures, where hubs, switches, and routers perform distinct roles in information transmission and amplification. This interdisciplinary perspective provides a conceptual foundation for understanding the differentiated structural properties and amplification dynamics across the three types of retweeter networks.
 
-1.  Direct co-retweet: An edge between two retweeters is formed if both retweeted exactly the same original misinformation tweet. This represents direct, synchronous engagement and captures the immediate amplification behavior around misinformation.
+### Direct Co-Retweet Network
 
-2.  Quote pathway co-retweet: An edge is established between two retweeters if both retweeted either the original misinformation tweet or a tweet explicitly quoting it. This behavior includes secondary dissemination through user-generated reinterpretations, potentially broadening the narrative framing around the misinformation.
+The first category, Direct Co-Retweet, establishes edges between two retweeters if both have retweeted the exact same misinformation tweet. This behavior reflects the most immediate and synchronous form of information amplification, typically associated with highly reactive and temporally concentrated user engagement (Vosoughi, Roy, & Aral, 2018). Conceptually, this network corresponds to a meta-network of amplification hubs, where retweeters function as hubs and edges represent their frequent co-engagement in amplifying identical misinformation content.
 
-3.  Reply pathway co-retweet: An edge connects two retweeters if both retweeted either the original misinformation tweet or a tweet explicitly replying to it. This pathway highlights interactive engagement, reflecting discussions, debates, or reactions surrounding misinformation content.
+Drawing on computer network engineering principles, this structure is analogous to the interactions among Ethernet hubs. In such environments, hubs indiscriminately broadcast all received data to connected devices (Tanenbaum & Wetherall, 2011). When considering a meta-level perspective, hubs themselves can also be seen as engaging in co-broadcasting behavior—frequently handling and transmitting the same data streams across the network (Kurose & Ross, 2021). Similarly, retweeter hubs that frequently co-retweet the same misinformation content effectively form a densely connected meta-network through these shared amplification events.
 
-Each co-retweeting behavior results in a distinct adjacency matrix, generating three separate network across six misinformation claims which represent the same topic.
+This network structure is expected to exhibit high density, as the frequent and indiscriminate co-retweeting behavior creates numerous direct ties among retweeter hubs. However, despite this density, the network is anticipated to have low degree centralization. The dissemination process is horizontally distributed, lacking reliance on a small set of dominant actors. In such flat structures, no single retweeter disproportionately influences the amplification process, mirroring how Ethernet hubs operate without prioritizing specific nodes (Forouzan, 2017).
+
+Finally, the clustering coefficient is expected to remain low. Although the network is dense, these connections emerge primarily from transient, event-driven co-amplification rather than stable or cohesive subgroup formations. Similar to how broadcast redundancy in Ethernet hubs increases traffic but does not foster tightly-knit clusters, retweeters in direct co-retweet networks exhibit high connectivity without forming persistent triadic relationships (Barabási, 2016; Newman, 2010).
+
+
+### Quote Pathway Co-Retweet
+
+The second category, quote pathway co-retweet, forms edges between two retweeters if both have retweeted either the original misinformation tweet or any tweet explicitly quoting it. This behavior introduces an additional narrative layer, where misinformation is not simply repeated but often reframed or recontextualized, amplifying its persuasive power through reinterpretation and added commentary (Papacharissi & de Fatima Oliveira, 2012).
+
+At the meta-network level, this structural pattern corresponds to how Ethernet switches coordinate with one another through selective forwarding strategies. In network architecture, switches do not indiscriminately broadcast information like hubs but instead intelligently manage traffic by forwarding data packets to specific destinations based on address information (Stallings, 2020). When viewed from a meta-network perspective, switches that frequently participate in the forwarding of similar high-level data streams (e.g., similar content types or priority flows) form structured pathways that optimize information exchange across the broader network (Kurose & Ross, 2021). Similarly, retweeter hubs engaged in quote retweet behaviors form connections not through direct repetition but through shared amplification of interpretive or reframed misinformation content, fostering more purposeful but selective ties across the meta-network.
+
+This structural logic suggests a moderate density within quote pathway co-retweet networks compared to direct co-retweet network. While engagement remains significant, the selective nature of quoting (forwarding data packets to specific destinations) introduces filtering mechanisms that reduce indiscriminate content propagation (Tanenbaum & Wetherall, 2011). Additionally, these networks are expected to exhibit moderate degree centralization. Certain influential actors whose reinterpretations or commentaries resonate widely may emerge as interpretive leaders. However, the absence of rigid hierarchical pathways means that overall centralization remains less pronounced compared to highly stratified networks (Forouzan, 2017).
+
+Notably, quote-based networks are hypothesized to display a moderate to high clustering coefficient. Unlike direct retweeting, quoting inherently introduces an additional layer of selective engagement, where users actively choose not only to propagate misinformation but also to reframe it within specific narrative contexts. This behavior fosters the emergence of localized interpretive communities, where users repeatedly interact with others who share similar viewpoints or rhetorical framings of the misinformation narrative (Papacharissi, 2015). As these shared interpretive practices accumulate, the likelihood of triadic closure among users increases, leading to tightly-knit subgroups centered around influential reframings. This pattern parallels the formation of Virtual Local Area Networks (VLANs) in computer network architecture, where Ethernet switches logically segment larger networks into smaller, cohesive subnetworks. These subnetworks facilitate more frequent and efficient data exchanges among devices within the same logical group, even if they are physically dispersed (Perlman, 1985; Kurose & Ross, 2021). Similarly, retweeter hubs participating in quoting behaviors selectively engage with content that resonates within specific narrative frames, effectively constructing “interpretive subnetworks” within the broader misinformation amplification meta-network.
+
+
+### Reply Pathway Co-Retweet
+
+The third category, reply pathway co-retweet, forms edges when two retweeters have either retweeted the original misinformation tweet or a tweet explicitly replying to it. This behavior represents a higher level of interactive engagement, often characterized by public debates, emotional reactions, and efforts to contest or clarify misinformation narratives. Empirical studies indicate that reply chains, particularly around controversial content, foster emotionally charged discussions and recursive interactions, intensifying user clustering around specific conversational threads (Chuai et al., 2024; Fazio et al., 2015).
+
+In this meta-network of retweeters, reply-based connections closely mirror the behavior of core routers in computer network infrastructures. These routers do not simply relay information to endpoints but serve as critical junctions that interconnect subnetworks, efficiently managing large-scale traffic flows and concentrating communication through pivotal nodes (Stallings, 2020). Similarly, influential retweeters in reply networks often occupy structurally central positions, acting as conversational hubs that bridge otherwise disconnected retweeter communities and facilitate cross-cluster narrative circulation (Freeman, 1979).
+
+Accordingly, reply-path co-retweet networks are expected to exhibit low global density but high local clustering and degree centralization. In this meta-network of retweeters, edges emerge from shared engagement with specific reply chains linked to misinformation narratives. This structural configuration reflects how user participation in reply-based dissemination tends to concentrate around focused conversational threads, leading to the formation of tightly knit local discussion clusters. Analogous to how routers in computer networks manage information flow between distinct subnetworks, certain highly active retweeters function as bridging hubs, connecting otherwise fragmented communities by amplifying reply-thread content across broader audience segments. This contributes to a network structure characterized by high clustering coefficients and the presence of central nodes that facilitate cross-group information circulation, even as overall connection density remains low.
+
+Thus, each co-retweeting behavior produces a distinct network topology, operationalized through separate adjacency matrices, and analyzed across six temporally distinct misinformation claim related to the same topic. These conceptual distinctions provide insight into how different dissemination behaviors shape the structural organization of retweeter amplification networks, revealing how collective retweeter behaviors manifest in varying patterns of density, centralization, and clustering coefficient within these meta-networks of amplification.
+
 
 ## Analytical Strategy and Network Metrics
 
@@ -167,31 +214,209 @@ While detailed node attribute data are limited in our dataset, exploratory Expon
 
 All data processing, network construction, and analysis procedures were conducted using the RStudio (version \>= 4.0.0), primarily leveraging the `statnet` family of packages for network analysis, along with auxiliary packages for statistical testing (`stats` etc.) and data visualization (`ggplot2` etc.).
 
-# Data Collection & Graph
 
-## Dataset
+# Analysis
 
-This study uses secondary data from the **MuMiN Project** (Multi-platform Misinformation Influence Network), publicly available at: <https://data.bristol.ac.uk/data/en_GB/dataset/23yv276we2mll25fjakkfim2ml/resource/e63a98c4-b4d6-4a89-9be9-06875b83ce33?inner_span=True>
+## Basic Network Metrics
 
-The dataset includes information about social media users, tweets, misinformation claims, and their relational behaviors across various platforms.
+### Compare 3 Networks overall difference
+
+```{r}
+# 1. 读入三个网络的邻接矩阵
+adj_direct <- as.matrix(read.csv("data/adj_matrix_co_retweet.csv", row.names = 1, check.names = FALSE))
+adj_quote <- as.matrix(read.csv("data/adj_matrix_co_retweet_quote_path.csv", row.names = 1, check.names = FALSE))
+adj_reply <- as.matrix(read.csv("data/adj_matrix_co_retweet_reply_path.csv", row.names = 1, check.names = FALSE))
+
+# 2. 转换为 statnet 的 network 对象
+net_direct <- network(adj_direct, directed = FALSE, matrix.type = "adjacency")
+net_quote <- network(adj_quote, directed = FALSE, matrix.type = "adjacency")
+net_reply <- network(adj_reply, directed = FALSE, matrix.type = "adjacency")
+
+# 3. 定义计算函数
+compute_network_metrics <- function(net) {
+  data.frame(
+    Nodes = network.size(net),
+    Edges = network.edgecount(net),
+    Density = gden(net),
+    Average_Degree = mean(degree(net), na.rm = TRUE),
+    Transitivity = gtrans(net, mode = "graph"),
+    Centralization_Degree = centralization(net, degree, mode = "freeman")
+  )
+}
+
+# 4. 计算各网络的指标
+metrics_direct <- compute_network_metrics(net_direct)
+metrics_quote <- compute_network_metrics(net_quote)
+metrics_reply <- compute_network_metrics(net_reply)
+
+# 5. 合并结果输出
+metrics_result <- rbind(
+  cbind(Network = "Direct Co-Retweet", metrics_direct),
+  cbind(Network = "Quote Pathway", metrics_quote),
+  cbind(Network = "Reply Pathway", metrics_reply)
+)
+
+print(metrics_result)
+
+
+# plot(net_direct)
+# plot(net_quote)
+# plot(net_reply)
+```
+
+
+
+# Reference
+
+Barabási, A.-L. (2016). Network science. Cambridge University Press. https://www.cambridge.org/fr/academic/subjects/physics/statistical-physics/network-science?format=HB&isbn=9781107076266
+
+Bruns, A., Harrington, S., & Hurcombe, E. (2020). Corona? 5G? or both? The dynamics of COVID-19 conspiracy theories on Facebook. *Media International Australia, 177*(1), 12–29. <https://doi.org/10.1177/1329878X20946113>
+
+Chuai, Y., Sergeeva, A., Lenzini, G., & Pröllochs, N. (2024). Community fact-checks trigger moral outrage in replies to misleading posts on social media (arXiv preprint arXiv:2409.08829). https://arxiv.org/abs/2409.08829
+
+Cinelli, M., Quattrociocchi, W., Galeazzi, A., et al. (2020). The COVID-19 social media infodemic. *Scientific Reports, 10*, 16598. <https://doi.org/10.1038/s41598-020-73510-5>
+
+Fazio, L. K., Brashier, N. M., Payne, B. K., & Marsh, E. J. (2015). Knowledge does not protect against illusory truth. Journal of Experimental Psychology: General, 144(5), 993–1002. https://doi.org/10.1037/xge0000098
+
+Ferrara, E. (2020). What types of COVID-19 conspiracies are populated by Twitter bots? *First Monday, 25*(6). <https://doi.org/10.5210/fm.v25i6.10633>
+
+Freeman, L. C. (1979). Centrality in social networks: Conceptual clarification. Social Networks, 1(3), 215–239. https://doi.org/10.1016/0378-8733(78)90021-7
+
+Forouzan, B. A. (2017). Data Communications and Networking (5th ed.). McGraw-Hill Education.
+
+Guarino, S., Trino, N., Celestini, A., Chessa, A., & Riotta, G. (2020). Characterizing networks of propaganda on Twitter: A case study. *Applied Network Science, 5*, 59. <https://doi.org/10.1007/s41109-020-00286-y>
+
+Guess, A., Nagler, J., & Tucker, J. (2019). Less than you think: Prevalence and predictors of fake news dissemination on Facebook. *Science Advances, 5*(1), eaau4586. <https://doi.org/10.1126/sciadv.aau4586>
+
+Kurose, J. F., & Ross, K. W. (2021). Computer Networking: A Top-Down Approach (8th ed.). Pearson.
+
+Papacharissi, Z. (2015). Affective Publics: Sentiment, Technology, and Politics. Oxford University Press.
+
+Papacharissi, Z., & de Fatima Oliveira, M. (2012). Affective news and networked publics: The rhythms of news storytelling on #egypt. Journal of Communication, 62(2), 266–282. https://doi.org/10.1111/j.1460-2466.2012.01630.x
+
+Perlman, R. (1985). An algorithm for distributed computation of a spanning tree in an extended LAN. ACM SIGCOMM Computer Communication Review, 15(4), 44–53. https://doi.org/10.1145/319056.319004
+
+Shao, C., Ciampaglia, G. L., Varol, O., et al. (2018). The spread of low-credibility content by social bots. *Nature Communications, 9*, 4787. <https://doi.org/10.1038/s41467-018-06930-7>
+
+Stallings, W. (2020). Data and computer communications (11th ed.). Pearson.
+
+Stam, C., Saldanha, E., Halappanavar, M., & Acharya, A. (2024). DISHONEST: Dissecting misinformation spread using homogeneous social networks and semantic topic classification. arXiv preprint arXiv:2412.09578. https://arxiv.org/abs/2412.09578
+
+Tanenbaum, A. S., & Wetherall, D. J. (2011). Computer networks (5th ed.). Pearson.
+
+Truong, B. T., Hui, P.-M., Torres-Lugo, C., Pacheco, D., Flammini, A., & Menczer, F. (2021). Uncovering coordinated networks on social media. Proceedings of the International AAAI Conference on Web and Social Media, 15(1), 455–466. https://doi.org/10.1609/icwsm.v15i1.18075
+
+Vosoughi, S., Roy, D., & Aral, S. (2018). The spread of true and false news online. *Science, 359*(6380), 1146–1151. <https://doi.org/10.1126/science.aap9559>
+
+Wasserman, S., & Faust, K. (1994). *Social Network Analysis: Methods and Applications*. Cambridge University Press.
+
+Weber, D., & Neumann, F. (2021). Amplifying influence through coordinated behaviour in social networks. Social Network Analysis and Mining, 11(1), 1–13. https://doi.org/10.1007/s13278-021-00815-2
+
+Wu, Y., & Shen, H. (2023). Examining retweeting behavior on social networking sites from the perspective of online identity and self-presentation. Frontiers in Psychology, 14, 10202284. https://doi.org/10.3389/fpsyg.2023.10202284
+
+Zhao, Z., & Wang, X. (2024). To Reply or to Quote: Comparing conversational framing strategies on Twitter. Proceedings of the ACM on Human-Computer Interaction, 8(CSCW1), Article 3625680. https://doi.org/10.1145/3625680
+
+# Appendix
+
+## Data Collection
+
+This study uses secondary data from the **MuMiN Project** (Multi-platform Misinformation Influence Network), publicly available at: <https://data.bris.ac.uk/datasets/23yv276we2mll25fjakkfim2ml/mumin.zip> The dataset includes information about retweeter ids, tweets ids, misinformation claims, and the date when specific misinformation claims uttered etc.
+
+**Note: About the `date`, [the explanation of dataset's authours](https://arxiv.org/abs/2202.11684):**
+
+*"`date`: The date the claim was uttered. If this date was not available then the date of the review was used. If neither of those two were available then we extracted a potential date from the URL of the fact-checking article using the regular expression \[0-9\]{4}-\[0-9\]{2}-\[0-9\]{2}."*
+
+After downloading all files, create a `data` folder in your working directory and place the files inside it. Then, follow the setup instructions provided [here](https://colab.research.google.com/drive/1JCjgg3moGBOuZk4iVjBpQNqgsAYFyNoS#scrollTo=YS1uxj-59UmA). Use the shell to install required packages via `pip` as directed. Next, open `VS Code`, and run the following Python script to convert `.pkl` files to `.csv`:
+
+```{python}
+#| eval: false
+#| include: true
+
+import pandas as pd
+import os
+
+input_dir = "data/mumin"
+output_dir = "data/mumin_csv"
+os.makedirs(output_dir, exist_ok=True)
+
+file_names = [
+    "claim",
+    "user",
+    "tweet",
+    "reply",
+    "article",
+    "tweet_discusses_claim",
+    "article_discusses_claim",
+    "user_follows_user",
+    "user_retweeted_tweet",
+    "reply_quote_of_tweet",
+    "reply_reply_to_tweet"
+]
+
+for name in file_names:
+    input_path = os.path.join(input_dir, name)
+    output_path = os.path.join(output_dir, f"{name}.csv")
+    try:
+        df = pd.read_pickle(input_path, compression="xz")
+        df.to_csv(output_path, index=False)
+        print(f"Saved: {output_path}")
+    except Exception as e:
+        print(f"Failed to convert {name}: {e}")
+
+```
+
+This script will generate the corresponding CSV files for further analysis.
+
+**Note:** *If you have a [X Developer API Pro Account](https://developer.x.com/en/portal/products/pro), you can directly follow the dataset's authors' [MuMiN Tutorial](https://colab.research.google.com/drive/1JCjgg3moGBOuZk4iVjBpQNqgsAYFyNoS#scrollTo=YS1uxj-59UmA) and conduct a deeper analysis with more enriched variables when [rehydrating the original datasets](https://colab.research.google.com/drive/1JCjgg3moGBOuZk4iVjBpQNqgsAYFyNoS#scrollTo=bOQqaJOa_PbF&line=1&uniqifier=1).*
+
+After all steps above done, you can review the data in R:
+
+```{r}
+#| eval: false
+#| include: true
+# Set the data path 
+data_path <- "data/mumin_csv/"
+
+# Define the list of files to read
+files <- c(
+  "claim.csv", "user.csv", "tweet.csv", "reply.csv", "article.csv",
+  "tweet_discusses_claim.csv", "article_discusses_claim.csv",
+  "user_follows_user.csv", "user_retweeted_tweet.csv",
+  "reply_quote_of_tweet.csv", "reply_reply_to_tweet.csv"
+)
+
+# Preview the first few rows of each file 
+previews <- lapply(files, function(fname) {
+  fpath <- file.path(data_path, fname)
+  tryCatch(
+    read_csv(fpath, n_max = 5),
+    error = function(e) tibble::tibble(error = paste("Error:", e$message))
+  )
+})
+
+names(previews) <- files
+
+```
 
 ## Data Preparation
 
 ### Loading Required Packages
 
 ```{r}
-#| label: set up packages
+#| eval: false
 library(tidyverse)
 library(readr)
 library(statnet)
 library(intergraph)
 library(reshape2)
 library(btergm)
+library(igraph)
 ```
 
 ### Loading and Merging Data
 
 ```{r}
+#| output: false
 # Load data
 tweets <- read_csv("data/mumin_csv/tweet.csv")
 claims <- read_csv("data/mumin_csv/claim.csv")
@@ -222,21 +447,15 @@ head(table(user_claim$cluster_keywords))
 
 This study focuses specifically on misinformation narratives claiming that **COVID-19 was deliberately created or spread by China or the Wuhan laboratory**. The following filtering steps were applied:
 
-1.  Filter keywords containing "china" or "wuhan".
-
-2.  Manually select misinformation topics directly related to the COVID-19 origin narrative.
-
-3.  Restrict the analysis to English-language posts labeled as "misinformation".
-
-**Note:**
-
 ```{r}
+#| output: false
+# Filter keywords containing "china" or "wuhan"
 user_claim_filtered <- user_claim |> 
   filter(str_detect(keywords, "china|wuhan")) 
 
 head(unique(user_claim_filtered$keywords))
 
-# Final filtered dataset
+# Manually select misinformation topics directly related to the COVID-19 origin narrative
 covid_wuhan_misinfo <- user_claim_filtered |>
   filter(keywords %in% c(
     "coronavirus comes biological laboratory wuhan",
@@ -264,6 +483,7 @@ covid_wuhan_misinfo <- user_claim_filtered |>
     "air comes china import coronavirus",
     "coronavirus released china"
   )) |>
+  # Restrict the analysis to English-language posts labeled as "misinformation"
   filter(language == "en") |>
   filter(label == "misinformation")
 
@@ -281,6 +501,7 @@ This network models the co-dissemination behavior of misinformation retweeters. 
 The `co-retweet` network represents a co-dissemination behavior among retweeters. A tie is created between two users only if they both retweeted the same specific misinformation tweet, which is identified by a shared `tweet_id` in `user_retweeted_tweet.csv` file. Each edge is weighted by the number of such co-retweeting events, reflecting how often the same pair of users jointly retweeted the same pieces of misinformation. Though this relationship does not suggest that a paired users share the same opinion, it captures direct and synchronous amplification of specific misinformation claim in tweets. Therefore, by analyzing the weighted connections among pairs of retweeters, this network checks which retweeters are central to the misinformation amplification/dissemination process, and whether specific communities or cliques form around the repeated propagation of misinformation.
 
 ```{r}
+#| output: false
 # Extract misinformation-related tweets id
 misinfo_tweet_id <- unique(covid_wuhan_misinfo$tweet_id)
 
@@ -364,7 +585,6 @@ The **Co-Retweet (Quote Pathway)** Network captures relational ties between user
 
 ```{r}
 # Load quote relationships between tweets (quoting tweet & quoted tweet)
-
 quote_relations <- read_csv("data/mumin_csv/reply_quote_of_tweet.csv") |>
   filter(tgt %in% misinfo_tweet_id | src %in% misinfo_tweet_id) |> 
   rename(
@@ -607,470 +827,6 @@ if (nrow(retweeter_follow_edges_directed) == 0) {
 ```
 
 Analysis of the follower network among misinformation retweeters revealed no recorded follower-followee relationships within this group. This indicates that users involved in the dissemination of COVID-19 origin misinformation acted largely as isolated agents rather than as members of a tightly connected social network. Such a pattern suggests that the spread of misinformation in this case was driven primarily by content virality and opportunistic engagement, rather than through established social ties or influencer-led dissemination.
-
-# Analysis
-
-## Basic Network Metrics
-
-### Compare 3 Networks overall difference
-
-```{r}
-# 1. 读入三个网络的邻接矩阵
-adj_direct <- as.matrix(read.csv("data/adj_matrix_co_retweet.csv", row.names = 1, check.names = FALSE))
-adj_quote <- as.matrix(read.csv("data/adj_matrix_co_retweet_quote_path.csv", row.names = 1, check.names = FALSE))
-adj_reply <- as.matrix(read.csv("data/adj_matrix_co_retweet_reply_path.csv", row.names = 1, check.names = FALSE))
-
-# 2. 转换为 statnet 的 network 对象
-net_direct <- network(adj_direct, directed = FALSE, matrix.type = "adjacency")
-net_quote <- network(adj_quote, directed = FALSE, matrix.type = "adjacency")
-net_reply <- network(adj_reply, directed = FALSE, matrix.type = "adjacency")
-
-# 3. 定义计算函数
-compute_network_metrics <- function(net) {
-  data.frame(
-    Nodes = network.size(net),
-    Edges = network.edgecount(net),
-    Density = gden(net),
-    Average_Degree = mean(degree(net), na.rm = TRUE),
-    Transitivity = gtrans(net, mode = "graph"),
-    Centralization_Degree = centralization(net, degree, mode = "freeman")
-  )
-}
-
-# 4. 计算各网络的指标
-metrics_direct <- compute_network_metrics(net_direct)
-metrics_quote <- compute_network_metrics(net_quote)
-metrics_reply <- compute_network_metrics(net_reply)
-
-# 5. 合并结果输出
-metrics_result <- rbind(
-  cbind(Network = "Direct Co-Retweet", metrics_direct),
-  cbind(Network = "Quote Pathway", metrics_quote),
-  cbind(Network = "Reply Pathway", metrics_reply)
-)
-
-print(metrics_result)
-
-
-plot(net_direct)
-plot(net_quote)
-plot(net_reply)
-```
-
-### T-Test
-
-```{r}
-# # 创建数据框手动输入结果
-# metrics_df <- data.frame(
-#   Network = c("Direct", "Quote", "Reply"),
-#   Density = c(0.1309, 0.0838, 0.0894),
-#   Centralization = c(0.0868, 0.1348, 0.1291)
-# )
-# 
-# # t-test: Density Direct vs Quote
-# t.test_density_dq <- t.test(
-#   x = rep(metrics_df$Density[1], 112),  # Direct
-#   y = rep(metrics_df$Density[2], 112)   # Quote
-# )
-# 
-# # t-test: Density Direct vs Reply
-# t.test_density_dr <- t.test(
-#   x = rep(metrics_df$Density[1], 112),  # Direct
-#   y = rep(metrics_df$Density[3], 112)   # Reply
-# )
-# 
-# # t-test: Centralization Direct vs Quote
-# t.test_cent_dq <- t.test(
-#   x = rep(metrics_df$Centralization[1], 112),
-#   y = rep(metrics_df$Centralization[2], 112)
-# )
-# 
-# # 查看结果
-# t.test_density_dq
-# t.test_density_dr
-# t.test_cent_dq
-
-
-```
-
-### Co-retweet Net
-
-```{r}
-# Load 6 Stage Net
-co_retweet_stage_networks <- list(
-  Stage1 = read.csv("data/adj_matrix_stage1.csv", row.names = 1) |> 
-    as.matrix() |> 
-    network(directed = FALSE, matrix.type = "adjacency"),
-  
-  Stage2 = read.csv("data/adj_matrix_stage2.csv", row.names = 1) |> 
-    as.matrix() |> 
-    network(directed = FALSE, matrix.type = "adjacency"),
-  
-  Stage3 = read.csv("data/adj_matrix_stage3.csv", row.names = 1) |> 
-    as.matrix() |> 
-    network(directed = FALSE, matrix.type = "adjacency"),
-  
-  Stage4 = read.csv("data/adj_matrix_stage4.csv", row.names = 1) |> 
-    as.matrix() |> 
-    network(directed = FALSE, matrix.type = "adjacency"),
-  
-  Stage5 = read.csv("data/adj_matrix_stage5.csv", row.names = 1) |> 
-    as.matrix() |> 
-    network(directed = FALSE, matrix.type = "adjacency"),
-  
-  Stage6 = read.csv("data/adj_matrix_stage6.csv", row.names = 1) |> 
-    as.matrix() |> 
-    network(directed = FALSE, matrix.type = "adjacency")
-)
-
-```
-
-```{r}
-
-compute_local_clustering <- function(net) {
-  adj_mat <- as.matrix.network.adjacency(net)
-  n <- nrow(adj_mat)
-  
-  clustering_vals <- numeric(n)
-  
-  for (i in 1:n) {
-    neighbors <- which(adj_mat[i, ] == 1)
-    k <- length(neighbors)
-    if (k < 2) {
-      clustering_vals[i] <- NA  # 无法形成三角形，设为 NA
-    } else {
-      subgraph <- adj_mat[neighbors, neighbors]
-      actual_edges <- sum(subgraph) / 2  # 无向图
-      possible_edges <- k * (k - 1) / 2
-      clustering_vals[i] <- actual_edges / possible_edges
-    }
-  }
-  
-  return(clustering_vals)
-}
-
-
-compute_metrics <- function(net) {
-  data.frame(
-    Nodes = network.size(net),
-    Edges = network.edgecount(net),
-    Density = gden(net),
-    Average_Degree = mean(degree(net), na.rm = TRUE),
-    Degree_Centralization = centralization(net, degree, mode = "freeman"),
-    Closeness_Centralization = centralization(net, closeness, mode = "freeman"),
-    Betweenness_Centralization = centralization(net, betweenness, mode = "freeman"),
-    Transitivity_Global = gtrans(net, mode = "graph"),
-    Transitivity_Local = mean(compute_local_clustering(net), na.rm = TRUE)  # 替代 clustering.coefficient
-  )
-}
-
-
-```
-
-```{r}
-metrics_results <- lapply(co_retweet_stage_networks, compute_metrics)
-metrics_df <- do.call(rbind, metrics_results)
-metrics_df$Stage <- rownames(metrics_df)
-
-# reorder columns
-metrics_df <- metrics_df[, c("Stage", setdiff(names(metrics_df), "Stage"))]
-
-print(metrics_df)
-
-```
-
-The analysis of basic network metrics across the six stages reveals a highly clustered network structure with consistently high global and local transitivity values, suggesting that misinformation retweet activities predominantly occurred within tightly-knit groups. Notably, Stage 2 exhibits the highest average degree and network density, indicating peak activity and diffusion potential at this stage. Conversely, low centralization scores across closeness and betweenness measures imply the absence of prominent gatekeepers or highly influential intermediaries within the network.
-
-# Reference
-
-Bruns, A., Harrington, S., & Hurcombe, E. (2020). Corona? 5G? or both? The dynamics of COVID-19 conspiracy theories on Facebook. *Media International Australia, 177*(1), 12–29. <https://doi.org/10.1177/1329878X20946113>
-
-Cinelli, M., Quattrociocchi, W., Galeazzi, A., et al. (2020). The COVID-19 social media infodemic. *Scientific Reports, 10*, 16598. <https://doi.org/10.1038/s41598-020-73510-5>
-
-Ferrara, E. (2020). What types of COVID-19 conspiracies are populated by Twitter bots? *First Monday, 25*(6). <https://doi.org/10.5210/fm.v25i6.10633>
-
-Guarino, S., Trino, N., Celestini, A., Chessa, A., & Riotta, G. (2020). Characterizing networks of propaganda on Twitter: A case study. *Applied Network Science, 5*, 59. <https://doi.org/10.1007/s41109-020-00286-y>
-
-Guess, A., Nagler, J., & Tucker, J. (2019). Less than you think: Prevalence and predictors of fake news dissemination on Facebook. *Science Advances, 5*(1), eaau4586. <https://doi.org/10.1126/sciadv.aau4586>
-
-Shao, C., Ciampaglia, G. L., Varol, O., et al. (2018). The spread of low-credibility content by social bots. *Nature Communications, 9*, 4787. <https://doi.org/10.1038/s41467-018-06930-7>
-
-Stam, C., Saldanha, E., Halappanavar, M., & Acharya, A. (2024). DISHONEST: Dissecting misinformation spread using homogeneous social networks and semantic topic classification. arXiv preprint arXiv:2412.09578. https://arxiv.org/abs/2412.09578
-
-Truong, B. T., Hui, P.-M., Torres-Lugo, C., Pacheco, D., Flammini, A., & Menczer, F. (2021). Uncovering coordinated networks on social media. Proceedings of the International AAAI Conference on Web and Social Media, 15(1), 455–466. https://doi.org/10.1609/icwsm.v15i1.18075
-
-Vosoughi, S., Roy, D., & Aral, S. (2018). The spread of true and false news online. *Science, 359*(6380), 1146–1151. <https://doi.org/10.1126/science.aap9559>
-
-Wasserman, S., & Faust, K. (1994). *Social Network Analysis: Methods and Applications*. Cambridge University Press.
-
-Weber, D., & Neumann, F. (2021). Amplifying influence through coordinated behaviour in social networks. Social Network Analysis and Mining, 11(1), 1–13. https://doi.org/10.1007/s13278-021-00815-2
-
-Wu, Y., & Shen, H. (2023). Examining retweeting behavior on social networking sites from the perspective of online identity and self-presentation. Frontiers in Psychology, 14, 10202284. https://doi.org/10.3389/fpsyg.2023.10202284
-
-Zhao, Z., & Wang, X. (2024). To Reply or to Quote: Comparing conversational framing strategies on Twitter. Proceedings of the ACM on Human-Computer Interaction, 8(CSCW1), Article 3625680. https://doi.org/10.1145/3625680
-
-# Appendix
-
-## Data Collection
-
-This study uses secondary data from the **MuMiN Project** (Multi-platform Misinformation Influence Network), publicly available at: <https://data.bris.ac.uk/datasets/23yv276we2mll25fjakkfim2ml/mumin.zip> The dataset includes information about retweeter ids, tweets ids, misinformation claims, and the date when specific misinformation claims uttered etc.
-
-**Note: About the `date`, [the explanation of dataset's authours](https://arxiv.org/abs/2202.11684):**
-
-*"`date`: The date the claim was uttered. If this date was not available then the date of the review was used. If neither of those two were available then we extracted a potential date from the URL of the fact-checking article using the regular expression \[0-9\]{4}-\[0-9\]{2}-\[0-9\]{2}."*
-
-After downloading all files, create a `data` folder in your working directory and place the files inside it. Then, follow the setup instructions provided [here](https://colab.research.google.com/drive/1JCjgg3moGBOuZk4iVjBpQNqgsAYFyNoS#scrollTo=YS1uxj-59UmA). Use the shell to install required packages via `pip` as directed. Next, open `VS Code`, and run the following Python script to convert `.pkl` files to `.csv`:
-
-```{python}
-#| eval: false
-#| include: true
-
-import pandas as pd
-import os
-
-input_dir = "data/mumin"
-output_dir = "data/mumin_csv"
-os.makedirs(output_dir, exist_ok=True)
-
-file_names = [
-    "claim",
-    "user",
-    "tweet",
-    "reply",
-    "article",
-    "tweet_discusses_claim",
-    "article_discusses_claim",
-    "user_follows_user",
-    "user_retweeted_tweet",
-    "reply_quote_of_tweet",
-    "reply_reply_to_tweet"
-]
-
-for name in file_names:
-    input_path = os.path.join(input_dir, name)
-    output_path = os.path.join(output_dir, f"{name}.csv")
-    try:
-        df = pd.read_pickle(input_path, compression="xz")
-        df.to_csv(output_path, index=False)
-        print(f"Saved: {output_path}")
-    except Exception as e:
-        print(f"Failed to convert {name}: {e}")
-
-```
-
-This script will generate the corresponding CSV files for further analysis.
-
-**Note:** *If you have a [X Developer API Pro Account](https://developer.x.com/en/portal/products/pro), you can directly follow the dataset's authors' [MuMiN Tutorial](https://colab.research.google.com/drive/1JCjgg3moGBOuZk4iVjBpQNqgsAYFyNoS#scrollTo=YS1uxj-59UmA) and conduct a deeper analysis with more enriched variables when [rehydrating the original datasets](https://colab.research.google.com/drive/1JCjgg3moGBOuZk4iVjBpQNqgsAYFyNoS#scrollTo=bOQqaJOa_PbF&line=1&uniqifier=1).*
-
-After all steps above done, you can review the data in R:
-
-```{r}
-#| eval: false
-#| include: true
-# Set the data path 
-data_path <- "data/mumin_csv/"
-
-# Define the list of files to read
-files <- c(
-  "claim.csv", "user.csv", "tweet.csv", "reply.csv", "article.csv",
-  "tweet_discusses_claim.csv", "article_discusses_claim.csv",
-  "user_follows_user.csv", "user_retweeted_tweet.csv",
-  "reply_quote_of_tweet.csv", "reply_reply_to_tweet.csv"
-)
-
-# Preview the first few rows of each file 
-previews <- lapply(files, function(fname) {
-  fpath <- file.path(data_path, fname)
-  tryCatch(
-    read_csv(fpath, n_max = 5),
-    error = function(e) tibble::tibble(error = paste("Error:", e$message))
-  )
-})
-
-names(previews) <- files
-
-```
-
-## Data Preparation
-
-### Loading Required Packages
-
-```{r}
-#| eval: false
-library(tidyverse)
-library(readr)
-library(statnet)
-library(intergraph)
-library(reshape2)
-library(btergm)
-library(igraph)
-```
-
-### Loading and Merging Data
-
-```{r}
-#| eval: false
-# Load data
-tweets <- read_csv("data/mumin_csv/tweet.csv")
-claims <- read_csv("data/mumin_csv/claim.csv")
-tweet_claim <- read_csv("data/mumin_csv/tweet_discusses_claim.csv")
-user_retweet <- read_csv("data/mumin_csv/user_retweeted_tweet.csv")
-
-# Join tweet & claim via tweet_claim
-tweet_claim_joined <- tweet_claim |> 
-  rename(tweet_id = src, claim_id = tgt) |> 
-  inner_join(claims, by = c("claim_id" = "id"))
-
-# Join retweeters within users & claim via retweeted tweet
-user_claim <- user_retweet |> 
-  rename(retweeter_id = src, tweet_id = tgt) |> 
-  inner_join(tweet_claim_joined, by = "tweet_id")
-
-# Create a mapping of retweeters and tweets
-retweet_map <- user_claim |> 
-  select(retweeter_id, tweet_id) |> 
-  distinct() 
-
-# Basic data overview
-table(user_claim$label)
-head(table(user_claim$cluster_keywords))
-```
-
-### Filtering for Target Misinformation Narratives
-
-This study focuses specifically on misinformation narratives claiming that **COVID-19 was deliberately created or spread by China or the Wuhan laboratory**. The following filtering steps were applied:
-
-```{r}
-#| eval: false
-# Filter keywords containing "china" or "wuhan"
-user_claim_filtered <- user_claim |> 
-  filter(str_detect(keywords, "china|wuhan")) 
-
-head(unique(user_claim_filtered$keywords))
-
-# Manually select misinformation topics directly related to the COVID-19 origin narrative
-covid_wuhan_misinfo <- user_claim_filtered |>
-  filter(keywords %in% c(
-    "coronavirus comes biological laboratory wuhan",
-    "including corona virus manufactured wuhan",
-    "china created spread coronavirus",
-    "announced coronavirus artificially created china",
-    "china created coronavirus",
-    "coronavirus created laboratory china",
-    "honjo said china manufactured coronavirus",
-    "said new coronavirus manufactured wuhan",
-    "coronavirus tested biological weapon china",
-    "china testing coronavirus biological weapon",
-    "covid 19 lab china",
-    "coronavirus natural worked wuhan laboratory",
-    "coronavirus manufactured laboratory wuhan specifically",
-    "doctor claimed coronavirus china create",
-    "corona virus manufactured china",
-    "says current coronavirus manufactured wuhan",
-    "wuhan coronavirus created patented",
-    "covid 19 disease manufactured china",
-    "pandemic caused artificial virus china",
-    "collaborator assures coronavirus manufactured wuhan",
-    "concluded covid leaked wuhan lab",
-    "coronavirus created united states china",
-    "air comes china import coronavirus",
-    "coronavirus released china"
-  )) |>
-  # Restrict the analysis to English-language posts labeled as "misinformation"
-  filter(language == "en") |>
-  filter(label == "misinformation")
-
-# Distribution of final misinformation topics
-table(covid_wuhan_misinfo$keywords)
-table(covid_wuhan_misinfo$cluster_keywords)
-```
-
-## Social Network Construction
-
-This network models the co-dissemination behavior of misinformation retweeters. While the exact paths of information transmission are unknown, this co-spreader network captures the structural relationships that may facilitate misinformation diffusion.
-
-### Co-Retweet Network
-
-The `co-retweet` network represents a co-dissemination behavior among retweeters. A tie is created between two users only if they both retweeted the same specific misinformation tweet, which is identified by a shared `tweet_id` in `user_retweeted_tweet.csv` file. Each edge is weighted by the number of such co-retweeting events, reflecting how often the same pair of users jointly retweeted the same pieces of misinformation. Though this relationship does not suggest that a paired users share the same opinion, it captures direct and synchronous amplification of specific misinformation claim in tweets. Therefore, by analyzing the weighted connections among pairs of retweeters, this network checks which retweeters are central to the misinformation amplification/dissemination process, and whether specific communities or cliques form around the repeated propagation of misinformation.
-
-```{r}
-#| eval: false
-# Extract misinformation-related tweets id
-misinfo_tweet_id <- unique(covid_wuhan_misinfo$tweet_id)
-
-# Identify pairs of users who co-retweeted the same misinformation tweet
-co_retweet_edges <- user_retweet |> 
-  filter(tgt %in% misinfo_tweet_id) |> 
-  rename(tweet_id = tgt, retweeter_id = src) |> 
-  group_by(tweet_id) |> 
-  summarise(
-    pairs = list(as.data.frame(t(combn(retweeter_id, 2)))), 
-    .groups = "drop"
-  ) |> 
-  unnest(pairs) |> 
-  mutate(
-    user_1 = pmin(V1, V2), # Ensure lower ID comes first
-    user_2 = pmax(V1, V2) # Ensure higher ID comes second
-  ) |> 
-  select(user_1, user_2) |> 
-  group_by(user_1, user_2) |> 
-  summarise(weight = n(), .groups = "drop") |> 
-  mutate(type = "co-retweet") |>
-  filter(user_1 != user_2) |>
-  mutate(
-    user_1 = as.character(user_1),
-    user_2 = as.character(user_2)
-  )
-
-# Obtain the full list of unique users involved
-all_retweeters <- unique(c(
-  covid_wuhan_misinfo$retweeter_id,  
-  co_retweet_edges$user_1, 
-  co_retweet_edges$user_2
-)) |> 
-  as.character() |> 
-  sort()
-
-# Create initial matrix
-adj_matrix_co_retweet <- acast(
-  co_retweet_edges, 
-  user_1 ~ user_2, 
-  value.var = "weight", 
-  fill = 0
-)
-
-# Ensure matrix completeness by adding missing rows and columns
-missing_rows <- setdiff(all_retweeters, rownames(adj_matrix_co_retweet))
-missing_cols <- setdiff(all_retweeters, colnames(adj_matrix_co_retweet))
-
-if (length(missing_rows) > 0) {
-  adj_matrix_co_retweet <- rbind(
-    adj_matrix_co_retweet, 
-    matrix(0, nrow = length(missing_rows), ncol = ncol(adj_matrix_co_retweet), 
-           dimnames = list(missing_rows, colnames(adj_matrix_co_retweet)))
-  )
-}
-
-if (length(missing_cols) > 0) {
-  adj_matrix_co_retweet <- cbind(
-    adj_matrix_co_retweet, 
-    matrix(0, nrow = nrow(adj_matrix_co_retweet), ncol = length(missing_cols), 
-           dimnames = list(rownames(adj_matrix_co_retweet), missing_cols))
-  )
-}
-
-# Reorder the matrix to align rows and columns
-adj_matrix_co_retweet <- adj_matrix_co_retweet[all_retweeters, all_retweeters]
-
-# Export the adjacency matrix for further analysis
-write.csv(adj_matrix_co_retweet, "data/adj_matrix_co_retweet.csv", row.names = TRUE)
-
-# Check dimensions of the final matrix
-ncol(adj_matrix_co_retweet)
-nrow(adj_matrix_co_retweet)
-
-table(co_retweet_edges$weight)
-```
 
 ## Graph
 
@@ -2905,7 +2661,7 @@ write.csv(all_metrics, "data/network_metrics_summary.csv", row.names = FALSE)
 | Quote Path Co-Retweet  | 6     | 112  | 10    | 0.0016  | 0.36       | 1          | 1        | 1.000        | 107      |
 | Reply Path Co-Retweet  | 6     | 112  | 10    | 0.0016  | 0.36       | 1          | 1        | 1.000        | 107      |
 
-**Table 1: Basic Network Structure**
+**Table 1: Basic Network Structure Over Time**
 
 | Network_Type           | Stage | Degree_Centralization | Betweenness_Centralization | Closeness_Centralization |
 |------------------------|-------|-----------------------|----------------------------|--------------------------|
@@ -2928,7 +2684,7 @@ write.csv(all_metrics, "data/network_metrics_summary.csv", row.names = FALSE)
 | Quote Path Co-Retweet  | 6     | 0.0026                | 0.0000                     | 0                        |
 | Reply Path Co-Retweet  | 6     | 0.0026                | 0.0000                     | 0                        |
 
-**Table 2: Network Centralization**
+**Table 2: Network Centralization Over Time**
 
 
 | Network_Type           | Stage | Cliques_Total | Cliques_Max_Size | Cliques_Min_Size |
@@ -2952,11 +2708,8 @@ write.csv(all_metrics, "data/network_metrics_summary.csv", row.names = FALSE)
 | Quote Path Co-Retweet  | 6     | 1              | 5                | 5                |
 | Reply Path Co-Retweet  | 6     | 1              | 5                | 5                |
 
-**Table 3: Clique Structural Features**
+**Table 3: Clique Structural Features Over Time**
 
-```{r}
-
-```
 
 ```{=html}
 <script>
