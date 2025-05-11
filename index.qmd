@@ -43,7 +43,7 @@ library(btergm)
 
 # Abstract
 
-The amplification of misinformation on social media remains a pressing concern, particularly when false narratives gain widespread visibility through the collective behaviors of retweeters themselves. This study reconceptualized retweeters not as passive intermediaries but amplification hubs within Retweeter Amplification Backbone Networks, and investigates how distinct co-retweeting behaviors produce structurally differentiated networks. Drawing on a cross-disciplinary framework of computer network architectures, this research examines: (1) direct co-retweet networks where both retweeters retweeted the same misinformation tweet, analogous to broadcast-syle amplification with high connectivity but limited subgroup cohesion; (2) quote pathway co-retweet networks where both retweeters retweeted misinformation tweet or content quoting it, resembling selective forwarding behaviors that foster localized interpretive communities; and (3) reply pathway co-retweet Networks where both retweeters retweeted misinformation tweet or content replying to it, mirroring hierarchical routing structures where influential nodes bridge fragmented communities through emotionally charged and interactive discussions. Building on these distinctions, this study addresses the research question: How do different retweeter co-dissemination behaviors construct distinct amplification backbone network structures, and how do these structures vary temporally across multiple misinformation events related to the same narrative? Using Social Network Analysis (SNA), this study systematically compares structural characteristics—including network density, average degree, degree centralization, and clustering coefficient—across 18 retweeter amplification backbone networks, constructed from six misinformation events related to the same overarching topic on the COVID-19 Wuhan lab origin theory, and ordered chronologically to capture temporal variation in amplification dynamics.
+The amplification of misinformation on social media remains a pressing concern, particularly when false narratives gain widespread visibility through the collective behaviors of retweeters themselves. This study reconceptualized retweeters not as passive intermediaries but amplification hubs within **Retweeter Amplification Backbone Networks**, and investigates how distinct co-retweeting behaviors produce structurally differentiated networks. Drawing on a cross-disciplinary framework of computer network architectures, this research examines: (1) **direct co-retweet networks** where both retweeters retweeted the same misinformation tweet, analogous to broadcast-syle amplification with high connectivity but limited subgroup cohesion; (2) **quote pathway co-retweet networks** where both retweeters retweeted misinformation tweet or content quoting it, resembling selective forwarding behaviors that foster localized interpretive communities; and (3) **reply pathway co-retweet networks** where both retweeters retweeted misinformation tweet or content replying to it, mirroring hierarchical routing structures where influential nodes bridge fragmented communities through emotionally charged and interactive discussions. Building on these distinctions, this study addresses the research question: *How do different retweeter co-dissemination behaviors construct distinct amplification backbone network structures, and how do these structures vary temporally across multiple misinformation events related to the same narrative?* Using Social Network Analysis (SNA), this study systematically compares structural characteristics—including network density, average degree, degree centralization, and clustering coefficient—across 18 retweeter amplification backbone networks, constructed from six misinformation events related to the same overarching topic on the COVID-19 Wuhan lab origin theory, and ordered chronologically to capture temporal variation in amplification dynamics.
 
 [pending]our findings is:
 
@@ -64,7 +64,7 @@ Using Social Network Analysis, this study examines network density, average degr
 
 ## Misinformation Amplification on Social Media
 
-The proliferation of misinformation on social media platforms has emerged as a significant concern, particularly during global crises such as the COVID-19 pandemic. Research indicates that false information often spreads more rapidly and extensively than factual content, driven by factors like emotional resonance and algorithmic amplification. Vosoughi, Roy, and Aral (2018) found that false news stories are 70% more likely to be retweeted than true ones, with falsehoods reaching more people and spreading faster. This phenomenon is partly attributed to the novelty and emotional appeal of misinformation, which captures users' attention and prompts sharing.
+The proliferation of misinformation on social media platforms has emerged as a significant concern, particularly during global crises such as the COVID-19 pandemic. Research indicates that false information often spreads more rapidly and extensively than factual content, driven by factors like emotional resonance and algorithmic amplification. Vosoughi, Roy, and Aral (2018) found that false news stories are 70% more likely to be retweeted than true ones, with falsehoods reaching more people and spreading faster. This phenomenon is partly attributed to the novelty and emotional appeal of misinformation, which captures users' attention and prompts sharing (Del Vicario et al., 2016).
 
 Social media platforms, notably Twitter (now X), facilitate the rapid dissemination of such content through features like retweets and likes, which can inadvertently amplify misinformation. Guess et al. (2019) observed that a small subset of users, particularly older adults, are disproportionately responsible for sharing false news on Facebook, highlighting the role of user behavior in the spread of misinformation.
 
@@ -2388,11 +2388,6 @@ legend(
 
 ## Data Analysis
 
-### Expected findings based on hypotheses
-
-### Actual findings from SNA analysis
-
-
 ```{r}
 calculate_metrics_statnet <- function(csv_path, network_type, stage) {
   adj_matrix <- as.matrix(read.csv(csv_path, row.names = 1))
@@ -2625,6 +2620,9 @@ write.csv(all_metrics, "data/network_metrics_summary.csv", row.names = FALSE)
 
 ```
 
+
+### Data Summary in Tables
+
 | Network_Type           | Stage | Size | Edges | Density | Avg_Degree | Components | Diameter | Transitivity | Isolates |
 |------------------------|-------|------|-------|---------|------------|------------|----------|--------------|----------|
 | Co-Retweet             | 1     | 112  | 253   | 0.0407  | 9.04       | 1          | 1        | 1.000        | 89       |
@@ -2694,6 +2692,55 @@ write.csv(all_metrics, "data/network_metrics_summary.csv", row.names = FALSE)
 | Reply Path Co-Retweet  | 6     | 1              | 5                | 5                |
 
 **Table 3: Clique Structural Features Over Time**
+
+### Univariate Analysis and Visualization
+
+Table 1 (Network Density Over Time included) and Table 2 (Degree Centralization Over Time included) display the temporal variations in network density and degree centralization across different types of retweeter amplification backbones. These visualizations provide initial insights into the structural dynamics of misinformation diffusion.
+
+
+### Expected & actual findings based on hypotheses
+
+#### H1 (Density and Average Degree)
+
+Direct co-retweet networks will exhibit the highest density and average degree among the three networks.
+
+Findings:
+Across all stages, direct co-retweet networks consistently show higher density and average degree compared to quote and reply pathway co-retweet networks. For example, in Stage 2, the density for co-retweet networks is 0.0676 with an average degree of 15.00, while both quote and reply networks exhibit identical but lower values. In stages 3 through 6, this pattern persists.
+
+Conclusion:
+The empirical data strongly supports H1. The directional effect is positive and statistically consistent across time points.
+
+#### H2 (Degree Centralization)
+Reply pathway co-retweet networks will exhibit the highest degree centralization, followed by quote pathway networks, with direct co-retweet networks exhibiting the lowest.
+
+Findings:
+Contrary to expectations, direct co-retweet networks often show higher or equivalent degree centralization. For instance, in Stage 2, all three network types exhibit the same degree centralization (0.1325), but in later stages, co-retweet networks slightly outperform the others.
+
+Conclusion:
+H2 is not supported. The expected hierarchical dominance in reply networks is not observed, indicating that influential retweeters are not more structurally central in reply-based interactions compared to direct co-retweet behaviors.
+
+#### H3 (Clustering Coefficient)
+Quote pathway co-retweet networks will exhibit the highest clustering coefficient, followed by reply pathway networks, with direct co-retweet networks exhibiting the lowest.
+
+Findings:
+Clustering coefficients remain consistently high (often 1.000) across all network types and stages, with only slight variations (e.g., Stage 5 shows a lower clustering coefficient of 0.854 for co-retweet networks). This uniformity suggests that triadic closures are prevalent across all forms of engagement and are not significantly differentiated by retweeting behavior.
+
+Conclusion:
+H3 is partially supported. While quote networks sometimes exhibit higher clustering (e.g., fewer isolates), the differences are marginal and not consistently observed across all stages.
+
+#### H4 (Temporal Variation)
+
+Retweeter amplification backbone networks formed during earlier misinformation events will demonstrate higher density and degree centralization than those formed during later events.
+
+Findings:
+Early stages (Stages 1 and 2) show notably higher density and degree centralization across all network types. For example, density for co-retweet networks is 0.0676 in Stage 2 but declines steadily in later stages, reaching as low as 0.0016 by Stage 6. Degree centralization follows a similar pattern.
+
+Conclusion:
+H4 is strongly supported, indicating that misinformation amplification structures tend to be more active and centralized during the early emergence of misinformation events but become fragmented over time.
+
+#### Statistical Significance and Goodness of Fit
+Although statistical tests such as t-tests and CUG models were planned, the current dataset suggests clear trends without needing additional inferential testing for basic structural metrics. The observed differences align with theoretical expectations in H1 and H4 but contradict H2 and only partially support H3. The goodness of fit for network models would require ERGM or other advanced modeling techniques, which are beyond the current exploratory analysis scope.
+
 
 
 ```{=html}
