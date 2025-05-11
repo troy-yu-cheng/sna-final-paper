@@ -165,7 +165,7 @@ While detailed node attribute data are limited in our dataset, exploratory Expon
 
 ## Tools
 
-All data processing, network construction, and analysis procedures were conducted using the RStudio (version >= 4.0.0), primarily leveraging the `statnet` family of packages for network analysis, along with auxiliary packages for statistical testing (`stats` etc.) and data visualization (`ggplot2` etc.).
+All data processing, network construction, and analysis procedures were conducted using the RStudio (version \>= 4.0.0), primarily leveraging the `statnet` family of packages for network analysis, along with auxiliary packages for statistical testing (`stats` etc.) and data visualization (`ggplot2` etc.).
 
 # Data Collection & Graph
 
@@ -903,6 +903,7 @@ library(statnet)
 library(intergraph)
 library(reshape2)
 library(btergm)
+library(igraph)
 ```
 
 ### Loading and Merging Data
@@ -1787,6 +1788,7 @@ layout_coords <- gplot(net_stage1_quote,
                        gmode = "graph", 
                        mode = "kamadakawai")
 ```
+
 ```{r}
 
 vertex_colors <- ifelse(assigned_groups == target_group, "darkorange", "gray")
@@ -1867,6 +1869,7 @@ plot_subtitle <- paste0("Misinformation Claim: ", stage_keywords,
 set.seed(42)
 layout_coords <- gplot(net_stage2_quote, gmode = "graph", mode = "kamadakawai")
 ```
+
 ```{r}
 vertex_colors <- ifelse(assigned_groups == target_group, "darkorange", "gray")
 
@@ -1946,6 +1949,7 @@ plot_subtitle <- paste0("Misinformation Claim: ", stage_keywords,
 set.seed(42)
 layout_coords <- gplot(net_stage3_quote, gmode = "graph", mode = "kamadakawai")
 ```
+
 ```{r}
 vertex_colors <- ifelse(assigned_groups == target_group, "darkorange", "gray")
 
@@ -2026,6 +2030,7 @@ plot_subtitle <- paste0("Misinformation Claim: ", stage_keywords,
 set.seed(42)
 layout_coords <- gplot(net_stage4_quote, gmode = "graph", mode = "kamadakawai")
 ```
+
 ```{r}
 vertex_colors <- ifelse(assigned_groups == target_group, "darkorange", "gray")
 
@@ -2107,6 +2112,7 @@ plot_subtitle <- paste0("Misinformation Claim: ", stage_keywords,
 set.seed(42)
 layout_coords <- gplot(net_stage5_quote, gmode = "graph", mode = "kamadakawai")
 ```
+
 ```{r}
 vertex_colors <- ifelse(assigned_groups == target_group, "darkorange", "gray")
 
@@ -2182,6 +2188,7 @@ plot_subtitle <- paste0("Misinformation Claim: ", stage_keywords,
 set.seed(42)
 layout_coords <- gplot(net_stage6_quote, gmode = "graph", mode = "kamadakawai")
 ```
+
 ```{r}
 vertex_colors <- ifelse(assigned_groups == target_group, "darkorange", "gray")
 
@@ -2266,6 +2273,7 @@ plot_subtitle <- paste0("Misinformation Claim: ", stage_keywords, " | Claim Utte
 set.seed(42)
 layout_coords <- gplot(net_stage1_reply, gmode = "graph", mode = "kamadakawai")
 ```
+
 ```{r}
 vertex_colors <- ifelse(assigned_groups == target_group, "forestgreen", "gray")
 
@@ -2299,6 +2307,7 @@ legend(
 ```
 
 #### Stage 2 Plot (Reply path Co-retweet Net)
+
 ```{r}
 #| output: false
 # Stage 2 Parameters
@@ -2336,6 +2345,7 @@ plot_subtitle <- paste0("Misinformation Claim: ", stage_keywords,
 set.seed(42)
 layout_coords <- gplot(net_stage2_reply, gmode = "graph", mode = "kamadakawai")
 ```
+
 ```{r}
 vertex_colors <- ifelse(assigned_groups == target_group, "forestgreen", "gray")
 
@@ -2407,6 +2417,7 @@ plot_subtitle <- paste0("Misinformation Claim: ", stage_keywords,
 set.seed(42)
 layout_coords <- gplot(net_stage3_reply, gmode = "graph", mode = "kamadakawai")
 ```
+
 ```{r}
 vertex_colors <- ifelse(assigned_groups == target_group, "forestgreen", "gray")
 
@@ -2474,6 +2485,7 @@ plot_subtitle <- paste0("Misinformation Claim: ", stage_keywords, " | Claim Utte
 set.seed(42)
 layout_coords <- gplot(net_stage4_reply, gmode = "graph", mode = "kamadakawai")
 ```
+
 ```{r}
 vertex_colors <- ifelse(assigned_groups == target_group, "forestgreen", "gray")
 
@@ -2538,6 +2550,7 @@ plot_subtitle <- paste0("Misinformation Claim: ", stage_keywords, " | Claim Utte
 set.seed(42)
 layout_coords <- gplot(net_stage5_reply, gmode = "graph", mode = "kamadakawai")
 ```
+
 ```{r}
 vertex_colors <- ifelse(assigned_groups == target_group, "forestgreen", "gray")
 
@@ -2601,6 +2614,7 @@ plot_subtitle <- paste0("Misinformation Claim: ", stage_keywords, " | Claim Utte
 set.seed(42)
 layout_coords <- gplot(net_stage6_reply, gmode = "graph", mode = "kamadakawai")
 ```
+
 ```{r}
 vertex_colors <- ifelse(assigned_groups == target_group, "forestgreen", "gray")
 
@@ -2633,14 +2647,13 @@ legend(
 
 ## Data Analysis
 
-### Expected findings based on hypotheses 
-
+### Expected findings based on hypotheses
 
 ### Actual findings from SNA analysis
 
+
 ```{r}
-# Function to calculate metrics for a given CSV path and network type label
-calculate_metrics <- function(csv_path, network_type, stage) {
+calculate_metrics_statnet <- function(csv_path, network_type, stage) {
   adj_matrix <- as.matrix(read.csv(csv_path, row.names = 1))
   net <- network(adj_matrix, directed = FALSE, matrix.type = "adjacency")
   
@@ -2648,36 +2661,196 @@ calculate_metrics <- function(csv_path, network_type, stage) {
     return(data.frame(
       Network_Type = network_type,
       Stage = stage,
-      Density = NA,
-      Avg_Degree = NA,
-      Centralization = NA,
-      Transitivity = NA
+      Size = NA,
+      Edges = NA,
+      Components = NA,
+      Diameter = NA,
+      Transitivity = NA,
+      Isolates = NA,
+      Degree_Centralization = NA,
+      Betweenness_Centralization = NA,
+      Closeness_Centralization = NA,
+      Cliques_Total = NA,
+      Cliques_Max_Size = NA,
+      Cliques_Min_Size = NA
     ))
   }
   
-  density <- gden(net)
-  avg_degree <- mean(degree(net))
+  size <- network.size(net)
+  edges <- network.edgecount(net)
   
-  # Degree Centralization (Manual Calculation)
+  # Components: Exclude isolates
+  components_info <- component.dist(net)
+  num_components <- sum(components_info$csize > 1)
+  
+  isolates_count <- sum(degree(net) == 0)
+  
+  # Diameter
+  dist_matrix <- geodist(net)$gdist
+  dist_matrix[is.infinite(dist_matrix)] <- NA
+  diameter_val <- max(dist_matrix, na.rm = TRUE)
+  
+  # Transitivity
+  transitivity_val <- gtrans(net)
+  
+  # Degree Centralization
   deg_vals <- degree(net)
-  if (length(deg_vals) > 0) {
-    centralization <- (max(deg_vals) * (network.size(net) - 1) - sum(max(deg_vals) - deg_vals)) / 
-      ((network.size(net) - 1)^2)
+  centralization_deg <- if (length(deg_vals) > 0) {
+    (max(deg_vals) * (size - 1) - sum(max(deg_vals) - deg_vals)) / ((size - 1)^2)
   } else {
-    centralization <- NA
+    NA
   }
   
-  transitivity <- gtrans(net)
+  # Betweenness Centralization
+  btw_vals <- betweenness(net)
+  centralization_btw <- if (length(btw_vals) > 0) {
+    (max(btw_vals) * (size - 1) - sum(max(btw_vals) - btw_vals)) / ((size - 1)^2)
+  } else {
+    NA
+  }
   
+  # Closeness Centralization
+  cls_vals <- closeness(net, g = geodist(net)$gdist)
+  centralization_cls <- if (length(cls_vals) > 0) {
+    (max(cls_vals) * (size - 1) - sum(max(cls_vals) - cls_vals)) / ((size - 1)^2)
+  } else {
+    NA
+  }
+  
+  # Clique Metrics - Filter cliques of size >= 3
+  clique_info <- sna::clique.census(net, mode = "graph", tabulate.by.vertex = FALSE)
+  clique_counts <- clique_info$clique.count
+  valid_sizes <- which(as.numeric(names(clique_counts)) >= 3 & clique_counts > 0)
+  
+  total_cliques <- if (length(valid_sizes) > 0) sum(clique_counts[valid_sizes]) else 0
+  max_clique_size <- if (length(valid_sizes) > 0) max(valid_sizes) else NA
+  min_clique_size <- if (length(valid_sizes) > 0) min(valid_sizes) else NA
+
+  
+  # Output Data Frame
   data.frame(
     Network_Type = network_type,
     Stage = stage,
-    Density = round(density, 4),
-    Avg_Degree = round(avg_degree, 2),
-    Centralization = round(centralization, 4),
-    Transitivity = round(transitivity, 4)
+    Size = size,
+    Edges = edges,
+    Components = num_components,
+    Diameter = diameter_val,
+    Transitivity = round(transitivity_val, 4),
+    Isolates = isolates_count,
+    Degree_Centralization = round(centralization_deg, 4),
+    Betweenness_Centralization = round(centralization_btw, 4),
+    Closeness_Centralization = round(centralization_cls, 4),
+    Cliques_Total = total_cliques,
+    Cliques_Max_Size = max_clique_size,
+    Cliques_Min_Size = min_clique_size
   )
 }
+
+```
+
+
+```{r}
+calculate_metrics_statnet <- function(csv_path, network_type, stage) {
+  adj_matrix <- as.matrix(read.csv(csv_path, row.names = 1))
+  net <- network(adj_matrix, directed = FALSE, matrix.type = "adjacency")
+  
+  if (network.size(net) <= 1) {
+    return(data.frame(
+      Network_Type = network_type,
+      Stage = stage,
+      Size = NA,
+      Edges = NA,
+      Density = NA,
+      Avg_Degree = NA,
+      Components = NA,
+      Diameter = NA,
+      Transitivity = NA,
+      Isolates = NA,
+      Degree_Centralization = NA,
+      Betweenness_Centralization = NA,
+      Closeness_Centralization = NA,
+      Cliques_Total = NA,
+      Cliques_Max_Size = NA,
+      Cliques_Min_Size = NA
+    ))
+  }
+  
+  size <- network.size(net)
+  edges <- network.edgecount(net)
+  
+  # Density and Average Degree
+  density_val <- gden(net)
+  avg_degree_val <- mean(degree(net))
+  
+  # Components: Exclude isolates
+  components_info <- component.dist(net)
+  num_components <- sum(components_info$csize > 1)
+  
+  isolates_count <- sum(degree(net) == 0)
+  
+  # Diameter
+  dist_matrix <- geodist(net)$gdist
+  dist_matrix[is.infinite(dist_matrix)] <- NA
+  diameter_val <- max(dist_matrix, na.rm = TRUE)
+  
+  # Transitivity
+  transitivity_val <- gtrans(net)
+  
+  # Degree Centralization
+  deg_vals <- degree(net)
+  centralization_deg <- if (length(deg_vals) > 0) {
+    (max(deg_vals) * (size - 1) - sum(max(deg_vals) - deg_vals)) / ((size - 1)^2)
+  } else {
+    NA
+  }
+  
+  # Betweenness Centralization
+  btw_vals <- betweenness(net)
+  centralization_btw <- if (length(btw_vals) > 0) {
+    (max(btw_vals) * (size - 1) - sum(max(btw_vals) - btw_vals)) / ((size - 1)^2)
+  } else {
+    NA
+  }
+  
+  # Closeness Centralization
+  cls_vals <- closeness(net, g = geodist(net)$gdist)
+  centralization_cls <- if (length(cls_vals) > 0) {
+    (max(cls_vals) * (size - 1) - sum(max(cls_vals) - cls_vals)) / ((size - 1)^2)
+  } else {
+    NA
+  }
+  
+  # Clique Metrics - Filter cliques of size >= 3
+  clique_info <- sna::clique.census(net, mode = "graph", tabulate.by.vertex = FALSE)
+  clique_counts <- clique_info$clique.count
+  valid_sizes <- which(as.numeric(names(clique_counts)) >= 3 & clique_counts > 0)
+  
+  total_cliques <- if (length(valid_sizes) > 0) sum(clique_counts[valid_sizes]) else 0
+  max_clique_size <- if (length(valid_sizes) > 0) max(valid_sizes) else NA
+  min_clique_size <- if (length(valid_sizes) > 0) min(valid_sizes) else NA
+
+  # Output Data Frame
+  data.frame(
+    Network_Type = network_type,
+    Stage = stage,
+    Size = size,
+    Edges = edges,
+    Density = round(density_val, 4),
+    Avg_Degree = round(avg_degree_val, 2),
+    Components = num_components,
+    Diameter = diameter_val,
+    Transitivity = round(transitivity_val, 4),
+    Isolates = isolates_count,
+    Degree_Centralization = round(centralization_deg, 4),
+    Betweenness_Centralization = round(centralization_btw, 4),
+    Closeness_Centralization = round(centralization_cls, 4),
+    Cliques_Total = total_cliques,
+    Cliques_Max_Size = max_clique_size,
+    Cliques_Min_Size = min_clique_size
+  )
+}
+
+
 ```
 
 
@@ -2700,7 +2873,7 @@ network_files <- expand.grid(
 # Compute all metrics
 all_metrics <- purrr::pmap_dfr(
   list(network_files$file_path, network_files$network_label, network_files$stage),
-  calculate_metrics
+  calculate_metrics_statnet
 )
 
 # Final Table View
@@ -2711,33 +2884,80 @@ write.csv(all_metrics, "data/network_metrics_summary.csv", row.names = FALSE)
 
 ```
 
-| Network_Type          | Stage | Density  | Avg_Degree | Centralization | Transitivity |
-|-----------------------|-------|----------|-------------|----------------|--------------|
-| Co-Retweet            | 1     | 0.0407   | 9.04        | 0.0786         | 1.000        |
-| Quote Path Co-Retweet | 1     | 0.0000   | 0.00        | 0.0000         | 1.000        |
-| Reply Path Co-Retweet | 1     | 0.0000   | 0.00        | 0.0000         | 1.000        |
-| Co-Retweet            | 2     | 0.0676   | 15.00       | 0.1325         | 1.000        |
-| Quote Path Co-Retweet | 2     | 0.0676   | 15.00       | 0.1325         | 1.000        |
-| Reply Path Co-Retweet | 2     | 0.0676   | 15.00       | 0.1325         | 1.000        |
-| Co-Retweet            | 3     | 0.0045   | 1.00        | 0.0080         | 1.000        |
-| Quote Path Co-Retweet | 3     | 0.0045   | 1.00        | 0.0080         | 1.000        |
-| Reply Path Co-Retweet | 3     | 0.0045   | 1.00        | 0.0080         | 1.000        |
-| Co-Retweet            | 4     | 0.0124   | 2.75        | 0.0237         | 1.000        |
-| Quote Path Co-Retweet | 4     | 0.0092   | 2.04        | 0.0172         | 1.000        |
-| Reply Path Co-Retweet | 4     | 0.0124   | 2.75        | 0.0237         | 1.000        |
-| Co-Retweet            | 5     | 0.0042   | 0.93        | 0.0071         | 0.854        |
-| Quote Path Co-Retweet | 5     | 0.0010   | 0.21        | 0.0015         | 1.000        |
-| Reply Path Co-Retweet | 5     | 0.0034   | 0.75        | 0.0058         | 1.000        |
-| Co-Retweet            | 6     | 0.0016   | 0.36        | 0.0026         | 1.000        |
-| Quote Path Co-Retweet | 6     | 0.0016   | 0.36        | 0.0026         | 1.000        |
-| Reply Path Co-Retweet | 6     | 0.0016   | 0.36        | 0.0026         | 1.000        |
+| Network_Type           | Stage | Size | Edges | Density | Avg_Degree | Components | Diameter | Transitivity | Isolates |
+|------------------------|-------|------|-------|---------|------------|------------|----------|--------------|----------|
+| Co-Retweet             | 1     | 112  | 253   | 0.0407  | 9.04       | 1          | 1        | 1.000        | 89       |
+| Quote Path Co-Retweet  | 1     | 112  | 0     | 0.0000  | 0.00       | 0          | 0        | 1.000        | 112      |
+| Reply Path Co-Retweet  | 1     | 112  | 0     | 0.0000  | 0.00       | 0          | 0        | 1.000        | 112      |
+| Co-Retweet             | 2     | 112  | 420   | 0.0676  | 15.00      | 2          | 1        | 1.000        | 71       |
+| Quote Path Co-Retweet  | 2     | 112  | 420   | 0.0676  | 15.00      | 2          | 1        | 1.000        | 71       |
+| Reply Path Co-Retweet  | 2     | 112  | 420   | 0.0676  | 15.00      | 2          | 1        | 1.000        | 71       |
+| Co-Retweet             | 3     | 112  | 28    | 0.0045  | 1.00       | 1          | 1        | 1.000        | 104      |
+| Quote Path Co-Retweet  | 3     | 112  | 28    | 0.0045  | 1.00       | 1          | 1        | 1.000        | 104      |
+| Reply Path Co-Retweet  | 3     | 112  | 28    | 0.0045  | 1.00       | 1          | 1        | 1.000        | 104      |
+| Co-Retweet             | 4     | 112  | 77    | 0.0124  | 2.75       | 4          | 1        | 1.000        | 86       |
+| Quote Path Co-Retweet  | 4     | 112  | 57    | 0.0092  | 2.04       | 2          | 1        | 1.000        | 96       |
+| Reply Path Co-Retweet  | 4     | 112  | 77    | 0.0124  | 2.75       | 4          | 1        | 1.000        | 86       |
+| Co-Retweet             | 5     | 112  | 26    | 0.0042  | 0.93       | 1          | 2        | 0.854        | 103      |
+| Quote Path Co-Retweet  | 5     | 112  | 6     | 0.0010  | 0.21       | 1          | 1        | 1.000        | 108      |
+| Reply Path Co-Retweet  | 5     | 112  | 21    | 0.0034  | 0.75       | 1          | 1        | 1.000        | 105      |
+| Co-Retweet             | 6     | 112  | 10    | 0.0016  | 0.36       | 1          | 1        | 1.000        | 107      |
+| Quote Path Co-Retweet  | 6     | 112  | 10    | 0.0016  | 0.36       | 1          | 1        | 1.000        | 107      |
+| Reply Path Co-Retweet  | 6     | 112  | 10    | 0.0016  | 0.36       | 1          | 1        | 1.000        | 107      |
+
+**Table 1: Basic Network Structure**
+
+| Network_Type           | Stage | Degree_Centralization | Betweenness_Centralization | Closeness_Centralization |
+|------------------------|-------|-----------------------|----------------------------|--------------------------|
+| Co-Retweet             | 1     | 0.0786                | 0.0000                     | 0                        |
+| Quote Path Co-Retweet  | 1     | 0.0000                | 0.0000                     | 0                        |
+| Reply Path Co-Retweet  | 1     | 0.0000                | 0.0000                     | 0                        |
+| Co-Retweet             | 2     | 0.1325                | 0.0000                     | 0                        |
+| Quote Path Co-Retweet  | 2     | 0.1325                | 0.0000                     | 0                        |
+| Reply Path Co-Retweet  | 2     | 0.1325                | 0.0000                     | 0                        |
+| Co-Retweet             | 3     | 0.0080                | 0.0000                     | 0                        |
+| Quote Path Co-Retweet  | 3     | 0.0080                | 0.0000                     | 0                        |
+| Reply Path Co-Retweet  | 3     | 0.0080                | 0.0000                     | 0                        |
+| Co-Retweet             | 4     | 0.0237                | 0.0000                     | 0                        |
+| Quote Path Co-Retweet  | 4     | 0.0172                | 0.0000                     | 0                        |
+| Reply Path Co-Retweet  | 4     | 0.0237                | 0.0000                     | 0                        |
+| Co-Retweet             | 5     | 0.0071                | 0.0008                     | 0                        |
+| Quote Path Co-Retweet  | 5     | 0.0015                | 0.0000                     | 0                        |
+| Reply Path Co-Retweet  | 5     | 0.0058                | 0.0000                     | 0                        |
+| Co-Retweet             | 6     | 0.0026                | 0.0000                     | 0                        |
+| Quote Path Co-Retweet  | 6     | 0.0026                | 0.0000                     | 0                        |
+| Reply Path Co-Retweet  | 6     | 0.0026                | 0.0000                     | 0                        |
+
+**Table 2: Network Centralization**
 
 
+| Network_Type           | Stage | Cliques_Total | Cliques_Max_Size | Cliques_Min_Size |
+|------------------------|-------|----------------|------------------|------------------|
+| Co-Retweet             | 1     | 1              | 23               | 23               |
+| Quote Path Co-Retweet  | 1     | 0              | NA               | NA               |
+| Reply Path Co-Retweet  | 1     | 0              | NA               | NA               |
+| Co-Retweet             | 2     | 2              | 25               | 16               |
+| Quote Path Co-Retweet  | 2     | 2              | 25               | 16               |
+| Reply Path Co-Retweet  | 2     | 2              | 25               | 16               |
+| Co-Retweet             | 3     | 1              | 8                | 8                |
+| Quote Path Co-Retweet  | 3     | 1              | 8                | 8                |
+| Reply Path Co-Retweet  | 3     | 1              | 8                | 8                |
+| Co-Retweet             | 4     | 4              | 9                | 5                |
+| Quote Path Co-Retweet  | 4     | 2              | 9                | 7                |
+| Reply Path Co-Retweet  | 4     | 4              | 9                | 5                |
+| Co-Retweet             | 5     | 2              | 7                | 4                |
+| Quote Path Co-Retweet  | 5     | 1              | 4                | 4                |
+| Reply Path Co-Retweet  | 5     | 1              | 7                | 7                |
+| Co-Retweet             | 6     | 1              | 5                | 5                |
+| Quote Path Co-Retweet  | 6     | 1              | 5                | 5                |
+| Reply Path Co-Retweet  | 6     | 1              | 5                | 5                |
 
+**Table 3: Clique Structural Features**
 
 ```{r}
 
 ```
+
 ```{=html}
 <script>
 document.addEventListener("DOMContentLoaded", function() {
