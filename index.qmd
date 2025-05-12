@@ -64,25 +64,52 @@ Using Social Network Analysis, this study examines network density, average degr
 
 ## Misinformation Amplification on Social Media
 
-The proliferation of misinformation on social media platforms has emerged as a significant concern, particularly during global crises such as the COVID-19 pandemic. Research indicates that false information often spreads more rapidly and extensively than factual content, driven by factors like emotional resonance and algorithmic amplification. Vosoughi, Roy, and Aral (2018) found that false news stories are 70% more likely to be retweeted than true ones, with falsehoods reaching more people and spreading faster. This phenomenon is partly attributed to the novelty and emotional appeal of misinformation, which captures users' attention and prompts sharing (Del Vicario et al., 2016).
+The amplification of misinformation on social media has emerged as a critical concern in contemporary communication environments, particularly during crisis events such as the COVID-19 pandemic. Unlike traditional media ecosystems, where information flows are subject to editorial control and verification processes, social media platforms enable the rapid and often unchecked spread of false information. This phenomenon is primarily driven by the psychological appeal of misinformation, which frequently exhibits high levels of novelty and emotional resonance (Vosoughi, Roy, & Aral, 2018). Such content which can stimuli users' intuitive or emotional thinking is more likely to capture user attention and prompt sharing behaviors (Pennycook et al., 2021), thereby accelerating its diffusion .
 
-Social media platforms, notably Twitter (now X), facilitate the rapid dissemination of such content through features like retweets and likes, which can inadvertently amplify misinformation. Guess et al. (2019) observed that a small subset of users, particularly older adults, are disproportionately responsible for sharing false news on Facebook, highlighting the role of user behavior in the spread of misinformation.
+At the platform level, algorithmic curation further intensifies this process by privileging content that maximizes user engagement (Fernández et al., 2021). Algorithms systematically prioritize emotionally charged content—especially narratives evoking fear, outrage, or moral indignation—because such content generates more interactions and keeps users engaged (Brady et al., 2017; Cinelli et al., 2021). As a consequence, users are frequently exposed to information that reinforces their existing beliefs, creating self-reinforcing informational environments commonly referred to as “echo chambers” (Del Vicario et al., 2016; Guess, Nagler, & Tucker, 2019). In such environments, misinformation becomes more resistant to correction, and its visibility is artificially sustained by both user behavior and algorithmic design.
 
-Algorithmic curation further exacerbates the issue by promoting content that elicits strong emotional reactions, such as anger or fear, thereby increasing engagement metrics. Cinelli et al. (2020) demonstrated that platforms like Twitter and Facebook can create echo chambers where users are exposed predominantly to information that aligns with their existing beliefs, reinforcing misinformation. This environment not only accelerates the spread of false narratives but also hampers the dissemination of corrective information.
+The COVID-19 pandemic exemplified the societal risks associated with this dynamic. Empirical analyses revealed that misinformation regarding COVID-19 health measures and virus origins often spread more rapidly and reached wider audiences than verified scientific information, complicating public health responses and crisis communication strategies (Cinelli et al., 2020). In response, the World Health Organization introduced the concept of an “infodemic” to describe the overabundance of information—both accurate and misleading—that impedes informed decision-making during public health emergencies (WHO, 2020).
 
-The COVID-19 pandemic has underscored the dangers of misinformation amplification. Cinelli et al. (2020) analyzed the diffusion of COVID-19-related information across multiple platforms and found that misinformation often spreads faster than factual content, posing significant challenges to public health efforts. The World Health Organization has termed this overabundance of information, both accurate and misleading, as an "infodemic," emphasizing the need for effective strategies to manage information dissemination during health crises.
+While considerable research has explored the psychological drivers of misinformation spread and the algorithmic mechanisms that reinforce it, less attention has been devoted to understanding the structural foundations that sustain its amplification at the collective level. Despite increasing scholarly interest, the underlying structural mechanisms through which misinformation narratives persist and gain visibility remain insufficiently understood. This gap necessitates a closer examination of how user behaviors aggregate into network structures that contribute to the endurance and reach of misinformation narratives across time.
 
 ## Retweeters as Structural Amplifiers
 
-In social media research, retweeters are typically conceptualized as transmission nodes that contribute to the spread of information by extending its audience reach. Much of this literature focuses on their individual-level influence and capacity for virality, often overlooking the structural roles retweeters play in shaping amplification backbones. For instance, Yan et al. (2021) examined how retweet mechanisms affect user posting and commenting behaviors using agent-based simulations, emphasizing the role of retweeting in driving user engagement. However, such studies largely neglect how retweeters collectively form structural relationships through shared amplification behaviors.
 
-Recent work has begun to explore the structural characteristics of coordinated behavior on social media platforms. Weber and Neumann (2021) introduced a temporal window approach to identify groups of accounts engaging in highly coordinated behaviors within specific timeframes, highlighting the role of these groups in amplifying information. While this line of inquiry acknowledges the importance of coordination, it still does not fully address how retweeters build structural ties through collective behavioral patterns.
 
-Additionally, some studies recognize that the structural configuration of retweet networks significantly influences the diffusion of information. For example, research has identified core-periphery structures within retweet networks that may lead to underestimating the actual reach of information, underscoring the importance of considering network topology in understanding amplification processes (Klein, 2022). Yet, these studies primarily focus on macro-level structural properties without explicitly examining the micro-level formation of relational ties through shared amplification behavior.
 
-Thus, while existing literature offers valuable insights into retweeter influence and coordinated behavior, it largely overlooks the structural connections formed through shared amplification practices. This study addresses this gap by investigating how retweeters construct amplification backbone networks through collective behavioral convergence, providing a more nuanced understanding of the organizational logic underlying misinformation persistence and visibility.
+
+
+While the amplification of misinformation on social media has been extensively studied, much of the existing literature primarily focuses on two areas: the dynamics of information diffusion through cascade models and the influential role of key individuals in spreading content.
+
+Cascade models (like epidemiological model SIR) conceptualize information spread as a chain of user-to-user transmissions, where each retweet or share is a probabilistic response to prior exposure. These models often treat retweeters as homogeneous units within the transmission chain, lacking individual or structural specificity (Goel, Kamesh Munagala, et al., 2015; Goel, Anderson, et al., 2015; Kupavskii et al., 2012).
+
+Parallel research has examined the role of influencers in amplifying misinformation, emphasizing users with large follower bases or high centrality in networks (Flaherty & Mangan, 2025). This approach tends to reduce amplification to a function of individual-level reach (Gallagher, 2022), overlooking how groups of retweeters may collectively shape the visibility and longevity of misinformation through patterned co-engagement (Shao et al., 2018).
+
+Recent studies have begun to explore coordinated behaviors among social media users, particularly in the context of political messaging and misinformation. For instance, Pacheco et al. (2021) introduced methods to detect groups of accounts engaging in synchronized activities, highlighting their role in boosting the exposure of low-credibility content. However, such work often focuses on malicious coordination (e.g., bots or trolls) and still rarely treats retweeters as a distinct analytic category whose structural connections can be meaningfully analyzed.
+
+Despite the growing recognition of structural factors in misinformation diffusion, few studies have examined how retweeters themselves—rather than influencers or message originators—form behavioral linkages that serve as amplification backbones. Retweeters are typically treated as anonymous nodes of replication, yet they may form emergent structures through co-dissemination behaviors such as retweeting the same misinformation or retweeting content that quotes or replies to it. These patterns of shared engagement, even when uncoordinated or unintentional, may constitute the behavioral core of sustained amplification.
+
+This study addresses this overlooked area by conceptualizing retweeters not merely as transmission endpoints but as structurally significant actors who collectively construct amplification backbones. By shifting the analytical focus from individual influence to networked behavioral convergence, this research proposes a new framework for understanding the organizational logic that sustains misinformation in social media environments.
+
+
+
+While the amplification of misinformation on social media has been extensively studied, much of the existing literature primarily focuses on two areas: the dynamics of information diffusion through cascade models and the influential role of key individuals in spreading content.
+
+Cascade models (like epidemiological model SIR) conceptualize information spread as a chain of user-to-user transmissions, where each retweet or share is a probabilistic response to prior exposure. These models often treat retweeters as homogeneous units within the transmission chain, lacking individual or structural specificity (Goel, Kamesh Munagala, et al., 2015; Goel, Anderson, et al., 2015; Kupavskii et al., 2012). Parallel research has examined the role of influencers in amplifying misinformation, emphasizing users with large follower bases or high centrality in networksndefined. This approach tends to reduce amplification to a function of individual-level reach, overlooking how groups of retweeters may collectively shape the visibility and longevity of misinformation through patterned co-engagement (Shao et al., 2018).
+
+Recent studies have begun to explore coordinated behaviors among social media users, particularly in the context of political messaging and misinformation. For instance, Pacheco et al. (2021) introduced methods to detect groups of accounts engaging in synchronized activities, highlighting their role in boosting the exposure of low-credibility content. However, such work often focuses on malicious coordination (e.g., bots or trolls) and still rarely treats retweeters as a distinct analytic category whose structural connections can be meaningfully analyzed. Despite the growing recognition of structural factors in misinformation diffusion, few studies have examined how retweeters themselves—rather than influencers or message originators—form behavioral linkages that serve as amplification backbones. Retweeters are typically treated as anonymous nodes of replication, yet they may form emergent structures through co-dissemination behaviors such as retweeting the same misinformation or retweeting content that quotes or replies to it. These patterns of shared engagement, even when uncoordinated or unintentional, may constitute the behavioral core of sustained amplification.
+
+This study addresses this overlooked area by conceptualizing retweeters not merely as transmission endpoints but as structurally significant actors who collectively construct amplification backbones. By shifting the analytical focus from individual influence to networked behavioral convergence, this research proposes a new framework for understanding the organizational logic that sustains misinformation in social media environments.
 
 ## Network Structures and Co-Dissemination Behaviors
+
+3.  From Co-Dissemination Behaviors to Retweeter Amplification Backbone Networks (How This Study Advances the Field) 明确提出：本研究首次系统性区分了three forms of co-dissemination behaviors（direct retweeting, quoting, replying）。
+
+引入跨学科的计算机网络类比，为不同行为带来的网络结构差异提供解释模型。
+
+引用具体研究，说明为何这种细分可以更好理解信息放大的结构逻辑。
+
+如果你需要，我可以直接按照这个逻辑给你整理好每一部分的完整文本，并补充相应的权威文献和APA引用。你想要直接完整改写一版吗？
 
 Understanding the structural characteristics of misinformation diffusion networks is critical for identifying patterns of spread and potential intervention points. Social Network Analysis (SNA) provides powerful tools to examine network metrics such as density, centralization, and transitivity (Wasserman & Faust, 1994). Recent studies reveal that misinformation networks often exhibit highly centralized structures, enabling faster and broader dissemination through a few influential nodes (Guarino et al., 2020).
 
@@ -100,20 +127,15 @@ The data utilized in this research are collected from the [MuMiN (Multilingual M
 
 ## Nodes and Edges Definition
 
-
 It is not a diffusion network tracing how misinformation flows from one user to another through follower relationships or direct influence.
 
 You are not modeling how information “spreads” across individual pathways or trying to identify classic “influencers” in the sense of high-betweenness or high-follower nodes within a transmission chain.
-
-
 
 It is a structural co-behavior network focused on how amplifiers (retweeters) relate to one another through shared amplification behavior.
 
 Edges represent behavioral convergence—i.e., two retweeters acted similarly by amplifying the same misinformation content (directly, through quoting, or replying).
 
 Your goal is to understand how these collective behavioral patterns create structural conditions that either sustain or constrain misinformation amplification, independent of individual follower influence.
-
-
 
 This study conceptualizes individual retweeters—users actively involved in the redistribution of misinformation—as foundational units within larger meta-networks of amplification. These retweeter-centric networks, or amplification backbones, capture how collective user behaviors create structural conditions that facilitate or constrain the amplification potential of misinformation, independent of the content itself (Barabási, 2016). Each retweeter is represented as a network node, and relational ties (edges) are defined through three distinct co-retweeting behaviors. To interpret the structural and functional characteristics of the resulting networks, a cross-disciplinary heuristic framework is applied, drawing specifically from principles in computer network engineering. In this framework, the study analogizes retweeter networks to the organizational patterns found in physical network infrastructures, where hubs, switches, and routers perform distinct roles in information transmission and amplification. This interdisciplinary perspective provides a conceptual foundation for understanding the differentiated structural properties and amplification dynamics across the three types of retweeter networks.
 
@@ -769,7 +791,6 @@ ncol(adj_matrix_co_retweet_reply_path)
 table(co_retweet_reply_path_edges$weight)
 ```
 
-
 ### Extra EDA
 
 #### Followship
@@ -818,7 +839,6 @@ if (nrow(retweeter_follow_edges_directed) == 0) {
 
 Analysis of the follower network among misinformation retweeters revealed no recorded follower-followee relationships within this group. This indicates that users involved in the dissemination of COVID-19 origin misinformation acted largely as isolated agents rather than as members of a tightly connected social network. Such a pattern suggests that the spread of misinformation in this case was driven primarily by content virality and opportunistic engagement, rather than through established social ties or influencer-led dissemination.
 
-
 #### Follower Counts
 
 ```{r}
@@ -844,15 +864,11 @@ The follower count data is used here not to identify influencers, but to charact
 
 Instead, we can check: **Do the structural patterns of amplifier co-behavior suggest reliance on high-profile nodes, or do they reveal decentralized, echo-chamber-like clusters of low-profile actors?**
 
-According to our output, among the 112 retweeters involved in misinformation amplification reveals a highly polarized distribution. Specifically, only 8 retweeters have a modest following of 1–2 followers, while a single retweeter holds a disproportionately large follower base of 229. The remaining 103 retweeters have zero followers. 
+According to our output, among the 112 retweeters involved in misinformation amplification reveals a highly polarized distribution. Specifically, only 8 retweeters have a modest following of 1–2 followers, while a single retweeter holds a disproportionately large follower base of 229. The remaining 103 retweeters have zero followers.
 
 The overwhelmingly low follower counts among retweeters suggest that most amplification behavior arises from low-profile users acting collectively, rather than from a centralized set of influential nodes. This aligns with the structural investigation of how amplification backbones emerge from the behaviors of ordinary users, independent of their social reach.
 
-
-
-
-现在我们把刚才提到的东西形成narrative：
-Follower counts 极低意味着，尽管这些 retweeters共同参与了谣言放大，但他们本身没有强大的“外部传播能力”。
+现在我们把刚才提到的东西形成narrative： Follower counts 极低意味着，尽管这些 retweeters共同参与了谣言放大，但他们本身没有强大的“外部传播能力”。
 
 因此，这些共同行为的边更多地反映的是意识形态共鸣、情感驱动或事件反应同步性，而不是实际的信息放大效能。
 
@@ -860,18 +876,15 @@ Follower counts 极低意味着，尽管这些 retweeters共同参与了谣言�
 
 This feature does not invalidate your network analysis; it sharpens its theoretical positioning.
 
-| 网络类型                         | Follower Counts 特征的影响                                                        |
-| ---------------------------- | ---------------------------------------------------------------------------- |
-| **Direct Co-Retweet**        | 说明这种看似密集的网络，更多体现为对热点内容的**同步响应**，而非真实的高效放大，边代表的更多是“同一时刻被动跟风”。                 |
-| **Quote Pathway Co-Retweet** | 强化了这类网络的**解释性社群**特征，尽管 retweeters 没有大规模的受众，但他们通过重新解读和附加立场制造局部影响。             |
+| 网络类型 | Follower Counts 特征的影响 |
+|---------------------|---------------------------------------------------|
+| **Direct Co-Retweet** | 说明这种看似密集的网络，更多体现为对热点内容的**同步响应**，而非真实的高效放大，边代表的更多是“同一时刻被动跟风”。 |
+| **Quote Pathway Co-Retweet** | 强化了这类网络的**解释性社群**特征，尽管 retweeters 没有大规模的受众，但他们通过重新解读和附加立场制造局部影响。 |
 | **Reply Pathway Co-Retweet** | 进一步印证了这类网络的**情绪驱动**和**局部封闭讨论**特征，这些 retweeters 可能就是在小范围争吵、表达态度，而非具备扩散能力的放大者。 |
 
 你的分析不是关于“谣言能被放大多远”，而是关于“谁在参与放大这种行为，以及他们如何彼此构成放大结构的骨干”。
 
-这直接支持你提出的Amplification Backbone概念，强调的是一种社会结构现象，而非流量影响力的传递。
-This feature does not invalidate your network analysis; it sharpens its theoretical positioning.
-
-
+这直接支持你提出的Amplification Backbone概念，强调的是一种社会结构现象，而非流量影响力的传递。 This feature does not invalidate your network analysis; it sharpens its theoretical positioning.
 
 Amplifier ≠ Influencer
 
@@ -884,8 +897,6 @@ Literature 中“Amplifiers”的角色常常和 Influencers 混淆，但你的�
 你的网络强调的是放大者之间的结构性共鸣和联合行为模式。这种放大不一定导致广泛的外部扩散，但却维持了谣言的持续性存在和集体认知效应。
 
 在 Literature Review 中可以明确指出：这种放大骨干的存在，正是为什么即便没有大规模的扩散，一些谣言仍然在特定群体中“长尾式存活”并反复被激活的原因。
-
-
 
 ## Graph
 
@@ -2630,7 +2641,7 @@ write.csv(all_metrics, "data/network_metrics_summary.csv", row.names = FALSE)
 **Table 1: Basic Network Structure Over Time**
 
 | Network_Type | Stage | Degree_Centralization | Betweenness_Centralization | Closeness_Centralization |
-|--------------|--------------|--------------|---------------|--------------|
+|---------------|---------------|---------------|---------------|---------------|
 | Co-Retweet | 1 | 0.0786 | 0.0000 | 0 |
 | Quote Path Co-Retweet | 1 | 0.0000 | 0.0000 | 0 |
 | Reply Path Co-Retweet | 1 | 0.0000 | 0.0000 | 0 |
@@ -2653,7 +2664,7 @@ write.csv(all_metrics, "data/network_metrics_summary.csv", row.names = FALSE)
 **Table 2: Network Centralization Over Time**
 
 | Network_Type          | Stage | Cliques_Total | Cliques_Max_Size | Cliques_Min_Size |
-|-----------------|--------------|--------------|--------------|--------------|
+|---------------|---------------|---------------|---------------|---------------|
 | Co-Retweet            | 1     | 1             | 23               | 23               |
 | Quote Path Co-Retweet | 1     | 0             | NA               | NA               |
 | Reply Path Co-Retweet | 1     | 0             | NA               | NA               |
