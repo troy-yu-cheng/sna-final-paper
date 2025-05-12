@@ -39,15 +39,16 @@ library(statnet)
 library(intergraph)
 library(reshape2)
 library(btergm)
+library(effectsize)
 ```
 
 # Abstract
 
-The amplification of misinformation on social media remains a pressing concern, particularly when false narratives gain widespread visibility through the collective behaviors of retweeters themselves. This study reconceptualized retweeters not as passive intermediaries but amplification hubs within **Retweeter Amplification Backbone Networks**, and investigates how distinct co-retweeting behaviors produce structurally differentiated networks. Drawing on a cross-disciplinary framework of computer network architectures, this research examines: (1) **direct co-retweet networks** where both retweeters retweeted the same misinformation tweet, analogous to broadcast-syle amplification with high connectivity but limited subgroup cohesion; (2) **quote pathway co-retweet networks** where both retweeters retweeted misinformation tweet or content quoting it, resembling selective forwarding behaviors that foster localized interpretive communities; and (3) **reply pathway co-retweet networks** where both retweeters retweeted misinformation tweet or content replying to it, mirroring hierarchical routing structures where influential nodes bridge fragmented communities through emotionally charged and interactive discussions. Building on these distinctions, this study addresses the research question: *How do different retweeter co-dissemination behaviors construct distinct amplification backbone network structures, and how do these structures vary temporally across multiple misinformation events related to the same narrative?* Using Social Network Analysis (SNA), this study systematically compares structural characteristics—including network density, average degree, degree centralization, and clustering coefficient—across 18 retweeter amplification backbone networks, constructed from six misinformation events related to the same overarching topic on the COVID-19 Wuhan lab origin theory, and ordered chronologically to capture temporal variation in amplification dynamics.
+The amplification of misinformation on social media remains a pressing concern, particularly when false narratives gain widespread visibility through the collective behaviors of retweeters themselves. This study reconceptualized retweeters not as passive intermediaries but amplification hubs within **Retweeter Amplification Backbone Networks**, and investigates how distinct co-retweeting behaviors produce structurally differentiated networks. Drawing on a cross-disciplinary framework of computer network architectures, this research examines: (1) **direct co-retweet networks** where both retweeters retweeted the same misinformation tweet, analogous to broadcast-syle amplification with high connectivity but limited subgroup cohesion; (2) **quote pathway co-retweet networks** where both retweeters retweeted misinformation tweet or content quoting it, resembling selective forwarding behaviors that foster localized interpretive communities; and (3) **reply pathway co-retweet networks** where both retweeters retweeted misinformation tweet or content replying to it, mirroring hierarchical routing structures where influential nodes bridge fragmented communities through emotionally charged and interactive discussions. Building on these distinctions, this study addresses the research question: ***How do different retweeter co-dissemination behaviors construct distinct amplification backbone network structures, and how do these structures vary temporally across multiple misinformation events related to the same narrative?*** Using Social Network Analysis (SNA), this study systematically compares structural characteristics—including network density, average degree, degree centralization, and clustering coefficient—across 18 retweeter amplification backbone networks, constructed from six misinformation events related to the same overarching topic on the COVID-19 Wuhan lab origin theory, and ordered chronologically to capture temporal variation in amplification dynamics.
 
-[pending]our findings is:
+\[pending\]our findings is:
 
-*Keywords: Retweeter amplification backbone networks, collective misinformation amplification, social network analysis, Twitter,  COVID-19 Wuhan lab origin theory*
+*Keywords: Retweeter amplification backbone networks, collective misinformation amplification, social network analysis, Twitter, COVID-19 Wuhan lab origin theory*
 
 ------------------------------------------------------------------------
 
@@ -58,7 +59,6 @@ The rapid spread of misinformation on social media platforms presents serious ch
 To understand these structural patterns, this study applies a cross-disciplinary framework informed by concepts from computer network engineering. It analyzes how different forms of retweeter engagement shape the structural features of amplification networks, including direct co-retweeting, co-retweeting on quote pathway and co-retweeting on reply pathway. Each behavior is defined as a distinct mode of information transmission. Direct retweeting functions like signal broadcasting in Ethernet hubs, quoting resembles selective information forwarding in network switches, and replying operates similarly to routing protocols that manage complex communication pathways (Kurose & Ross, 2021; Barabási, 2016; Forouzan, 2013; Tanenbaum, 2011). This interdisciplinary perspective provides a conceptual framework to understand the organizational logic of retweeter amplification backbones and guides the development of theoretically grounded falsifiable hypotheses regarding the distinct structural outcomes associated with different co-retweeting behaviors.
 
 Using Social Network Analysis, this study examines network density, average degree, centralization, and clustering to compare the structural characteristics of retweeter amplification backbones formed through each engagement behavior. Statistical tests, including t-tests and Conditional Uniform Graph (CUG) models, are used to assess whether observed network patterns differ significantly across these behaviors. Exploratory network modeling is also used to examine structural tendencies within these networks. The empirical focus of this study is a series of six misinformation claims related to the [COVID-19 Wuhan lab origin theory](https://en.wikipedia.org/wiki/COVID-19_lab_leak_theory), spanning from March 2020 to August 2021. This sequence enables an opportunity to explore not only structural differences across co-dissemination behaviors but also temporal variations in retweeter amplification backbones within a unified misinformation narrative. In total, eighteen retweeter amplification backbone networks are analyzed—three amplification pathways across six misinformation events—providing critical insights into how collective retweeter behaviors evolve in response to emerging misinformation waves.
-
 
 # Literature Review
 
@@ -74,15 +74,13 @@ The COVID-19 pandemic has underscored the dangers of misinformation amplificatio
 
 ## Retweeters as Structural Amplifiers
 
-While much attention has been given to the originators of misinformation, retweeters play a crucial role in its propagation. Retweeters act as intermediaries, bridging content to broader audiences and often contributing to the virality of misinformation. Shao et al. (2018) found that a small number of accounts, often retweeters, were responsible for a significant portion of the spread of low-credibility content, highlighting their amplifying effect. Similarly, Ferrara (2020) observed that coordinated retweeting behaviors can significantly enhance the reach and impact of false narratives, underscoring the importance of analyzing retweeter networks.
+In social media research, retweeters are typically conceptualized as transmission nodes that contribute to the spread of information by extending its audience reach. Much of this literature focuses on their individual-level influence and capacity for virality, often overlooking the structural roles retweeters play in shaping amplification backbones. For instance, Yan et al. (2021) examined how retweet mechanisms affect user posting and commenting behaviors using agent-based simulations, emphasizing the role of retweeting in driving user engagement. However, such studies largely neglect how retweeters collectively form structural relationships through shared amplification behaviors.
 
-The structural characteristics of retweeter networks can influence the dissemination patterns of misinformation. Guarino et al. (2020) demonstrated that misinformation networks often exhibit higher modularity and clustering coefficients compared to factual information networks, suggesting that retweeters form tightly-knit communities that facilitate rapid information spread. These structural features can create echo chambers, where misinformation is reinforced and seldom challenged.
+Recent work has begun to explore the structural characteristics of coordinated behavior on social media platforms. Weber and Neumann (2021) introduced a temporal window approach to identify groups of accounts engaging in highly coordinated behaviors within specific timeframes, highlighting the role of these groups in amplifying information. While this line of inquiry acknowledges the importance of coordination, it still does not fully address how retweeters build structural ties through collective behavioral patterns.
 
-Recent studies have also explored the temporal dynamics of retweeter behavior. Stam et al. (2024) introduced a novel metric to track the speed at which users traverse social networks, revealing that retweeters of misinformation tend to engage with homogeneous content and communities over time. This behavior contributes to the persistence and reinforcement of false narratives within specific user groups.
+Additionally, some studies recognize that the structural configuration of retweet networks significantly influences the diffusion of information. For example, research has identified core-periphery structures within retweet networks that may lead to underestimating the actual reach of information, underscoring the importance of considering network topology in understanding amplification processes (Klein, 2022). Yet, these studies primarily focus on macro-level structural properties without explicitly examining the micro-level formation of relational ties through shared amplification behavior.
 
-Furthermore, the role of retweeters in shaping public discourse has been examined in the context of specific events. For instance, during the COVID-19 pandemic, retweeters were instrumental in spreading both accurate information and misinformation. Cinelli et al. (2020) analyzed the diffusion of COVID-19-related information across multiple platforms and found that retweeters significantly influenced the reach and speed of information dissemination, often amplifying content that aligned with their beliefs.
-
-Understanding the behaviors and network positions of retweeters is essential for developing strategies to mitigate the spread of misinformation. By identifying key retweeters and analyzing their network connections, interventions can be designed to disrupt the flow of false information and promote the dissemination of accurate content.
+Thus, while existing literature offers valuable insights into retweeter influence and coordinated behavior, it largely overlooks the structural connections formed through shared amplification practices. This study addresses this gap by investigating how retweeters construct amplification backbone networks through collective behavioral convergence, providing a more nuanced understanding of the organizational logic underlying misinformation persistence and visibility.
 
 ## Network Structures and Co-Dissemination Behaviors
 
@@ -94,19 +92,30 @@ Co-dissemination behaviors take various forms across social media platforms. For
 
 Despite growing attention to these behaviors, much of the existing literature tends to treat retweeting as a uniform action without systematically distinguishing between the different relational pathways through which misinformation spreads. This lack of differentiation overlooks important variations in how narratives are amplified, reinterpreted, or contested across user interactions. Addressing this gap, our study builds on prior work to explore how distinguishing between co-dissemination behaviors—such as direct retweeting, quoting, and replying—can offer a more nuanced understanding of misinformation diffusion dynamics.
 
-
-
 # Research Method
 
 ## Data Source and Collection
 
 The data utilized in this research are collected from the [MuMiN (Multilingual Misinformation Network) dataset](https://mumin-dataset.github.io/), which comprises large-scale misinformation diffusion events on Twitter (now X). Specifically, this study focus on a set of six prominent misinformation claims related to the narrative asserting that [COVID-19 was deliberately created or manufactured by China or a laboratory in Wuhan](https://en.wikipedia.org/wiki/COVID-19_lab_leak_theory) across a time span from March 2020 to August 2021. Each misinformation claim represents a distinct temporal event under the same topic, thus allowing for comparisons across different stages of misinformation dissemination.
 
-
 ## Nodes and Edges Definition
 
-This study conceptualizes individual retweeters—users actively involved in the redistribution of misinformation—as foundational units within larger meta-networks of amplification. These retweeter-centric networks, or amplification backbones, capture how collective user behaviors create structural conditions that facilitate or constrain the amplification potential of misinformation, independent of the content itself (Barabási, 2016). Each retweeter is represented as a network node, and relational ties (edges) are defined through three distinct co-retweeting behaviors. To interpret the structural and functional characteristics of the resulting networks, a cross-disciplinary heuristic framework is applied, drawing specifically from principles in computer network engineering. In this framework, the study analogizes retweeter networks to the organizational patterns found in physical network infrastructures, where hubs, switches, and routers perform distinct roles in information transmission and amplification. This interdisciplinary perspective provides a conceptual foundation for understanding the differentiated structural properties and amplification dynamics across the three types of retweeter networks.
 
+It is not a diffusion network tracing how misinformation flows from one user to another through follower relationships or direct influence.
+
+You are not modeling how information “spreads” across individual pathways or trying to identify classic “influencers” in the sense of high-betweenness or high-follower nodes within a transmission chain.
+
+
+
+It is a structural co-behavior network focused on how amplifiers (retweeters) relate to one another through shared amplification behavior.
+
+Edges represent behavioral convergence—i.e., two retweeters acted similarly by amplifying the same misinformation content (directly, through quoting, or replying).
+
+Your goal is to understand how these collective behavioral patterns create structural conditions that either sustain or constrain misinformation amplification, independent of individual follower influence.
+
+
+
+This study conceptualizes individual retweeters—users actively involved in the redistribution of misinformation—as foundational units within larger meta-networks of amplification. These retweeter-centric networks, or amplification backbones, capture how collective user behaviors create structural conditions that facilitate or constrain the amplification potential of misinformation, independent of the content itself (Barabási, 2016). Each retweeter is represented as a network node, and relational ties (edges) are defined through three distinct co-retweeting behaviors. To interpret the structural and functional characteristics of the resulting networks, a cross-disciplinary heuristic framework is applied, drawing specifically from principles in computer network engineering. In this framework, the study analogizes retweeter networks to the organizational patterns found in physical network infrastructures, where hubs, switches, and routers perform distinct roles in information transmission and amplification. This interdisciplinary perspective provides a conceptual foundation for understanding the differentiated structural properties and amplification dynamics across the three types of retweeter networks.
 
 ### Direct Co-Retweet Network
 
@@ -118,7 +127,6 @@ This network structure is expected to exhibit high density, as the frequent and 
 
 Finally, the clustering coefficient is expected to remain low. Although the network is dense, these connections emerge primarily from transient, event-driven co-amplification rather than stable or cohesive subgroup formations. Similar to how broadcast redundancy in Ethernet hubs increases traffic but does not foster tightly-knit clusters, retweeters in direct co-retweet networks exhibit high connectivity without forming persistent triadic relationships (Barabási, 2016; Newman, 2010).
 
-
 ### Quote Pathway Co-Retweet
 
 The second category, quote pathway co-retweet, forms edges between two retweeters if both have retweeted either the original misinformation tweet or any tweet explicitly quoting it. This behavior introduces an additional narrative layer, where misinformation is not simply repeated but often reframed or recontextualized, amplifying its persuasive power through reinterpretation and added commentary (Papacharissi & de Fatima Oliveira, 2012).
@@ -129,7 +137,6 @@ This structural logic suggests a moderate density within quote pathway co-retwee
 
 Notably, quote-based networks are hypothesized to display a moderate to high clustering coefficient. Unlike direct retweeting, quoting inherently introduces an additional layer of selective engagement, where users actively choose not only to propagate misinformation but also to reframe it within specific narrative contexts. This behavior fosters the emergence of localized interpretive communities, where users repeatedly interact with others who share similar viewpoints or rhetorical framings of the misinformation narrative (Papacharissi, 2015). As these shared interpretive practices accumulate, the likelihood of triadic closure among users increases, leading to tightly-knit subgroups centered around influential reframings. This pattern parallels the formation of Virtual Local Area Networks (VLANs) in computer network architecture, where Ethernet switches logically segment larger networks into smaller, cohesive subnetworks. These subnetworks facilitate more frequent and efficient data exchanges among devices within the same logical group, even if they are physically dispersed (Perlman, 1985; Kurose & Ross, 2021). Similarly, retweeter hubs participating in quoting behaviors selectively engage with content that resonates within specific narrative frames, effectively constructing “interpretive subnetworks” within the broader misinformation amplification meta-network.
 
-
 ### Reply Pathway Co-Retweet
 
 The third category, reply pathway co-retweet, forms edges when two retweeters have either retweeted the original misinformation tweet or a tweet explicitly replying to it. This behavior represents a higher level of interactive engagement, often characterized by public debates, emotional reactions, and efforts to contest or clarify misinformation narratives. Empirical studies indicate that reply chains, particularly around controversial content, foster emotionally charged discussions and recursive interactions, intensifying user clustering around specific conversational threads (Chuai et al., 2024; Fazio et al., 2015).
@@ -139,7 +146,6 @@ In this meta-network of retweeters, reply-based connections closely mirror the b
 Accordingly, reply-path co-retweet networks are expected to exhibit low global density but high local clustering and degree centralization. In this meta-network of retweeters, edges emerge from shared engagement with specific reply chains linked to misinformation narratives. This structural configuration reflects how user participation in reply-based dissemination tends to concentrate around focused conversational threads, leading to the formation of tightly knit local discussion clusters. Analogous to how routers in computer networks manage information flow between distinct subnetworks, certain highly active retweeters function as bridging hubs, connecting otherwise fragmented communities by amplifying reply-thread content across broader audience segments. This contributes to a network structure characterized by high clustering coefficients and the presence of central nodes that facilitate cross-group information circulation, even as overall connection density remains low.
 
 Thus, each co-retweeting behavior produces a distinct network topology, operationalized through separate adjacency matrices, and analyzed across six temporally distinct misinformation claim related to the same topic. These conceptual distinctions provide insight into how different dissemination behaviors shape the structural organization of retweeter amplification networks, revealing how collective retweeter behaviors manifest in varying patterns of density, centralization, and clustering coefficient within these meta-networks of amplification.
-
 
 ## Analytical Strategy and Network Metrics
 
@@ -199,7 +205,6 @@ While detailed node attribute data are limited in our dataset, exploratory Expon
 
 All data processing, network construction, and analysis procedures were conducted using the RStudio (version \>= 4.0.0), primarily leveraging the `statnet` family of packages for network analysis, along with auxiliary packages for statistical testing (`stats` etc.) and data visualization (`ggplot2` etc.).
 
-
 # Analysis
 
 ## Basic Network Metrics
@@ -207,17 +212,14 @@ All data processing, network construction, and analysis procedures were conducte
 ### Compare 3 Networks overall difference
 
 ```{r}
-# 1. 读入三个网络的邻接矩阵
 adj_direct <- as.matrix(read.csv("data/adj_matrix_co_retweet.csv", row.names = 1, check.names = FALSE))
 adj_quote <- as.matrix(read.csv("data/adj_matrix_co_retweet_quote_path.csv", row.names = 1, check.names = FALSE))
 adj_reply <- as.matrix(read.csv("data/adj_matrix_co_retweet_reply_path.csv", row.names = 1, check.names = FALSE))
 
-# 2. 转换为 statnet 的 network 对象
 net_direct <- network(adj_direct, directed = FALSE, matrix.type = "adjacency")
 net_quote <- network(adj_quote, directed = FALSE, matrix.type = "adjacency")
 net_reply <- network(adj_reply, directed = FALSE, matrix.type = "adjacency")
 
-# 3. 定义计算函数
 compute_network_metrics <- function(net) {
   data.frame(
     Nodes = network.size(net),
@@ -229,12 +231,10 @@ compute_network_metrics <- function(net) {
   )
 }
 
-# 4. 计算各网络的指标
 metrics_direct <- compute_network_metrics(net_direct)
 metrics_quote <- compute_network_metrics(net_quote)
 metrics_reply <- compute_network_metrics(net_reply)
 
-# 5. 合并结果输出
 metrics_result <- rbind(
   cbind(Network = "Direct Co-Retweet", metrics_direct),
   cbind(Network = "Quote Pathway", metrics_quote),
@@ -243,13 +243,10 @@ metrics_result <- rbind(
 
 print(metrics_result)
 
-
 # plot(net_direct)
 # plot(net_quote)
 # plot(net_reply)
 ```
-
-
 
 # Reference
 
@@ -272,6 +269,8 @@ Forouzan, B. A. (2017). Data Communications and Networking (5th ed.). McGraw-Hil
 Guarino, S., Trino, N., Celestini, A., Chessa, A., & Riotta, G. (2020). Characterizing networks of propaganda on Twitter: A case study. *Applied Network Science, 5*, 59. <https://doi.org/10.1007/s41109-020-00286-y>
 
 Guess, A., Nagler, J., & Tucker, J. (2019). Less than you think: Prevalence and predictors of fake news dissemination on Facebook. *Science Advances, 5*(1), eaau4586. <https://doi.org/10.1126/sciadv.aau4586>
+
+Klein, B. (2022). The network structure of online amplification (Doctoral dissertation, Northeastern University). Retrieved from https://repository.library.northeastern.edu/files/neu:4f186q93m/fulltext.pdf
 
 Kurose, J. F., & Ross, K. W. (2021). Computer Networking: A Top-Down Approach (8th ed.). Pearson.
 
@@ -298,6 +297,8 @@ Wasserman, S., & Faust, K. (1994). *Social Network Analysis: Methods and Applica
 Weber, D., & Neumann, F. (2021). Amplifying influence through coordinated behaviour in social networks. Social Network Analysis and Mining, 11(1), 1–13. https://doi.org/10.1007/s13278-021-00815-2
 
 Wu, Y., & Shen, H. (2023). Examining retweeting behavior on social networking sites from the perspective of online identity and self-presentation. Frontiers in Psychology, 14, 10202284. https://doi.org/10.3389/fpsyg.2023.10202284
+
+Yan, Y., Toriumi, F., & Sugawara, T. (2021). Understanding how retweets influence the behaviors of social networking service users via agent-based simulation. Computational Social Networks, 8(1), 18. https://doi.org/10.1186/s40649-021-00099-8
 
 Zhao, Z., & Wang, X. (2024). To Reply or to Quote: Comparing conversational framing strategies on Twitter. Proceedings of the ACM on Human-Computer Interaction, 8(CSCW1), Article 3625680. https://doi.org/10.1145/3625680
 
@@ -768,13 +769,17 @@ ncol(adj_matrix_co_retweet_reply_path)
 table(co_retweet_reply_path_edges$weight)
 ```
 
-### Follow
+
+### Extra EDA
+
+#### Followship
 
 A directed edge from User A to User B indicates that User A follows User B. This network captures the potential flow of influence among misinformation retweeters and allows for the identification of opinion leaders and hierarchical structures in misinformation diffusion.
 
 ```{r}
 # Load retweeter list
-retweeter_id_misinfo <- unique(covid_wuhan_misinfo$retweeter_id)
+retweeter_id_misinfo <- unique(covid_wuhan_misinfo$retweeter_id) |>
+  as.character()
 
 # Load and filter directed follow edges
 retweeter_follow_edges_directed <- read_csv("data/mumin_csv/user_follows_user.csv") |> 
@@ -812,6 +817,75 @@ if (nrow(retweeter_follow_edges_directed) == 0) {
 ```
 
 Analysis of the follower network among misinformation retweeters revealed no recorded follower-followee relationships within this group. This indicates that users involved in the dissemination of COVID-19 origin misinformation acted largely as isolated agents rather than as members of a tightly connected social network. Such a pattern suggests that the spread of misinformation in this case was driven primarily by content virality and opportunistic engagement, rather than through established social ties or influencer-led dissemination.
+
+
+#### Follower Counts
+
+```{r}
+# Grab Follower Counts for each nodes
+follow_data <- read_csv("data/mumin_csv/user_follows_user.csv") |>
+  mutate(tgt = as.character(tgt))
+
+follower_counts <- follow_data |> 
+  filter(tgt %in% retweeter_id_misinfo) |> 
+  count(tgt, name = "follower_count") |> 
+  rename(retweeter_id = tgt) 
+  
+sum(retweeter_id_misinfo %in% follow_data$tgt)
+
+follower_counts_full <- tibble(retweeter_id = retweeter_id_misinfo) |> 
+  left_join(follower_counts, by = "retweeter_id") |> 
+  replace_na(list(follower_count = 0)) |>
+  arrange(desc(follower_count))
+
+```
+
+The follower count data is used here not to identify influencers, but to characterize the composition of the amplifier backbone. In our context, we are not asking “Who can spread misinformation most effectively to a large audience?”
+
+Instead, we can check: **Do the structural patterns of amplifier co-behavior suggest reliance on high-profile nodes, or do they reveal decentralized, echo-chamber-like clusters of low-profile actors?**
+
+According to our output, among the 112 retweeters involved in misinformation amplification reveals a highly polarized distribution. Specifically, only 8 retweeters have a modest following of 1–2 followers, while a single retweeter holds a disproportionately large follower base of 229. The remaining 103 retweeters have zero followers. 
+
+The overwhelmingly low follower counts among retweeters suggest that most amplification behavior arises from low-profile users acting collectively, rather than from a centralized set of influential nodes. This aligns with the structural investigation of how amplification backbones emerge from the behaviors of ordinary users, independent of their social reach.
+
+
+
+
+现在我们把刚才提到的东西形成narrative：
+Follower counts 极低意味着，尽管这些 retweeters共同参与了谣言放大，但他们本身没有强大的“外部传播能力”。
+
+因此，这些共同行为的边更多地反映的是意识形态共鸣、情感驱动或事件反应同步性，而不是实际的信息放大效能。
+
+这个特征强化了你们网络作为一种“放大结构现象”的解释，而不是实质性影响力传播网络。
+
+This feature does not invalidate your network analysis; it sharpens its theoretical positioning.
+
+| 网络类型                         | Follower Counts 特征的影响                                                        |
+| ---------------------------- | ---------------------------------------------------------------------------- |
+| **Direct Co-Retweet**        | 说明这种看似密集的网络，更多体现为对热点内容的**同步响应**，而非真实的高效放大，边代表的更多是“同一时刻被动跟风”。                 |
+| **Quote Pathway Co-Retweet** | 强化了这类网络的**解释性社群**特征，尽管 retweeters 没有大规模的受众，但他们通过重新解读和附加立场制造局部影响。             |
+| **Reply Pathway Co-Retweet** | 进一步印证了这类网络的**情绪驱动**和**局部封闭讨论**特征，这些 retweeters 可能就是在小范围争吵、表达态度，而非具备扩散能力的放大者。 |
+
+你的分析不是关于“谣言能被放大多远”，而是关于“谁在参与放大这种行为，以及他们如何彼此构成放大结构的骨干”。
+
+这直接支持你提出的Amplification Backbone概念，强调的是一种社会结构现象，而非流量影响力的传递。
+This feature does not invalidate your network analysis; it sharpens its theoretical positioning.
+
+
+
+Amplifier ≠ Influencer
+
+Literature 中“Amplifiers”的角色常常和 Influencers 混淆，但你的研究强调的是结构性放大者，他们通过共同行为增强特定叙事的可见性和存在感，而不是直接拥有巨大的传播半径。
+
+你现在的发现正好作为一个理论修正点：“Unlike traditional studies that focus on individual influence and follower reach, this study reconceptualizes amplifiers as structural agents whose behavioral convergence sustains misinformation visibility, regardless of their personal audience size.”
+
+这强化了 Amplification Backbone 的概念
+
+你的网络强调的是放大者之间的结构性共鸣和联合行为模式。这种放大不一定导致广泛的外部扩散，但却维持了谣言的持续性存在和集体认知效应。
+
+在 Literature Review 中可以明确指出：这种放大骨干的存在，正是为什么即便没有大规模的扩散，一些谣言仍然在特定群体中“长尾式存活”并反复被激活的原因。
+
+
 
 ## Graph
 
@@ -2388,102 +2462,7 @@ legend(
 
 ## Data Analysis
 
-```{r}
-calculate_metrics_statnet <- function(csv_path, network_type, stage) {
-  adj_matrix <- as.matrix(read.csv(csv_path, row.names = 1))
-  net <- network(adj_matrix, directed = FALSE, matrix.type = "adjacency")
-  
-  if (network.size(net) <= 1) {
-    return(data.frame(
-      Network_Type = network_type,
-      Stage = stage,
-      Size = NA,
-      Edges = NA,
-      Components = NA,
-      Diameter = NA,
-      Transitivity = NA,
-      Isolates = NA,
-      Degree_Centralization = NA,
-      Betweenness_Centralization = NA,
-      Closeness_Centralization = NA,
-      Cliques_Total = NA,
-      Cliques_Max_Size = NA,
-      Cliques_Min_Size = NA
-    ))
-  }
-  
-  size <- network.size(net)
-  edges <- network.edgecount(net)
-  
-  # Components: Exclude isolates
-  components_info <- component.dist(net)
-  num_components <- sum(components_info$csize > 1)
-  
-  isolates_count <- sum(degree(net) == 0)
-  
-  # Diameter
-  dist_matrix <- geodist(net)$gdist
-  dist_matrix[is.infinite(dist_matrix)] <- NA
-  diameter_val <- max(dist_matrix, na.rm = TRUE)
-  
-  # Transitivity
-  transitivity_val <- gtrans(net)
-  
-  # Degree Centralization
-  deg_vals <- degree(net)
-  centralization_deg <- if (length(deg_vals) > 0) {
-    (max(deg_vals) * (size - 1) - sum(max(deg_vals) - deg_vals)) / ((size - 1)^2)
-  } else {
-    NA
-  }
-  
-  # Betweenness Centralization
-  btw_vals <- betweenness(net)
-  centralization_btw <- if (length(btw_vals) > 0) {
-    (max(btw_vals) * (size - 1) - sum(max(btw_vals) - btw_vals)) / ((size - 1)^2)
-  } else {
-    NA
-  }
-  
-  # Closeness Centralization
-  cls_vals <- closeness(net, g = geodist(net)$gdist)
-  centralization_cls <- if (length(cls_vals) > 0) {
-    (max(cls_vals) * (size - 1) - sum(max(cls_vals) - cls_vals)) / ((size - 1)^2)
-  } else {
-    NA
-  }
-  
-  # Clique Metrics - Filter cliques of size >= 3
-  clique_info <- sna::clique.census(net, mode = "graph", tabulate.by.vertex = FALSE)
-  clique_counts <- clique_info$clique.count
-  valid_sizes <- which(as.numeric(names(clique_counts)) >= 3 & clique_counts > 0)
-  
-  total_cliques <- if (length(valid_sizes) > 0) sum(clique_counts[valid_sizes]) else 0
-  max_clique_size <- if (length(valid_sizes) > 0) max(valid_sizes) else NA
-  min_clique_size <- if (length(valid_sizes) > 0) min(valid_sizes) else NA
-
-  
-  # Output Data Frame
-  data.frame(
-    Network_Type = network_type,
-    Stage = stage,
-    Size = size,
-    Edges = edges,
-    Components = num_components,
-    Diameter = diameter_val,
-    Transitivity = round(transitivity_val, 4),
-    Isolates = isolates_count,
-    Degree_Centralization = round(centralization_deg, 4),
-    Betweenness_Centralization = round(centralization_btw, 4),
-    Closeness_Centralization = round(centralization_cls, 4),
-    Cliques_Total = total_cliques,
-    Cliques_Max_Size = max_clique_size,
-    Cliques_Min_Size = min_clique_size
-  )
-}
-
-```
-
+**Hi, Professor! I'm still adjusting this part. As I found my network's definition not clear, I need to reconstruct them and find proper research hypotheses. I'll adjust this part later until I totally finish the literature work. Thank you for understanding!**
 
 ```{r}
 calculate_metrics_statnet <- function(csv_path, network_type, stage) {
@@ -2499,9 +2478,10 @@ calculate_metrics_statnet <- function(csv_path, network_type, stage) {
       Density = NA,
       Avg_Degree = NA,
       Components = NA,
-      Diameter = NA,
       Transitivity = NA,
       Isolates = NA,
+      Diameter = NA,
+      Average_Path_Length = NA,
       Degree_Centralization = NA,
       Betweenness_Centralization = NA,
       Closeness_Centralization = NA,
@@ -2528,6 +2508,9 @@ calculate_metrics_statnet <- function(csv_path, network_type, stage) {
   dist_matrix <- geodist(net)$gdist
   dist_matrix[is.infinite(dist_matrix)] <- NA
   diameter_val <- max(dist_matrix, na.rm = TRUE)
+  
+  # Calculate Average Path Length
+  avg_path_length <- mean(dist_matrix, na.rm = TRUE)
   
   # Transitivity
   transitivity_val <- gtrans(net)
@@ -2574,21 +2557,22 @@ calculate_metrics_statnet <- function(csv_path, network_type, stage) {
     Density = round(density_val, 4),
     Avg_Degree = round(avg_degree_val, 2),
     Components = num_components,
-    Diameter = diameter_val,
     Transitivity = round(transitivity_val, 4),
     Isolates = isolates_count,
+    
+    Diameter = diameter_val,
+    Average_Path_Length = round(avg_path_length, 4),
+    
     Degree_Centralization = round(centralization_deg, 4),
     Betweenness_Centralization = round(centralization_btw, 4),
     Closeness_Centralization = round(centralization_cls, 4),
+    
     Cliques_Total = total_cliques,
     Cliques_Max_Size = max_clique_size,
     Cliques_Min_Size = min_clique_size
   )
 }
-
-
 ```
-
 
 ```{r}
 # Define file paths and labels
@@ -2620,76 +2604,74 @@ write.csv(all_metrics, "data/network_metrics_summary.csv", row.names = FALSE)
 
 ```
 
-
 ### Data Summary in Tables
 
-| Network_Type           | Stage | Size | Edges | Density | Avg_Degree | Components | Diameter | Transitivity | Isolates |
-|------------------------|-------|------|-------|---------|------------|------------|----------|--------------|----------|
-| Co-Retweet             | 1     | 112  | 253   | 0.0407  | 9.04       | 1          | 1        | 1.000        | 89       |
-| Quote Path Co-Retweet  | 1     | 112  | 0     | 0.0000  | 0.00       | 0          | 0        | 1.000        | 112      |
-| Reply Path Co-Retweet  | 1     | 112  | 0     | 0.0000  | 0.00       | 0          | 0        | 1.000        | 112      |
-| Co-Retweet             | 2     | 112  | 420   | 0.0676  | 15.00      | 2          | 1        | 1.000        | 71       |
-| Quote Path Co-Retweet  | 2     | 112  | 420   | 0.0676  | 15.00      | 2          | 1        | 1.000        | 71       |
-| Reply Path Co-Retweet  | 2     | 112  | 420   | 0.0676  | 15.00      | 2          | 1        | 1.000        | 71       |
-| Co-Retweet             | 3     | 112  | 28    | 0.0045  | 1.00       | 1          | 1        | 1.000        | 104      |
-| Quote Path Co-Retweet  | 3     | 112  | 28    | 0.0045  | 1.00       | 1          | 1        | 1.000        | 104      |
-| Reply Path Co-Retweet  | 3     | 112  | 28    | 0.0045  | 1.00       | 1          | 1        | 1.000        | 104      |
-| Co-Retweet             | 4     | 112  | 77    | 0.0124  | 2.75       | 4          | 1        | 1.000        | 86       |
-| Quote Path Co-Retweet  | 4     | 112  | 57    | 0.0092  | 2.04       | 2          | 1        | 1.000        | 96       |
-| Reply Path Co-Retweet  | 4     | 112  | 77    | 0.0124  | 2.75       | 4          | 1        | 1.000        | 86       |
-| Co-Retweet             | 5     | 112  | 26    | 0.0042  | 0.93       | 1          | 2        | 0.854        | 103      |
-| Quote Path Co-Retweet  | 5     | 112  | 6     | 0.0010  | 0.21       | 1          | 1        | 1.000        | 108      |
-| Reply Path Co-Retweet  | 5     | 112  | 21    | 0.0034  | 0.75       | 1          | 1        | 1.000        | 105      |
-| Co-Retweet             | 6     | 112  | 10    | 0.0016  | 0.36       | 1          | 1        | 1.000        | 107      |
-| Quote Path Co-Retweet  | 6     | 112  | 10    | 0.0016  | 0.36       | 1          | 1        | 1.000        | 107      |
-| Reply Path Co-Retweet  | 6     | 112  | 10    | 0.0016  | 0.36       | 1          | 1        | 1.000        | 107      |
+| Network_Type | Stage | Size | Edges | Density | Avg_Degree | Components | Diameter | Transitivity | Isolates |
+|--------|--------|--------|--------|--------|--------|--------|--------|--------|--------|
+| Co-Retweet | 1 | 112 | 253 | 0.0407 | 9.04 | 1 | 1 | 1.000 | 89 |
+| Quote Path Co-Retweet | 1 | 112 | 0 | 0.0000 | 0.00 | 0 | 0 | 1.000 | 112 |
+| Reply Path Co-Retweet | 1 | 112 | 0 | 0.0000 | 0.00 | 0 | 0 | 1.000 | 112 |
+| Co-Retweet | 2 | 112 | 420 | 0.0676 | 15.00 | 2 | 1 | 1.000 | 71 |
+| Quote Path Co-Retweet | 2 | 112 | 420 | 0.0676 | 15.00 | 2 | 1 | 1.000 | 71 |
+| Reply Path Co-Retweet | 2 | 112 | 420 | 0.0676 | 15.00 | 2 | 1 | 1.000 | 71 |
+| Co-Retweet | 3 | 112 | 28 | 0.0045 | 1.00 | 1 | 1 | 1.000 | 104 |
+| Quote Path Co-Retweet | 3 | 112 | 28 | 0.0045 | 1.00 | 1 | 1 | 1.000 | 104 |
+| Reply Path Co-Retweet | 3 | 112 | 28 | 0.0045 | 1.00 | 1 | 1 | 1.000 | 104 |
+| Co-Retweet | 4 | 112 | 77 | 0.0124 | 2.75 | 4 | 1 | 1.000 | 86 |
+| Quote Path Co-Retweet | 4 | 112 | 57 | 0.0092 | 2.04 | 2 | 1 | 1.000 | 96 |
+| Reply Path Co-Retweet | 4 | 112 | 77 | 0.0124 | 2.75 | 4 | 1 | 1.000 | 86 |
+| Co-Retweet | 5 | 112 | 26 | 0.0042 | 0.93 | 1 | 2 | 0.854 | 103 |
+| Quote Path Co-Retweet | 5 | 112 | 6 | 0.0010 | 0.21 | 1 | 1 | 1.000 | 108 |
+| Reply Path Co-Retweet | 5 | 112 | 21 | 0.0034 | 0.75 | 1 | 1 | 1.000 | 105 |
+| Co-Retweet | 6 | 112 | 10 | 0.0016 | 0.36 | 1 | 1 | 1.000 | 107 |
+| Quote Path Co-Retweet | 6 | 112 | 10 | 0.0016 | 0.36 | 1 | 1 | 1.000 | 107 |
+| Reply Path Co-Retweet | 6 | 112 | 10 | 0.0016 | 0.36 | 1 | 1 | 1.000 | 107 |
 
 **Table 1: Basic Network Structure Over Time**
 
-| Network_Type           | Stage | Degree_Centralization | Betweenness_Centralization | Closeness_Centralization |
-|------------------------|-------|-----------------------|----------------------------|--------------------------|
-| Co-Retweet             | 1     | 0.0786                | 0.0000                     | 0                        |
-| Quote Path Co-Retweet  | 1     | 0.0000                | 0.0000                     | 0                        |
-| Reply Path Co-Retweet  | 1     | 0.0000                | 0.0000                     | 0                        |
-| Co-Retweet             | 2     | 0.1325                | 0.0000                     | 0                        |
-| Quote Path Co-Retweet  | 2     | 0.1325                | 0.0000                     | 0                        |
-| Reply Path Co-Retweet  | 2     | 0.1325                | 0.0000                     | 0                        |
-| Co-Retweet             | 3     | 0.0080                | 0.0000                     | 0                        |
-| Quote Path Co-Retweet  | 3     | 0.0080                | 0.0000                     | 0                        |
-| Reply Path Co-Retweet  | 3     | 0.0080                | 0.0000                     | 0                        |
-| Co-Retweet             | 4     | 0.0237                | 0.0000                     | 0                        |
-| Quote Path Co-Retweet  | 4     | 0.0172                | 0.0000                     | 0                        |
-| Reply Path Co-Retweet  | 4     | 0.0237                | 0.0000                     | 0                        |
-| Co-Retweet             | 5     | 0.0071                | 0.0008                     | 0                        |
-| Quote Path Co-Retweet  | 5     | 0.0015                | 0.0000                     | 0                        |
-| Reply Path Co-Retweet  | 5     | 0.0058                | 0.0000                     | 0                        |
-| Co-Retweet             | 6     | 0.0026                | 0.0000                     | 0                        |
-| Quote Path Co-Retweet  | 6     | 0.0026                | 0.0000                     | 0                        |
-| Reply Path Co-Retweet  | 6     | 0.0026                | 0.0000                     | 0                        |
+| Network_Type | Stage | Degree_Centralization | Betweenness_Centralization | Closeness_Centralization |
+|--------------|--------------|--------------|---------------|--------------|
+| Co-Retweet | 1 | 0.0786 | 0.0000 | 0 |
+| Quote Path Co-Retweet | 1 | 0.0000 | 0.0000 | 0 |
+| Reply Path Co-Retweet | 1 | 0.0000 | 0.0000 | 0 |
+| Co-Retweet | 2 | 0.1325 | 0.0000 | 0 |
+| Quote Path Co-Retweet | 2 | 0.1325 | 0.0000 | 0 |
+| Reply Path Co-Retweet | 2 | 0.1325 | 0.0000 | 0 |
+| Co-Retweet | 3 | 0.0080 | 0.0000 | 0 |
+| Quote Path Co-Retweet | 3 | 0.0080 | 0.0000 | 0 |
+| Reply Path Co-Retweet | 3 | 0.0080 | 0.0000 | 0 |
+| Co-Retweet | 4 | 0.0237 | 0.0000 | 0 |
+| Quote Path Co-Retweet | 4 | 0.0172 | 0.0000 | 0 |
+| Reply Path Co-Retweet | 4 | 0.0237 | 0.0000 | 0 |
+| Co-Retweet | 5 | 0.0071 | 0.0008 | 0 |
+| Quote Path Co-Retweet | 5 | 0.0015 | 0.0000 | 0 |
+| Reply Path Co-Retweet | 5 | 0.0058 | 0.0000 | 0 |
+| Co-Retweet | 6 | 0.0026 | 0.0000 | 0 |
+| Quote Path Co-Retweet | 6 | 0.0026 | 0.0000 | 0 |
+| Reply Path Co-Retweet | 6 | 0.0026 | 0.0000 | 0 |
 
 **Table 2: Network Centralization Over Time**
 
-
-| Network_Type           | Stage | Cliques_Total | Cliques_Max_Size | Cliques_Min_Size |
-|------------------------|-------|----------------|------------------|------------------|
-| Co-Retweet             | 1     | 1              | 23               | 23               |
-| Quote Path Co-Retweet  | 1     | 0              | NA               | NA               |
-| Reply Path Co-Retweet  | 1     | 0              | NA               | NA               |
-| Co-Retweet             | 2     | 2              | 25               | 16               |
-| Quote Path Co-Retweet  | 2     | 2              | 25               | 16               |
-| Reply Path Co-Retweet  | 2     | 2              | 25               | 16               |
-| Co-Retweet             | 3     | 1              | 8                | 8                |
-| Quote Path Co-Retweet  | 3     | 1              | 8                | 8                |
-| Reply Path Co-Retweet  | 3     | 1              | 8                | 8                |
-| Co-Retweet             | 4     | 4              | 9                | 5                |
-| Quote Path Co-Retweet  | 4     | 2              | 9                | 7                |
-| Reply Path Co-Retweet  | 4     | 4              | 9                | 5                |
-| Co-Retweet             | 5     | 2              | 7                | 4                |
-| Quote Path Co-Retweet  | 5     | 1              | 4                | 4                |
-| Reply Path Co-Retweet  | 5     | 1              | 7                | 7                |
-| Co-Retweet             | 6     | 1              | 5                | 5                |
-| Quote Path Co-Retweet  | 6     | 1              | 5                | 5                |
-| Reply Path Co-Retweet  | 6     | 1              | 5                | 5                |
+| Network_Type          | Stage | Cliques_Total | Cliques_Max_Size | Cliques_Min_Size |
+|-----------------|--------------|--------------|--------------|--------------|
+| Co-Retweet            | 1     | 1             | 23               | 23               |
+| Quote Path Co-Retweet | 1     | 0             | NA               | NA               |
+| Reply Path Co-Retweet | 1     | 0             | NA               | NA               |
+| Co-Retweet            | 2     | 2             | 25               | 16               |
+| Quote Path Co-Retweet | 2     | 2             | 25               | 16               |
+| Reply Path Co-Retweet | 2     | 2             | 25               | 16               |
+| Co-Retweet            | 3     | 1             | 8                | 8                |
+| Quote Path Co-Retweet | 3     | 1             | 8                | 8                |
+| Reply Path Co-Retweet | 3     | 1             | 8                | 8                |
+| Co-Retweet            | 4     | 4             | 9                | 5                |
+| Quote Path Co-Retweet | 4     | 2             | 9                | 7                |
+| Reply Path Co-Retweet | 4     | 4             | 9                | 5                |
+| Co-Retweet            | 5     | 2             | 7                | 4                |
+| Quote Path Co-Retweet | 5     | 1             | 4                | 4                |
+| Reply Path Co-Retweet | 5     | 1             | 7                | 7                |
+| Co-Retweet            | 6     | 1             | 5                | 5                |
+| Quote Path Co-Retweet | 6     | 1             | 5                | 5                |
+| Reply Path Co-Retweet | 6     | 1             | 5                | 5                |
 
 **Table 3: Clique Structural Features Over Time**
 
@@ -2697,51 +2679,311 @@ write.csv(all_metrics, "data/network_metrics_summary.csv", row.names = FALSE)
 
 Table 1 (Network Density Over Time included) and Table 2 (Degree Centralization Over Time included) display the temporal variations in network density and degree centralization across different types of retweeter amplification backbones. These visualizations provide initial insights into the structural dynamics of misinformation diffusion.
 
-
 ### Expected & actual findings based on hypotheses
 
-#### H1 (Density and Average Degree)
+四个假设与 CUG、ERGM 检验的对应关系 Hypothesis 指标 CUG Test ERGM 可以得出的结论 H1: Density & Avg Degree Density, Avg Degree ❌（描述性即可） ❌ 不适合 CUG/ERGM，用 ANOVA/描述统计验证 H2: Degree Centralization Degree Centralization ✅ ✅ 核心节点是否显著集中 H3: Clustering Coefficient Transitivity (Clustering) ✅ ✅ (gwesp term) 网络中三元闭合（群体化）倾向 H4: Temporal Variation Degree Centralization, Density ✅ ❌ 不同时间点的中心化和密度是否递减
 
-Direct co-retweet networks will exhibit the highest density and average degree among the three networks.
+#### H1 (Density and Average Degree): Direct co-retweet networks will exhibit the highest density and average degree among the three networks.
 
-Findings:
-Across all stages, direct co-retweet networks consistently show higher density and average degree compared to quote and reply pathway co-retweet networks. For example, in Stage 2, the density for co-retweet networks is 0.0676 with an average degree of 15.00, while both quote and reply networks exhibit identical but lower values. In stages 3 through 6, this pattern persists.
+**Null Hypothesis (H0):** The mean density and average degree are the same across the three network types.
 
-Conclusion:
-The empirical data strongly supports H1. The directional effect is positive and statistically consistent across time points.
+Descriptive trends indicated that direct co-retweet networks generally exhibited higher density and average degree compared to quote path and reply path co-retweet networks. For instance, in Stage 2, the density for co-retweet networks was 0.0676 with an average degree of 15.00, while both quote and reply path networks showed identical but lower values. This pattern was consistently observed across later stages.
 
-#### H2 (Degree Centralization)
-Reply pathway co-retweet networks will exhibit the highest degree centralization, followed by quote pathway networks, with direct co-retweet networks exhibiting the lowest.
+A one-way ANOVA was conducted to assess whether these observed differences were statistically significant.
 
-Findings:
-Contrary to expectations, direct co-retweet networks often show higher or equivalent degree centralization. For instance, in Stage 2, all three network types exhibit the same degree centralization (0.1325), but in later stages, co-retweet networks slightly outperform the others.
+```{r}
+#| output: false
 
-Conclusion:
-H2 is not supported. The expected hierarchical dominance in reply networks is not observed, indicating that influential retweeters are not more structurally central in reply-based interactions compared to direct co-retweet behaviors.
+# One-Way ANOVA for Density
+anova_density <- aov(Density ~ Network_Type, data = all_metrics)
+summary(anova_density)
+TukeyHSD(anova_density)
+
+# One-Way ANOVA for Average Degree
+anova_degree <- aov(Avg_Degree ~ Network_Type, data = all_metrics)
+summary(anova_degree)
+TukeyHSD(anova_degree)
+
+
+# Calculate Means and Standard Deviations
+density_stats <- all_metrics %>% 
+  group_by(Network_Type) %>% 
+  summarise(Mean_Density = round(mean(Density, na.rm = TRUE), 4),
+            SD_Density = round(sd(Density, na.rm = TRUE), 4))
+
+degree_stats <- all_metrics %>% 
+  group_by(Network_Type) %>% 
+  summarise(Mean_Avg_Degree = round(mean(Avg_Degree, na.rm = TRUE), 2),
+            SD_Avg_Degree = round(sd(Avg_Degree, na.rm = TRUE), 2))
+
+# Calculate Effect Sizes (η²)
+eta_density <- eta_squared(anova_density)
+eta_degree <- eta_squared(anova_degree)
+
+```
+
+The ANOVA results revealed no statistically significant differences in density, F(2, 15) = 0.158, p = .855, nor in average degree, F(2, 15) = 0.158, p = .855. Post-hoc comparisons using Tukey’s HSD test further confirmed that none of the pairwise differences between network types were statistically significant (p \> .85 for all comparisons).
+
+**Descriptive Statistics for Density:**
+
+| Network Type          | Mean Density | SD Density |
+|-----------------------|--------------|------------|
+| Co-Retweet            | 0.0218       | 0.0267     |
+| Quote Path Co-Retweet | 0.0140       | 0.0265     |
+| Reply Path Co-Retweet | 0.0149       | 0.0262     |
+
+**Descriptive Statistics for Average Degree:**
+
+| Network Type          | Mean Avg Degree | SD Avg Degree |
+|-----------------------|-----------------|---------------|
+| Co-Retweet            | 4.85            | 5.92          |
+| Quote Path Co-Retweet | 3.10            | 5.88          |
+| Reply Path Co-Retweet | 3.31            | 5.81          |
+
+**Post-hoc Test Results for Density:**
+
+| Comparison           | Difference | 95% CI Lower | 95% CI Upper | p-value |
+|----------------------|------------|--------------|--------------|---------|
+| Quote vs. Co-Retweet | -0.0079    | -0.0475      | 0.0318       | .866    |
+| Reply vs. Co-Retweet | -0.0069    | -0.0466      | 0.0327       | .894    |
+| Reply vs. Quote      | 0.0009     | -0.0387      | 0.0406       | .998    |
+
+**Post-hoc Test Results for Average Degree:**
+
+| Comparison           | Difference | 95% CI Lower | 95% CI Upper | p-value |
+|----------------------|------------|--------------|--------------|---------|
+| Quote vs. Co-Retweet | -1.745     | -10.545      | 7.055        | .865    |
+| Reply vs. Co-Retweet | -1.537     | -10.336      | 7.263        | .894    |
+| Reply vs. Quote      | 0.208      | -8.591       | 9.008        | .998    |
+
+**Effect Sizes (η²):**
+
+| Metric         | η² Effect Size |
+|----------------|----------------|
+| Density        | 0.02           |
+| Average Degree | 0.02           |
+
+Based on these results, we failed to reject the null hypothesis. While descriptive patterns suggest higher density and average degree in direct co-retweet networks, these differences were not statistically significant. Therefore, H1 is not supported by the current data.
+
+#### H2 (Degree Centralization): Reply pathway co-retweet networks will exhibit the highest degree centralization, followed by quote pathway networks, with direct co-retweet networks exhibiting the lowest.
+
+Null Hypothesis (H0): The mean degree centralization has no difference across the three network types.
+
+Descriptive observations suggest that, contrary to expectations, direct co-retweet networks often show higher or equivalent degree centralization. For instance, in Stage 2, all three network types exhibit identical degree centralization values (0.1325). In later stages, direct co-retweet networks consistently demonstrate slightly higher degree centralization compared to quote and reply pathway networks.
+
+To formally test whether the observed degree centralization values significantly deviate from random network structures, CUG tests were performed. Additionally, Exponential Random Graph Models (ERGMs) were estimated to explore structural factors contributing to centralization.
+
+Findings: Contrary to expectations, direct co-retweet networks often show higher or equivalent degree centralization. For instance, in Stage 2, all three network types exhibit the same degree centralization (0.1325), but in later stages, co-retweet networks slightly outperform the others.
+
+Conclusion: H2 is not supported. The expected hierarchical dominance in reply networks is not observed, indicating that influential retweeters are not more structurally central in reply-based interactions compared to direct co-retweet behaviors.
 
 #### H3 (Clustering Coefficient)
+
 Quote pathway co-retweet networks will exhibit the highest clustering coefficient, followed by reply pathway networks, with direct co-retweet networks exhibiting the lowest.
 
-Findings:
-Clustering coefficients remain consistently high (often 1.000) across all network types and stages, with only slight variations (e.g., Stage 5 shows a lower clustering coefficient of 0.854 for co-retweet networks). This uniformity suggests that triadic closures are prevalent across all forms of engagement and are not significantly differentiated by retweeting behavior.
+Findings: Clustering coefficients remain consistently high (often 1.000) across all network types and stages, with only slight variations (e.g., Stage 5 shows a lower clustering coefficient of 0.854 for co-retweet networks). This uniformity suggests that triadic closures are prevalent across all forms of engagement and are not significantly differentiated by retweeting behavior.
 
-Conclusion:
-H3 is partially supported. While quote networks sometimes exhibit higher clustering (e.g., fewer isolates), the differences are marginal and not consistently observed across all stages.
+Conclusion: H3 is partially supported. While quote networks sometimes exhibit higher clustering (e.g., fewer isolates), the differences are marginal and not consistently observed across all stages.
 
 #### H4 (Temporal Variation)
 
 Retweeter amplification backbone networks formed during earlier misinformation events will demonstrate higher density and degree centralization than those formed during later events.
 
-Findings:
-Early stages (Stages 1 and 2) show notably higher density and degree centralization across all network types. For example, density for co-retweet networks is 0.0676 in Stage 2 but declines steadily in later stages, reaching as low as 0.0016 by Stage 6. Degree centralization follows a similar pattern.
+Findings: Early stages (Stages 1 and 2) show notably higher density and degree centralization across all network types. For example, density for co-retweet networks is 0.0676 in Stage 2 but declines steadily in later stages, reaching as low as 0.0016 by Stage 6. Degree centralization follows a similar pattern.
 
-Conclusion:
-H4 is strongly supported, indicating that misinformation amplification structures tend to be more active and centralized during the early emergence of misinformation events but become fragmented over time.
+Conclusion: H4 is strongly supported, indicating that misinformation amplification structures tend to be more active and centralized during the early emergence of misinformation events but become fragmented over time.
 
 #### Statistical Significance and Goodness of Fit
+
 Although statistical tests such as t-tests and CUG models were planned, the current dataset suggests clear trends without needing additional inferential testing for basic structural metrics. The observed differences align with theoretical expectations in H1 and H4 but contradict H2 and only partially support H3. The goodness of fit for network models would require ERGM or other advanced modeling techniques, which are beyond the current exploratory analysis scope.
 
+#### CUG
 
+```{r}
+# read_network <- function(file_path) {
+#   adj_matrix <- as.matrix(read.csv(file_path, row.names = 1))
+#   net <- network(adj_matrix, directed = FALSE, matrix.type = "adjacency")
+#   return(net)
+# }
+# 
+# run_cug_tests <- function(file_path, network_label, stage) {
+#   net <- read_network(file_path)
+#   
+#   if (network.size(net) <= 1 || network.edgecount(net) == 0) {
+#     return(data.frame(
+#       Network_Type = network_label,
+#       Stage = stage,
+#       Degree_Centralization = NA,
+#       Degree_p = NA,
+#       Transitivity = NA,
+#       Transitivity_p = NA
+#     ))
+#   }
+#   
+#   # Safe CUG Degree Centralization
+#   cug_deg <- tryCatch({
+#     cug.test(
+#       net, 
+#       function(x) centralization(x, degree, mode = "graph"), 
+#       cmode = "edges", 
+#       reps = 1000
+#     )
+#   }, error = function(e) NULL)
+#   
+#   # Safe CUG Transitivity
+#   cug_trans <- tryCatch({
+#     cug.test(
+#       net, 
+#       gtrans, 
+#       cmode = "edges", 
+#       reps = 1000
+#     )
+#   }, error = function(e) NULL)
+#   
+#   data.frame(
+#     Network_Type = network_label,
+#     Stage = stage,
+#     Degree_Centralization = if (!is.null(cug_deg)) cug_deg$obs.stat else NA,
+#     Degree_p = if (!is.null(cug_deg)) cug_deg$pval else NA,
+#     Transitivity = if (!is.null(cug_trans)) cug_trans$obs.stat else NA,
+#     Transitivity_p = if (!is.null(cug_trans)) cug_trans$pval else NA
+#   )
+# }
+# 
+# 
+# # calculate CUG
+# cug_results <- pmap_dfr(
+#   list(network_files$file_path, network_files$network_label, network_files$stage),
+#   run_cug_tests
+# )
+# 
+# # print results
+# print(cug_results)
+# write.csv(cug_results, "data/cug_results_summary.csv", row.names = FALSE)
+# 
+# ??sna::centralization.degree
+# 
+# net <- read_network("data/adj_matrix_stage1.csv")
+# print(net)
+# summary(net)
+# 
+# 
+# cug_deg <- tryCatch({
+#   cug.test(
+#     net, 
+#     function(x) centralization(x, degree, mode = "graph"), 
+#     cmode = "edges", 
+#     reps = 100
+#   )
+# }, error = function(e) e)
+# 
+# print(cug_deg)
+# 
+# 
+# centralization(net, degree, mode = "graph")
+# 
+# 
+# 
+# 
+# set.seed(123)  # 保持可重复性
+# 
+# 
+# observed_deg_cent <- centralization(net, degree, mode = "graph")
+# 
+# 
+# sim_deg_cents <- replicate(1000, {
+#   rand_net <- rgraph(network.size(net), tprob = network.density(net))
+#   centralization(rand_net, degree, mode = "graph")
+# })
+# 
+# 
+# p_value_deg <- mean(sim_deg_cents >= observed_deg_cent)
+# 
+# 
+# cat("Observed Degree Centralization:", round(observed_deg_cent, 4), "\n")
+# cat("Empirical p-value:", round(p_value_deg, 4), "\n")
+# 
+# 
+# ```
+# 
+# ```{r}
+# run_manual_cug <- function(file_path, network_label, stage, reps = 1000) {
+#   net <- read_network(file_path)
+#   
+#   if (network.size(net) <= 1 || network.edgecount(net) == 0) {
+#     return(data.frame(
+#       Network_Type = network_label,
+#       Stage = stage,
+#       Degree_Centralization = NA,
+#       Degree_p = NA,
+#       Transitivity = NA,
+#       Transitivity_p = NA
+#     ))
+#   }
+#   
+#   set.seed(123)  
+#   
+#   # 1. Degree Centralization CUG
+#   observed_deg_cent <- centralization(net, degree, mode = "graph")
+#   sim_deg_cents <- replicate(reps, {
+#     rand_net <- rgraph(network.size(net), tprob = network.density(net))
+#     centralization(rand_net, degree, mode = "graph")
+#   })
+#   p_value_deg <- mean(sim_deg_cents >= observed_deg_cent)
+#   
+#   # 2. Transitivity (Clustering Coefficient) CUG
+#   observed_trans <- gtrans(net)
+#   sim_trans_vals <- replicate(reps, {
+#     rand_net <- rgraph(network.size(net), tprob = network.density(net))
+#     gtrans(rand_net)
+#   })
+#   p_value_trans <- mean(sim_trans_vals >= observed_trans)
+#   
+#   data.frame(
+#     Network_Type = network_label,
+#     Stage = stage,
+#     Degree_Centralization = round(observed_deg_cent, 4),
+#     Degree_p = round(p_value_deg, 4),
+#     Transitivity = round(observed_trans, 4),
+#     Transitivity_p = round(p_value_trans, 4)
+#   )
+# }
+# 
+# # 批量计算全部 18 个网络
+# cug_results <- pmap_dfr(
+#   list(network_files$file_path, network_files$network_label, network_files$stage),
+#   run_manual_cug
+# )
+# 
+# # 保存结果
+# write.csv(cug_results, "data/cug_results_summary.csv", row.names = FALSE)
+# print(cug_results)
+# 
+# 
+# isolates_prop <- sum(degree(net) == 0) / network.size(net)
+# 
+# local_trans <- sna::triad.census(net)
+# 
+# ```
+# 
+# ```{r}
+# network_metrics <- data.frame(
+#   Network_Type = rep(c("Co-Retweet", "Quote Path", "Reply Path"), each = 6),
+#   Stage = rep(1:6, times = 3),
+#   Density = c(0.0407, 0.0676, 0.0045, 0.0124, 0.0042, 0.0016, 
+#                0.0000, 0.0676, 0.0045, 0.0092, 0.0010, 0.0016, 
+#                0.0000, 0.0676, 0.0045, 0.0124, 0.0034, 0.0016)
+# )
+# 
+# # t-Test: Co-Retweet vs. Quote Path on Density
+# t_test_result <- t.test(
+#   Density ~ Network_Type, 
+#   data = subset(network_metrics, Network_Type %in% c("Co-Retweet", "Quote Path"))
+# )
+# print(t_test_result)
+# 
+
+```
 
 ```{=html}
 <script>
