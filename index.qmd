@@ -36,9 +36,7 @@ engine: knitr
 library(tidyverse)
 library(readr)
 library(statnet)
-library(intergraph)
 library(reshape2)
-library(btergm)
 library(effectsize)
 ```
 
@@ -100,9 +98,15 @@ Our analysis also introduces an interdisciplinary analogy drawn from computer ne
 
 # Research Method
 
-## Data Source and Collection
+## Data Collection and Preparation
 
-The data utilized in this research are collected from the [MuMiN (Multilingual Misinformation Network) dataset](https://mumin-dataset.github.io/), which comprises large-scale misinformation diffusion events on Twitter (now X). Specifically, this study focus on a set of six prominent misinformation claims related to the narrative asserting that [COVID-19 was deliberately created or manufactured by China or a laboratory in Wuhan](https://en.wikipedia.org/wiki/COVID-19_lab_leak_theory) across a time span from March 2020 to August 2021. Each misinformation claim represents a distinct temporal event under the same topic, thus allowing for comparisons across different stages of misinformation dissemination.
+This study employs secondary data from the [MuMiN Project](https://mumin-dataset.github.io/) (Multilingual Misinformation Influence Network), publicly available at [University of Bristol Data Repository](https://data.bris.ac.uk/datasets/23yv276we2mll25fjakkfim2ml/mumin.zip). The dataset includes detailed records of retweeter IDs, tweet IDs, misinformation claims, content metadata, and timestamps associated with the dissemination of misinformation.
+
+According to the dataset documentation (Nielsen & McConville, 2022), the date variable represents the `date` a misinformation claim was originally uttered. When this information was unavailable, the date of fact-check reviews or an extracted date from URLs using regular expressions was used to approximate the timeline. After downloading the dataset, all compressed `.pkl` files were converted into `.csv` format to facilitate analysis in R. This process involved using a Python script to batch convert files and organize them into a structured directory for subsequent processing.
+
+Following data preparation, key relational tables including `user interactions`, tweet misinformation claim mappings, and retweeter relationships were imported into R. These datasets were then cleaned, merged, and filtered to isolate relevant misinformation narratives for this study. To focus the analysis, this research examines misinformation narratives specifically related to the claim that [**COVID-19 was deliberately created or manufactured by China or a laboratory in Wuhan**](https://en.wikipedia.org/wiki/COVID-19_lab_leak_theory). A series of keyword filters targeting terms such as `china` and `wuhan` were applied to identify relevant records. Manual selection of misinformation topics further refined the dataset to include only those narratives directly linked to the COVID-19 origin conspiracy.
+
+Final filtering retained only `misinformation` content labeled as such by dataset curators and limited the language scope to `English`, resulting in a focused set of 112 unique retweeter nodes forming the basis for subsequent network construction and analysis. The resulting dataset provides a focused sample of misinformation narratives suitable for constructing amplification backbone networks and conducting structural analysis.
 
 
 ## Conceptualize Nodes and Edges
@@ -170,63 +174,57 @@ This study systematically maps the structural characteristics of retweeter ampli
 This framework offers a theoretical basis for predicting the structural properties of misinformation networks and guides the subsequent empirical analysis of network metrics.
 
 
-## Analytical Strategy and Network Metrics
+## Research Question and Hypotheses
 
-Social Network Analysis (SNA) techniques are systematically applied to evaluate structural properties of the retweeter networks constructed from each co-dissemination behavior. Specifically, this study focuses on three primary structural metrics:
+This study explores how different retweeter co-dissemination behaviors shape the structural properties of misinformation amplification backbones and whether these structural characteristics vary across different stages of misinformation dissemination. Specifically, it addresses the following research question: **How do different retweeter co-dissemination behaviors construct distinct amplification backbone network structures, and how do these structures vary temporally across multiple misinformation claims related to the same topic?**
 
-1.  Network Density, which measures the proportion of actual connections to all possible connections among retweeters, indicating the overall intensity of collective dissemination.
+Based on the conceptual framework and theoretical analogies developed in nodes and edges conceptualization, the following hypotheses are proposed to systematically examine structural differences across the three network types. Although each hypothesis focuses on a specific structural metric as the dependent variable, the independent variable (co-dissemination behavior) involves three categorical conditions, requiring appropriate comparative statistical methods.
 
-2.  Transitivity (Global Clustering Coefficient), capturing the extent to which retweeters tend to cluster into tightly interconnected groups, reflecting localized amplification dynamics.
 
-3.  Degree Centralization (Freeman’s Centralization), assessing the degree to which networks are structurally centralized around influential retweeters or "hubs," potentially highlighting core influencers in misinformation propagation.
+### Structural Differences Across Network Types
 
-## Hypotheses
+**H1 (Density):** *Direct co-retweet networks are expected to exhibit the highest density, followed by quote pathway and reply pathway networks, reflecting the immediacy and redundancy of direct amplification.*
 
-Based on our research question and theoretical considerations, this study proposes the following hypotheses regarding structural differences among the three co-retweet networks:
+**H2 (Transitivity):** *Quote pathway co-retweet networks will exhibit the highest transitivity among the three network types, indicating a greater tendency for localized interpretive clustering through narrative reframing.*
 
-**H1 (Density):** *Direct co-retweet networks exhibit significantly higher density and average degree compared to quote and reply pathway networks.*
+**H3 (Degree Centralization):** *Reply pathway co-retweet networks are expected to demonstrate higher local degree centralization compared to direct and quote pathway networks, reflecting the dominance of conversational hubs in emotionally charged discussions.*
 
-This hypothesis is grounded in the assumption that direct co-retweeting, as a more explicit form of simultaneous engagement, leads to denser connections among retweeters.
+**H4 (Average Path Length):** *Reply pathway co-retweet networks will have longer average path lengths than the other two network types, suggesting more fragmented conversational clusters and less efficient information flow.*
 
-**H2 (Centralization):** *Quote and reply pathway co-retweet networks exhibit significantly higher degree centralization compared to direct co-retweet networks.*
+### Temporal Variations in Network Structures
 
-This hypothesis anticipates that retweeters engaging in secondary dissemination behaviors (quote or reply) form more centralized structures, driven by influential actors shaping the interpretation or discussion around misinformation.
+**H5 (Temporal Structural Change):** *The structural properties of amplification backbones, including density, transitivity, degree centralization, and average path length, will vary significantly across misinformation lifecycle stages. Networks formed during earlier events are expected to differ structurally from those emerging in later stages, indicating shifts in amplification dynamics over time.*
 
-**H3 (Transitivity):** *Quote pathway co-retweet networks demonstrate higher transitivity (global clustering coefficient), reflecting tighter subgroup clustering compared to direct and reply pathway networks.*
 
-We posit that quote-based retweeting, which inherently involves reinterpretation or reframing of content, fosters greater clustering among subsets of retweeters.
+## Network Evaluation Metrics and Operationalization
 
-**H4 (Core Node Formation):** *Reply pathway co-retweet networks are more likely to exhibit clear core-periphery structures, featuring prominent central nodes (influential retweeters), compared to direct or quote pathway networks.*
+### SNA Metrics
 
-This hypothesis aligns with the interactive nature of reply-based dissemination, where debates and discussions can amplify the prominence of certain users.
+This study operationalizes its theoretical framework through Social Network Analysis (SNA), systematically evaluating the structural characteristics of retweeter amplification backbones. Drawing on established network science methodologies (Freeman, 1979; Wasserman & Faust, 1994; Newman, 2010), four key network-level metrics are computed to assess how different co-dissemination behaviors influence amplification structures.
 
-**H5 (Temporal Variation):** *The structural characteristics (density, transitivity, and centralization) of co-retweet networks significantly vary across different temporal misinformation events.*
+Network density is calculated to capture the overall intensity of amplification by measuring the ratio of realized edges to all possible edges. Higher density indicates more frequent co-amplification behaviors and reflects the immediacy and redundancy of information spread, particularly expected in direct co-retweet networks.
 
-Specifically, early-stage misinformation claims are hypothesized to produce denser and more centralized retweeter networks compared to claims disseminated at later stages, reflecting early retweeters' structural advantage in amplifying misinformation narratives.
+Transitivity, measured through the global clustering coefficient, evaluates the extent to which retweeters form tightly interconnected subgroups. This metric highlights localized amplification dynamics, providing insight into the emergence of interpretive communities, especially within quote pathway networks.
 
-These hypotheses are systematically tested through the comparative network analyses and statistical approaches outlined in this methods section.
+Degree centralization, based on Freeman’s centralization index, assesses the concentration of amplification behaviors around highly active nodes. This measure helps identify dominant amplifiers and the presence of hierarchical structures, which are hypothesized to be more pronounced in reply pathway networks due to emotionally charged conversational hubs.
 
-## Comparative Statistical Analysis
+Average path length is computed to assess the efficiency of information flow, representing the average number of steps required to connect any two nodes. Longer path lengths suggest fragmented amplification structures, often observed in emotionally driven reply pathway networks where conversations are dispersed across loosely connected clusters.
 
-To rigorously assess the differences among the three types of co-retweet networks, statistical analyses are conducted as follows:
+### Hypothesis Testing Strategy
 
-Firstly, descriptive statistics are computed to characterize the structural metrics (density, transitivity, and centralization) for each network type. Subsequently, pairwise t-tests and analysis of variance (ANOVA) are utilized to evaluate whether differences in structural metrics across network types are statistically significant.
+Structural metrics are computed for each of the 18 amplification backbone networks. To test the proposed hypotheses, one-way ANOVA is applied to compare differences across the three network types for each structural metric. Where significant differences are detected, post-hoc pairwise t-tests with Bonferroni correction are used to clarify specific group differences.
 
-To further validate the clustering patterns observed, Conditional Uniform Graph (CUG) tests are employed. CUG tests specifically determine whether the observed transitivity (clustering) within each retweeter network significantly exceeds expectations under random graph scenarios, thus confirming whether observed clustering is structurally meaningful rather than attributable to random chance.
+For all statistical tests, a significance level of p < 0.05 is used. Effect sizes are reported to provide additional interpretation of practical significance alongside statistical significance.
 
-## Temporal Comparative Analysis
-
-Considering that the misinformation claims occurred at distinct time points, this study leverages the temporal dimension inherent in the dataset. Each misinformation claim is analyzed separately, resulting in six temporal events. Given the three co-retweet behaviors, a total of 18 sub-networks (6 misinformation events × 3 co-retweet behaviors) are analyzed.
-
-Comparative analyses across these temporal sub-networks are conducted to identify structural variations over time. Specifically, structural metrics (density, transitivity, centralization) are compared across earlier versus later misinformation events. The goal is to explore whether earlier-stage misinformation claims form structurally distinct retweeter networks, potentially indicating differences in amplification dynamics across misinformation lifecycle stages.
-
-## Exploratory Exponential Random Graph Models (ERGMs)
-
-While detailed node attribute data are limited in our dataset, exploratory Exponential Random Graph Models (ERGMs) are additionally employed to understand underlying structural mechanisms influencing network formation. These ERGMs focus primarily on structural features, such as edges, degree distributions, and transitivity, to provide insights into fundamental network-generating processes driving tie formation among retweeters. Although exploratory, these models serve as valuable robustness checks that complement our descriptive and comparative findings.
+To validate the structural relevance of clustering patterns, Conditional Uniform Graph (CUG) tests are conducted. These tests assess whether observed transitivity values significantly exceed random graph expectations, confirming that clustering patterns arise from meaningful co-dissemination behaviors rather than random chance (Faust, 2006).
 
 ## Tools
 
-All data processing, network construction, and analysis procedures were conducted using the RStudio (version \>= 4.0.0), primarily leveraging the `statnet` family of packages for network analysis, along with auxiliary packages for statistical testing (`stats` etc.) and data visualization (`ggplot2` etc.).
+All data processing, network construction, and statistical analyses were conducted using RStudio (version ≥ 4.0.0). Data manipulation and visualization primarily relied on the `tidyverse` ecosystem, with `readr` used for efficient data import and preprocessing. Network modeling and the computation of structural metrics were performed using the `statnet` package, while `reshape2` facilitated data restructuring for network matrix construction and analysis.
+
+For statistical hypothesis testing, including the calculation of descriptive statistics, t-tests, and ANOVA models, the base `stats` package was employed. Effect sizes accompanying statistical tests were calculated using the `effectsize` package to provide additional insight into the practical significance of the results.
+
+The initial data preparation phase was completed using Python through **Visual Studio Code**, where raw data files from the MuMiN project were converted from `.pkl` to `.csv` formats. This conversion enabled seamless integration of the data into R for subsequent network analysis.
 
 # Analysis
 
