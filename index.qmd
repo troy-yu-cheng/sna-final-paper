@@ -149,6 +149,14 @@ Your goal is to understand how these collective behavioral patterns create struc
 
 ## Conceptualize Nodes and Edges
 
+This study conceptualizes individual retweeters—users actively involved in the redistribution of misinformation—as foundational nodes within larger meta-networks of amplification. These retweeter-centric networks, or amplification backbones, illustrate how collective user behaviors construct structural conditions that facilitate the amplification of misinformation, independent of the message content itself (Barabási, 2016). Each retweeter is represented as a node, and edges are defined through three distinct co-retweeting behaviors based on shared and repeated amplification actions.
+
+To analytically frame these behavioral patterns, this study applies a cross-disciplinary perspective inspired by computer network engineering. Specifically, it draws from established backbone architectures to explain how different user behaviors generate distinct network topologies. In this analogy, retweeter nodes correspond to high-capacity content distribution nodes in computer networks, and edges represent logical connections based on repeated and collective behaviors rather than direct communication. This perspective enables the derivation of structural expectations from well-studied computer network configurations, providing empirical grounding for the interpretation of network metrics (Stallings, 2020; Kurose & Ross, 2021).
+
+
+(https://codethechange.stanford.edu/guides/guide_kademlia.html#hash-table-partitions-chord)
+
+(https://codethechange.stanford.edu/guides/guide_kademlia.html#search-tree-partitions-kademlia)
 
 This study conceptualizes individual retweeters—users actively involved in the redistribution of misinformation—as foundational units within larger meta-networks of amplification. These retweeter-centric networks, or amplification backbones, capture how collective user behaviors create structural conditions that facilitate or constrain the amplification potential of misinformation, independent of the content itself (Barabási, 2016). Each retweeter is represented as a network node, and relational ties (edges) are defined through three distinct co-retweeting behaviors. To interpret the structural and functional characteristics of the resulting networks, a cross-disciplinary heuristic framework is applied, drawing specifically from principles in computer network engineering. In this framework, the study analogizes retweeter networks to the organizational patterns found in physical network infrastructures, where hubs, switches, and routers perform distinct roles in information transmission and amplification. This interdisciplinary perspective provides a conceptual foundation for understanding the differentiated structural properties and amplification dynamics across the three types of retweeter networks.
 
