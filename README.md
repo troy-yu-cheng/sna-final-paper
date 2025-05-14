@@ -9,7 +9,6 @@ This repository contains the final paper project for **CCTP 5020 Social Network 
 You can view the rendered paper as a GitHub Page here:  
 **[troy-yu-cheng.github.io/sna-final-paper](https://troy-yu-cheng.github.io/sna-final-paper/)**
 
----
 
 ## Overview
 
@@ -21,7 +20,6 @@ This project investigates how retweeters contribute to the amplification of misi
 
 A total of 18 backbone networks (3 network types × 6 stages) are constructed and compared using Social Network Analysis (SNA) methods.
 
----
 
 ## Research Focus
 
@@ -36,16 +34,15 @@ Key structural metrics examined:
 
 Both **hypothesis testing** and **Conditional Uniform Graph (CUG) tests** were employed for comparative analysis.
 
----
 
 ## Repository Structure
 
 ```bash
 .
-├── index.qmd # Source Quarto file for the paper
-├── index.html # Rendered HTML paper for GitHub Pages
-├── plot/ # Network plots for all 18 backbone networks
-├── assets/ # Supporting images or files
+├── index.qmd    # Source Quarto file for the paper
+├── index.html   # Rendered HTML paper for GitHub Pages
+├── plot/        # Network plots for all 18 backbone networks
+├── assets/ 
 ├── sna-final-paper.Rproj
 ├── trycstyle.css # Custom CSS styling for html
-└── README.md # This file
+└── README.md 
