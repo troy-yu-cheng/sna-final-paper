@@ -1,6 +1,6 @@
 # Structural Dynamics of Retweeter Amplification Backbone Networks
 
-***Author****: Troy (Yu) Cheng*
+***Author: Troy (Yu) Cheng***
 
 This repository contains the final paper project for **CCTP 5020 Social Network Analysis (Spring 2025, Georgetown University)**. 
 
