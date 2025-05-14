@@ -1,8 +1,6 @@
-# Structural Dynamics of Retweeter Amplification Backbone Networks: Analysis of COVID-19 Origin Misinformation on Twitter
+# Structural Dynamics of Retweeter Amplification Backbone Networks
 
 ***Author****: Troy (Yu) Cheng*
-
-# Structural Dynamics of Retweeter Amplification Backbone Networks
 
 This repository contains the final paper project for **CCTP 5020 Social Network Analysis (Spring 2025, Georgetown University)**. 
 
