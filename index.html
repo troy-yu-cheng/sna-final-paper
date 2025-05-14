@@ -7147,17 +7147,6 @@ background: #0a0e1a;
 <p>In terms of density, direct co-retweet networks exhibit the highest mean density (0.0218), confirming their tendency for redundant amplification within tightly connected structures. Quote and reply pathway networks have comparable, lower densities, indicating sparser co-dissemination patterns.</p>
 <p>In terms of local transitivity, direct co-retweet networks also have the highest mean local transitivity (0.1656), suggesting stronger localized clustering. Reply pathways show slightly higher clustering tendencies (0.1295) than quote pathways (0.1101), consistent with conversational thread formations.</p>
 <p>In terms of average path length, direct co-retweet networks display the shortest average path length (0.5442), in line with their broadcast-like amplification style. Quote and reply pathways have longer path lengths (0.3281 and 0.3698, respectively), indicating more layered and fragmented dissemination processes.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb78"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb78-1"><a href="#cb78-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Helper function to load a PNG as ggplot object</span></span>
-<span id="cb78-2"><a href="#cb78-2" aria-hidden="true" tabindex="-1"></a>load_network_image <span class="ot">&lt;-</span> <span class="cf">function</span>(filename) {</span>
-<span id="cb78-3"><a href="#cb78-3" aria-hidden="true" tabindex="-1"></a>  img <span class="ot">&lt;-</span> png<span class="sc">::</span><span class="fu">readPNG</span>(<span class="fu">paste0</span>(<span class="st">&quot;plot/&quot;</span>, filename))</span>
-<span id="cb78-4"><a href="#cb78-4" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb78-5"><a href="#cb78-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb78-6"><a href="#cb78-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Display Stage 1 Networks as Example</span></span>
-<span id="cb78-7"><a href="#cb78-7" aria-hidden="true" tabindex="-1"></a>p1 <span class="ot">&lt;-</span> <span class="fu">load_network_image</span>(<span class="st">&quot;Co-Retweet-Stage1.png&quot;</span>)</span>
-<span id="cb78-8"><a href="#cb78-8" aria-hidden="true" tabindex="-1"></a>p2 <span class="ot">&lt;-</span> <span class="fu">load_network_image</span>(<span class="st">&quot;Quote-Path-Co-Retweet-Stage1.png&quot;</span>) </span>
-<span id="cb78-9"><a href="#cb78-9" aria-hidden="true" tabindex="-1"></a>p3 <span class="ot">&lt;-</span> <span class="fu">load_network_image</span>(<span class="st">&quot;Reply-Path-Co-Retweet-Stage1.png&quot;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
 </section>
 </section>
 <section id="expected-actual-findings-based-on-hypotheses" class="level3" data-number="9.5.4">
@@ -7169,9 +7158,9 @@ background: #0a0e1a;
 <p><strong>Alternative Hypothesis:</strong> At least one network type exhibits significantly different density compared to the others.</p>
 <p>A one-way ANOVA was performed to examine the differences in network density across the three network types (I learned this from class statistical methodology last semester. It is better than t-test in this context).</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb79"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb79-1"><a href="#cb79-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ANOVA for Density</span></span>
-<span id="cb79-2"><a href="#cb79-2" aria-hidden="true" tabindex="-1"></a>density_aov <span class="ot">&lt;-</span> <span class="fu">aov</span>(Density <span class="sc">~</span> Network_Type, <span class="at">data =</span> all_metrics)</span>
-<span id="cb79-3"><a href="#cb79-3" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(density_aov)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb78"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb78-1"><a href="#cb78-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ANOVA for Density</span></span>
+<span id="cb78-2"><a href="#cb78-2" aria-hidden="true" tabindex="-1"></a>density_aov <span class="ot">&lt;-</span> <span class="fu">aov</span>(Density <span class="sc">~</span> Network_Type, <span class="at">data =</span> all_metrics)</span>
+<span id="cb78-3"><a href="#cb78-3" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(density_aov)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>             Df   Sum Sq   Mean Sq F value Pr(&gt;F)
 Network_Type  2 0.000221 0.0001103   0.158  0.855
@@ -7218,9 +7207,9 @@ Residuals    15 0.010488 0.0006992               </code></pre>
 <p><strong>Null Hypothesis:</strong> There is no significant difference in Local Transitivity across direct co-retweet, quote pathway co-retweet, and reply pathway co-retweet networks.</p>
 <p><strong>Alternative Hypothesis</strong>: Quote pathway co-retweet networks will exhibit the highest Local Transitivity among the three network types.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb81"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb81-1"><a href="#cb81-1" aria-hidden="true" tabindex="-1"></a><span class="co"># H2 Local Transitivity Analysis - ANOVA</span></span>
-<span id="cb81-2"><a href="#cb81-2" aria-hidden="true" tabindex="-1"></a>trans_aov <span class="ot">&lt;-</span> <span class="fu">aov</span>(Local_Transitivity <span class="sc">~</span> Network_Type, <span class="at">data =</span> all_metrics)</span>
-<span id="cb81-3"><a href="#cb81-3" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(trans_aov)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb80"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb80-1"><a href="#cb80-1" aria-hidden="true" tabindex="-1"></a><span class="co"># H2 Local Transitivity Analysis - ANOVA</span></span>
+<span id="cb80-2"><a href="#cb80-2" aria-hidden="true" tabindex="-1"></a>trans_aov <span class="ot">&lt;-</span> <span class="fu">aov</span>(Local_Transitivity <span class="sc">~</span> Network_Type, <span class="at">data =</span> all_metrics)</span>
+<span id="cb80-3"><a href="#cb80-3" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(trans_aov)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>             Df  Sum Sq  Mean Sq F value Pr(&gt;F)
 Network_Type  2 0.00952 0.004759   0.268  0.769
@@ -7266,9 +7255,9 @@ Residuals    15 0.26652 0.017768               </code></pre>
 <p><strong>Null Hypothesis:</strong> There is no significant difference in Degree Centralization across direct co-retweet, quote pathway co-retweet, and reply pathway co-retweet networks.</p>
 <p><strong>Alternative Hypothesis:</strong> Reply pathway co-retweet networks will exhibit the highest Degree Centralization among the three network types.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb83"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb83-1"><a href="#cb83-1" aria-hidden="true" tabindex="-1"></a><span class="co"># H3 Degree Centralization Analysis - ANOVA</span></span>
-<span id="cb83-2"><a href="#cb83-2" aria-hidden="true" tabindex="-1"></a>central_aov <span class="ot">&lt;-</span> <span class="fu">aov</span>(Degree_Centralization <span class="sc">~</span> Network_Type, <span class="at">data =</span> all_metrics)</span>
-<span id="cb83-3"><a href="#cb83-3" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(central_aov)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb82"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb82-1"><a href="#cb82-1" aria-hidden="true" tabindex="-1"></a><span class="co"># H3 Degree Centralization Analysis - ANOVA</span></span>
+<span id="cb82-2"><a href="#cb82-2" aria-hidden="true" tabindex="-1"></a>central_aov <span class="ot">&lt;-</span> <span class="fu">aov</span>(Degree_Centralization <span class="sc">~</span> Network_Type, <span class="at">data =</span> all_metrics)</span>
+<span id="cb82-3"><a href="#cb82-3" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(central_aov)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>             Df  Sum Sq   Mean Sq F value Pr(&gt;F)
 Network_Type  2 0.00082 0.0004091   0.151  0.861
@@ -7314,9 +7303,9 @@ Residuals    15 0.04061 0.0027073               </code></pre>
 <p><strong>Null Hypothesis:</strong> There is no significant difference in Average Path Length across direct co-retweet, quote pathway co-retweet, and reply pathway co-retweet networks.</p>
 <p><strong>Alternative Hypothesis:</strong> Reply pathway co-retweet networks exhibit significantly longer Average Path Lengths than direct and quote pathway networks.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb85"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb85-1"><a href="#cb85-1" aria-hidden="true" tabindex="-1"></a><span class="co"># H4 Average Path Length Analysis - ANOVA</span></span>
-<span id="cb85-2"><a href="#cb85-2" aria-hidden="true" tabindex="-1"></a>path_aov <span class="ot">&lt;-</span> <span class="fu">aov</span>(Average_Path_Length <span class="sc">~</span> Network_Type, <span class="at">data =</span> all_metrics)</span>
-<span id="cb85-3"><a href="#cb85-3" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(path_aov)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb84"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb84-1"><a href="#cb84-1" aria-hidden="true" tabindex="-1"></a><span class="co"># H4 Average Path Length Analysis - ANOVA</span></span>
+<span id="cb84-2"><a href="#cb84-2" aria-hidden="true" tabindex="-1"></a>path_aov <span class="ot">&lt;-</span> <span class="fu">aov</span>(Average_Path_Length <span class="sc">~</span> Network_Type, <span class="at">data =</span> all_metrics)</span>
+<span id="cb84-3"><a href="#cb84-3" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(path_aov)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>             Df Sum Sq Mean Sq F value Pr(&gt;F)
 Network_Type  2 0.1577 0.07883    0.83  0.455
@@ -7364,18 +7353,18 @@ Residuals    15 1.4240 0.09493               </code></pre>
 <section id="density-change-over-stages" class="level5">
 <h5 class="anchored" data-anchor-id="density-change-over-stages">Density Change Over Stages</h5>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb87"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb87-1"><a href="#cb87-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot for Density Change Across Stages</span></span>
-<span id="cb87-2"><a href="#cb87-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(all_metrics, <span class="fu">aes</span>(<span class="at">x =</span> Stage, <span class="at">y =</span> Density, <span class="at">color =</span> Network_Type, <span class="at">linetype =</span> Network_Type)) <span class="sc">+</span></span>
-<span id="cb87-3"><a href="#cb87-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">size =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
-<span id="cb87-4"><a href="#cb87-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">2</span>, <span class="at">shape =</span> <span class="dv">21</span>, <span class="at">fill =</span> <span class="st">&quot;white&quot;</span>) <span class="sc">+</span> </span>
-<span id="cb87-5"><a href="#cb87-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">&quot;#E41A1C&quot;</span>, <span class="st">&quot;#377EB8&quot;</span>, <span class="st">&quot;#4DAF4A&quot;</span>)) <span class="sc">+</span></span>
-<span id="cb87-6"><a href="#cb87-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_linetype_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">&quot;solid&quot;</span>, <span class="st">&quot;dashed&quot;</span>, <span class="st">&quot;dotdash&quot;</span>)) <span class="sc">+</span> </span>
-<span id="cb87-7"><a href="#cb87-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>() <span class="sc">+</span></span>
-<span id="cb87-8"><a href="#cb87-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Density Change Over Stages&quot;</span>, <span class="at">x =</span> <span class="st">&quot;Stage&quot;</span>, <span class="at">y =</span> <span class="st">&quot;Density&quot;</span>) <span class="sc">+</span></span>
-<span id="cb87-9"><a href="#cb87-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
-<span id="cb87-10"><a href="#cb87-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">text =</span> <span class="fu">element_text</span>(<span class="at">family =</span> <span class="st">&quot;serif&quot;</span>),</span>
-<span id="cb87-11"><a href="#cb87-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.position =</span> <span class="st">&quot;right&quot;</span></span>
-<span id="cb87-12"><a href="#cb87-12" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb86"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb86-1"><a href="#cb86-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot for Density Change Across Stages</span></span>
+<span id="cb86-2"><a href="#cb86-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(all_metrics, <span class="fu">aes</span>(<span class="at">x =</span> Stage, <span class="at">y =</span> Density, <span class="at">color =</span> Network_Type, <span class="at">linetype =</span> Network_Type)) <span class="sc">+</span></span>
+<span id="cb86-3"><a href="#cb86-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">size =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb86-4"><a href="#cb86-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">2</span>, <span class="at">shape =</span> <span class="dv">21</span>, <span class="at">fill =</span> <span class="st">&quot;white&quot;</span>) <span class="sc">+</span> </span>
+<span id="cb86-5"><a href="#cb86-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">&quot;#E41A1C&quot;</span>, <span class="st">&quot;#377EB8&quot;</span>, <span class="st">&quot;#4DAF4A&quot;</span>)) <span class="sc">+</span></span>
+<span id="cb86-6"><a href="#cb86-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_linetype_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">&quot;solid&quot;</span>, <span class="st">&quot;dashed&quot;</span>, <span class="st">&quot;dotdash&quot;</span>)) <span class="sc">+</span> </span>
+<span id="cb86-7"><a href="#cb86-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>() <span class="sc">+</span></span>
+<span id="cb86-8"><a href="#cb86-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Density Change Over Stages&quot;</span>, <span class="at">x =</span> <span class="st">&quot;Stage&quot;</span>, <span class="at">y =</span> <span class="st">&quot;Density&quot;</span>) <span class="sc">+</span></span>
+<span id="cb86-9"><a href="#cb86-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb86-10"><a href="#cb86-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">text =</span> <span class="fu">element_text</span>(<span class="at">family =</span> <span class="st">&quot;serif&quot;</span>),</span>
+<span id="cb86-11"><a href="#cb86-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.position =</span> <span class="st">&quot;right&quot;</span></span>
+<span id="cb86-12"><a href="#cb86-12" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -7386,11 +7375,11 @@ Residuals    15 1.4240 0.09493               </code></pre>
 </div>
 <p>The line plot shows that network density peaks at Stage 2 for all three network types, indicating highly active early amplification shortly after the initial misinformation dissemination. Among them, direct co-retweet and reply pathway networks exhibit the sharpest peaks, while the quote pathway shows a slightly lower but still prominent peak. After Stage 2, density sharply declines across all network types and remains low in subsequent stages, reflecting reduced amplification activities over time. This suggests that most co-dissemination behaviors concentrate heavily during the early lifecycle of misinformation, with minimal structural reinforcement in later stages.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb88"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb88-1"><a href="#cb88-1" aria-hidden="true" tabindex="-1"></a>covid_wuhan_misinfo <span class="sc">|&gt;</span></span>
-<span id="cb88-2"><a href="#cb88-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(date,keywords) <span class="sc">|&gt;</span></span>
-<span id="cb88-3"><a href="#cb88-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(date,keywords) <span class="sc">|&gt;</span></span>
-<span id="cb88-4"><a href="#cb88-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(date) <span class="sc">|&gt;</span></span>
-<span id="cb88-5"><a href="#cb88-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unique</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb87"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb87-1"><a href="#cb87-1" aria-hidden="true" tabindex="-1"></a>covid_wuhan_misinfo <span class="sc">|&gt;</span></span>
+<span id="cb87-2"><a href="#cb87-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(date,keywords) <span class="sc">|&gt;</span></span>
+<span id="cb87-3"><a href="#cb87-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(date,keywords) <span class="sc">|&gt;</span></span>
+<span id="cb87-4"><a href="#cb87-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(date) <span class="sc">|&gt;</span></span>
+<span id="cb87-5"><a href="#cb87-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unique</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div class="kable-table">
 <table class="caption-top table table-sm table-striped small">
@@ -7432,13 +7421,13 @@ Residuals    15 1.4240 0.09493               </code></pre>
 </div>
 <p>To better capture the temporal dynamics of misinformation dissemination, we reclassified the six original stages into two broader periods based on the observed event timeline. As shown in the figure, the early stage (Stages 1-4) occurred between March and June 2020, a period characterized by an intense initial burst of misinformation narratives surrounding the COVID-19 lab-leak theory. The late stage (Stages 5-6), spanning from January to August 2021, represents a phase of reactivation and residual discussions following the initial outbreak of these narratives. This binary temporal segmentation allows for a clearer examination of early amplification dynamics versus later stages of sustained but diminished dissemination.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb89"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb89-1"><a href="#cb89-1" aria-hidden="true" tabindex="-1"></a>all_metrics <span class="ot">&lt;-</span> all_metrics <span class="sc">%&gt;%</span></span>
-<span id="cb89-2"><a href="#cb89-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Stage_Group =</span> <span class="fu">ifelse</span>(Stage <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>), <span class="st">&quot;Early&quot;</span>, <span class="st">&quot;Late&quot;</span>))</span>
-<span id="cb89-3"><a href="#cb89-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb89-4"><a href="#cb89-4" aria-hidden="true" tabindex="-1"></a>direct_density <span class="ot">&lt;-</span> all_metrics <span class="sc">%&gt;%</span></span>
-<span id="cb89-5"><a href="#cb89-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Network_Type <span class="sc">==</span> <span class="st">&quot;Co-Retweet&quot;</span>)</span>
-<span id="cb89-6"><a href="#cb89-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb89-7"><a href="#cb89-7" aria-hidden="true" tabindex="-1"></a><span class="fu">t.test</span>(Density <span class="sc">~</span> Stage_Group, <span class="at">data =</span> direct_density)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb88"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb88-1"><a href="#cb88-1" aria-hidden="true" tabindex="-1"></a>all_metrics <span class="ot">&lt;-</span> all_metrics <span class="sc">%&gt;%</span></span>
+<span id="cb88-2"><a href="#cb88-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Stage_Group =</span> <span class="fu">ifelse</span>(Stage <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>), <span class="st">&quot;Early&quot;</span>, <span class="st">&quot;Late&quot;</span>))</span>
+<span id="cb88-3"><a href="#cb88-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb88-4"><a href="#cb88-4" aria-hidden="true" tabindex="-1"></a>direct_density <span class="ot">&lt;-</span> all_metrics <span class="sc">%&gt;%</span></span>
+<span id="cb88-5"><a href="#cb88-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Network_Type <span class="sc">==</span> <span class="st">&quot;Co-Retweet&quot;</span>)</span>
+<span id="cb88-6"><a href="#cb88-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb88-7"><a href="#cb88-7" aria-hidden="true" tabindex="-1"></a><span class="fu">t.test</span>(Density <span class="sc">~</span> Stage_Group, <span class="at">data =</span> direct_density)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
     Welch Two Sample t-test
@@ -7452,11 +7441,11 @@ sample estimates:
 mean in group Early  mean in group Late 
              0.0313              0.0029 </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb91"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb91-1"><a href="#cb91-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Quote Path Co-Retweet</span></span>
-<span id="cb91-2"><a href="#cb91-2" aria-hidden="true" tabindex="-1"></a>quote_density <span class="ot">&lt;-</span> all_metrics <span class="sc">%&gt;%</span></span>
-<span id="cb91-3"><a href="#cb91-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Network_Type <span class="sc">==</span> <span class="st">&quot;Quote Path Co-Retweet&quot;</span>)</span>
-<span id="cb91-4"><a href="#cb91-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb91-5"><a href="#cb91-5" aria-hidden="true" tabindex="-1"></a><span class="fu">t.test</span>(Density <span class="sc">~</span> Stage_Group, <span class="at">data =</span> quote_density)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb90"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb90-1"><a href="#cb90-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Quote Path Co-Retweet</span></span>
+<span id="cb90-2"><a href="#cb90-2" aria-hidden="true" tabindex="-1"></a>quote_density <span class="ot">&lt;-</span> all_metrics <span class="sc">%&gt;%</span></span>
+<span id="cb90-3"><a href="#cb90-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Network_Type <span class="sc">==</span> <span class="st">&quot;Quote Path Co-Retweet&quot;</span>)</span>
+<span id="cb90-4"><a href="#cb90-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb90-5"><a href="#cb90-5" aria-hidden="true" tabindex="-1"></a><span class="fu">t.test</span>(Density <span class="sc">~</span> Stage_Group, <span class="at">data =</span> quote_density)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
     Welch Two Sample t-test
@@ -7470,11 +7459,11 @@ sample estimates:
 mean in group Early  mean in group Late 
            0.020325            0.001300 </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb93"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb93-1"><a href="#cb93-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Reply Path Co-Retweet</span></span>
-<span id="cb93-2"><a href="#cb93-2" aria-hidden="true" tabindex="-1"></a>reply_density <span class="ot">&lt;-</span> all_metrics <span class="sc">%&gt;%</span></span>
-<span id="cb93-3"><a href="#cb93-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Network_Type <span class="sc">==</span> <span class="st">&quot;Reply Path Co-Retweet&quot;</span>)</span>
-<span id="cb93-4"><a href="#cb93-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb93-5"><a href="#cb93-5" aria-hidden="true" tabindex="-1"></a><span class="fu">t.test</span>(Density <span class="sc">~</span> Stage_Group, <span class="at">data =</span> reply_density)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb92"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb92-1"><a href="#cb92-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Reply Path Co-Retweet</span></span>
+<span id="cb92-2"><a href="#cb92-2" aria-hidden="true" tabindex="-1"></a>reply_density <span class="ot">&lt;-</span> all_metrics <span class="sc">%&gt;%</span></span>
+<span id="cb92-3"><a href="#cb92-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Network_Type <span class="sc">==</span> <span class="st">&quot;Reply Path Co-Retweet&quot;</span>)</span>
+<span id="cb92-4"><a href="#cb92-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb92-5"><a href="#cb92-5" aria-hidden="true" tabindex="-1"></a><span class="fu">t.test</span>(Density <span class="sc">~</span> Stage_Group, <span class="at">data =</span> reply_density)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
     Welch Two Sample t-test
@@ -7530,18 +7519,18 @@ mean in group Early  mean in group Late
 <section id="transitivity-change-over-stages" class="level5">
 <h5 class="anchored" data-anchor-id="transitivity-change-over-stages">Transitivity Change Over Stages</h5>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb95"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb95-1"><a href="#cb95-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot for Local Transitivity Change Across Stages</span></span>
-<span id="cb95-2"><a href="#cb95-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(all_metrics, <span class="fu">aes</span>(<span class="at">x =</span> Stage, <span class="at">y =</span> Local_Transitivity, <span class="at">color =</span> Network_Type, <span class="at">linetype =</span> Network_Type)) <span class="sc">+</span></span>
-<span id="cb95-3"><a href="#cb95-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">size =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
-<span id="cb95-4"><a href="#cb95-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">2</span>, <span class="at">shape =</span> <span class="dv">21</span>, <span class="at">fill =</span> <span class="st">&quot;white&quot;</span>) <span class="sc">+</span> </span>
-<span id="cb95-5"><a href="#cb95-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">&quot;#E41A1C&quot;</span>, <span class="st">&quot;#377EB8&quot;</span>, <span class="st">&quot;#4DAF4A&quot;</span>)) <span class="sc">+</span></span>
-<span id="cb95-6"><a href="#cb95-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_linetype_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">&quot;solid&quot;</span>, <span class="st">&quot;dashed&quot;</span>, <span class="st">&quot;dotdash&quot;</span>)) <span class="sc">+</span> </span>
-<span id="cb95-7"><a href="#cb95-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>() <span class="sc">+</span></span>
-<span id="cb95-8"><a href="#cb95-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Local Transitivity Change Over Stages&quot;</span>, <span class="at">x =</span> <span class="st">&quot;Stage&quot;</span>, <span class="at">y =</span> <span class="st">&quot;Local Transitivity&quot;</span>) <span class="sc">+</span></span>
-<span id="cb95-9"><a href="#cb95-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
-<span id="cb95-10"><a href="#cb95-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">text =</span> <span class="fu">element_text</span>(<span class="at">family =</span> <span class="st">&quot;serif&quot;</span>),</span>
-<span id="cb95-11"><a href="#cb95-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.position =</span> <span class="st">&quot;right&quot;</span></span>
-<span id="cb95-12"><a href="#cb95-12" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb94"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb94-1"><a href="#cb94-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot for Local Transitivity Change Across Stages</span></span>
+<span id="cb94-2"><a href="#cb94-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(all_metrics, <span class="fu">aes</span>(<span class="at">x =</span> Stage, <span class="at">y =</span> Local_Transitivity, <span class="at">color =</span> Network_Type, <span class="at">linetype =</span> Network_Type)) <span class="sc">+</span></span>
+<span id="cb94-3"><a href="#cb94-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">size =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb94-4"><a href="#cb94-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">2</span>, <span class="at">shape =</span> <span class="dv">21</span>, <span class="at">fill =</span> <span class="st">&quot;white&quot;</span>) <span class="sc">+</span> </span>
+<span id="cb94-5"><a href="#cb94-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">&quot;#E41A1C&quot;</span>, <span class="st">&quot;#377EB8&quot;</span>, <span class="st">&quot;#4DAF4A&quot;</span>)) <span class="sc">+</span></span>
+<span id="cb94-6"><a href="#cb94-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_linetype_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">&quot;solid&quot;</span>, <span class="st">&quot;dashed&quot;</span>, <span class="st">&quot;dotdash&quot;</span>)) <span class="sc">+</span> </span>
+<span id="cb94-7"><a href="#cb94-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>() <span class="sc">+</span></span>
+<span id="cb94-8"><a href="#cb94-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Local Transitivity Change Over Stages&quot;</span>, <span class="at">x =</span> <span class="st">&quot;Stage&quot;</span>, <span class="at">y =</span> <span class="st">&quot;Local Transitivity&quot;</span>) <span class="sc">+</span></span>
+<span id="cb94-9"><a href="#cb94-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb94-10"><a href="#cb94-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">text =</span> <span class="fu">element_text</span>(<span class="at">family =</span> <span class="st">&quot;serif&quot;</span>),</span>
+<span id="cb94-11"><a href="#cb94-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.position =</span> <span class="st">&quot;right&quot;</span></span>
+<span id="cb94-12"><a href="#cb94-12" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -7552,12 +7541,12 @@ mean in group Early  mean in group Late
 </div>
 <p>The line plot shows that Local Transitivity peaks sharply at Stage 2 for all network types, reflecting highly clustered retweet behaviors during the early dissemination phase of misinformation. Co-retweet networks consistently maintain higher levels of local clustering compared to quote and reply pathways across stages. However, all network types exhibit a dramatic decline in transitivity after Stage 2, remaining low through later stages. This pattern suggests that early amplification efforts are highly community-centered, while later dissemination phases become more fragmented and less clustered.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb96"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb96-1"><a href="#cb96-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Transitivity Temporal Change Analysis</span></span>
-<span id="cb96-2"><a href="#cb96-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb96-3"><a href="#cb96-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Direct Co-Retweet</span></span>
-<span id="cb96-4"><a href="#cb96-4" aria-hidden="true" tabindex="-1"></a>direct_trans <span class="ot">&lt;-</span> all_metrics <span class="sc">%&gt;%</span></span>
-<span id="cb96-5"><a href="#cb96-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Network_Type <span class="sc">==</span> <span class="st">&quot;Co-Retweet&quot;</span>)</span>
-<span id="cb96-6"><a href="#cb96-6" aria-hidden="true" tabindex="-1"></a><span class="fu">t.test</span>(Local_Transitivity <span class="sc">~</span> Stage_Group, <span class="at">data =</span> direct_trans)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb95"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb95-1"><a href="#cb95-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Transitivity Temporal Change Analysis</span></span>
+<span id="cb95-2"><a href="#cb95-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb95-3"><a href="#cb95-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Direct Co-Retweet</span></span>
+<span id="cb95-4"><a href="#cb95-4" aria-hidden="true" tabindex="-1"></a>direct_trans <span class="ot">&lt;-</span> all_metrics <span class="sc">%&gt;%</span></span>
+<span id="cb95-5"><a href="#cb95-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Network_Type <span class="sc">==</span> <span class="st">&quot;Co-Retweet&quot;</span>)</span>
+<span id="cb95-6"><a href="#cb95-6" aria-hidden="true" tabindex="-1"></a><span class="fu">t.test</span>(Local_Transitivity <span class="sc">~</span> Stage_Group, <span class="at">data =</span> direct_trans)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
     Welch Two Sample t-test
@@ -7571,10 +7560,10 @@ sample estimates:
 mean in group Early  mean in group Late 
             0.21875             0.05930 </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb98"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb98-1"><a href="#cb98-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Quote Path Co-Retweet</span></span>
-<span id="cb98-2"><a href="#cb98-2" aria-hidden="true" tabindex="-1"></a>quote_trans <span class="ot">&lt;-</span> all_metrics <span class="sc">%&gt;%</span></span>
-<span id="cb98-3"><a href="#cb98-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Network_Type <span class="sc">==</span> <span class="st">&quot;Quote Path Co-Retweet&quot;</span>)</span>
-<span id="cb98-4"><a href="#cb98-4" aria-hidden="true" tabindex="-1"></a><span class="fu">t.test</span>(Local_Transitivity <span class="sc">~</span> Stage_Group, <span class="at">data =</span> quote_trans)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb97"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb97-1"><a href="#cb97-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Quote Path Co-Retweet</span></span>
+<span id="cb97-2"><a href="#cb97-2" aria-hidden="true" tabindex="-1"></a>quote_trans <span class="ot">&lt;-</span> all_metrics <span class="sc">%&gt;%</span></span>
+<span id="cb97-3"><a href="#cb97-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Network_Type <span class="sc">==</span> <span class="st">&quot;Quote Path Co-Retweet&quot;</span>)</span>
+<span id="cb97-4"><a href="#cb97-4" aria-hidden="true" tabindex="-1"></a><span class="fu">t.test</span>(Local_Transitivity <span class="sc">~</span> Stage_Group, <span class="at">data =</span> quote_trans)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
     Welch Two Sample t-test
@@ -7588,10 +7577,10 @@ sample estimates:
 mean in group Early  mean in group Late 
             0.14510             0.04015 </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb100"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb100-1"><a href="#cb100-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Reply Path Co-Retweet</span></span>
-<span id="cb100-2"><a href="#cb100-2" aria-hidden="true" tabindex="-1"></a>reply_trans <span class="ot">&lt;-</span> all_metrics <span class="sc">%&gt;%</span></span>
-<span id="cb100-3"><a href="#cb100-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Network_Type <span class="sc">==</span> <span class="st">&quot;Reply Path Co-Retweet&quot;</span>)</span>
-<span id="cb100-4"><a href="#cb100-4" aria-hidden="true" tabindex="-1"></a><span class="fu">t.test</span>(Local_Transitivity <span class="sc">~</span> Stage_Group, <span class="at">data =</span> reply_trans)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb99"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb99-1"><a href="#cb99-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Reply Path Co-Retweet</span></span>
+<span id="cb99-2"><a href="#cb99-2" aria-hidden="true" tabindex="-1"></a>reply_trans <span class="ot">&lt;-</span> all_metrics <span class="sc">%&gt;%</span></span>
+<span id="cb99-3"><a href="#cb99-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Network_Type <span class="sc">==</span> <span class="st">&quot;Reply Path Co-Retweet&quot;</span>)</span>
+<span id="cb99-4"><a href="#cb99-4" aria-hidden="true" tabindex="-1"></a><span class="fu">t.test</span>(Local_Transitivity <span class="sc">~</span> Stage_Group, <span class="at">data =</span> reply_trans)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
     Welch Two Sample t-test
@@ -7647,17 +7636,17 @@ mean in group Early  mean in group Late
 <section id="degree-centralization-change-over-stages" class="level5">
 <h5 class="anchored" data-anchor-id="degree-centralization-change-over-stages">Degree Centralization Change Over Stages</h5>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb102"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb102-1"><a href="#cb102-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(all_metrics, <span class="fu">aes</span>(<span class="at">x =</span> Stage, <span class="at">y =</span> Degree_Centralization, <span class="at">color =</span> Network_Type, <span class="at">linetype =</span> Network_Type)) <span class="sc">+</span></span>
-<span id="cb102-2"><a href="#cb102-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">size =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
-<span id="cb102-3"><a href="#cb102-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">2</span>, <span class="at">shape =</span> <span class="dv">21</span>, <span class="at">fill =</span> <span class="st">&quot;white&quot;</span>) <span class="sc">+</span> </span>
-<span id="cb102-4"><a href="#cb102-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">&quot;#E41A1C&quot;</span>, <span class="st">&quot;#377EB8&quot;</span>, <span class="st">&quot;#4DAF4A&quot;</span>)) <span class="sc">+</span></span>
-<span id="cb102-5"><a href="#cb102-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_linetype_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">&quot;solid&quot;</span>, <span class="st">&quot;dashed&quot;</span>, <span class="st">&quot;dotdash&quot;</span>)) <span class="sc">+</span> </span>
-<span id="cb102-6"><a href="#cb102-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>() <span class="sc">+</span></span>
-<span id="cb102-7"><a href="#cb102-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Degree Centralization Change Over Stages&quot;</span>, <span class="at">x =</span> <span class="st">&quot;Stage&quot;</span>, <span class="at">y =</span> <span class="st">&quot;Degree Centralization&quot;</span>) <span class="sc">+</span></span>
-<span id="cb102-8"><a href="#cb102-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
-<span id="cb102-9"><a href="#cb102-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">text =</span> <span class="fu">element_text</span>(<span class="at">family =</span> <span class="st">&quot;serif&quot;</span>),</span>
-<span id="cb102-10"><a href="#cb102-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.position =</span> <span class="st">&quot;right&quot;</span></span>
-<span id="cb102-11"><a href="#cb102-11" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb101"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb101-1"><a href="#cb101-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(all_metrics, <span class="fu">aes</span>(<span class="at">x =</span> Stage, <span class="at">y =</span> Degree_Centralization, <span class="at">color =</span> Network_Type, <span class="at">linetype =</span> Network_Type)) <span class="sc">+</span></span>
+<span id="cb101-2"><a href="#cb101-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">size =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb101-3"><a href="#cb101-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">2</span>, <span class="at">shape =</span> <span class="dv">21</span>, <span class="at">fill =</span> <span class="st">&quot;white&quot;</span>) <span class="sc">+</span> </span>
+<span id="cb101-4"><a href="#cb101-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">&quot;#E41A1C&quot;</span>, <span class="st">&quot;#377EB8&quot;</span>, <span class="st">&quot;#4DAF4A&quot;</span>)) <span class="sc">+</span></span>
+<span id="cb101-5"><a href="#cb101-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_linetype_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">&quot;solid&quot;</span>, <span class="st">&quot;dashed&quot;</span>, <span class="st">&quot;dotdash&quot;</span>)) <span class="sc">+</span> </span>
+<span id="cb101-6"><a href="#cb101-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>() <span class="sc">+</span></span>
+<span id="cb101-7"><a href="#cb101-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Degree Centralization Change Over Stages&quot;</span>, <span class="at">x =</span> <span class="st">&quot;Stage&quot;</span>, <span class="at">y =</span> <span class="st">&quot;Degree Centralization&quot;</span>) <span class="sc">+</span></span>
+<span id="cb101-8"><a href="#cb101-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb101-9"><a href="#cb101-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">text =</span> <span class="fu">element_text</span>(<span class="at">family =</span> <span class="st">&quot;serif&quot;</span>),</span>
+<span id="cb101-10"><a href="#cb101-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.position =</span> <span class="st">&quot;right&quot;</span></span>
+<span id="cb101-11"><a href="#cb101-11" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -7668,12 +7657,12 @@ mean in group Early  mean in group Late
 </div>
 <p>The plot reveals that degree centralization peaks sharply at Stage 2 across all network types, suggesting that during early misinformation dissemination, amplification behaviors were highly centralized around a few influential hubs. However, after Stage 2, degree centralization dropped significantly and remained low throughout later stages. This suggests that the dominance of central hubs in spreading misinformation was primarily an early-stage phenomenon and did not persist as misinformation narratives evolved.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb103"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb103-1"><a href="#cb103-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Degree Centralization Temporal Change Analysis</span></span>
-<span id="cb103-2"><a href="#cb103-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb103-3"><a href="#cb103-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Direct Co-Retweet</span></span>
-<span id="cb103-4"><a href="#cb103-4" aria-hidden="true" tabindex="-1"></a>direct_central <span class="ot">&lt;-</span> all_metrics <span class="sc">%&gt;%</span></span>
-<span id="cb103-5"><a href="#cb103-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Network_Type <span class="sc">==</span> <span class="st">&quot;Co-Retweet&quot;</span>)</span>
-<span id="cb103-6"><a href="#cb103-6" aria-hidden="true" tabindex="-1"></a><span class="fu">t.test</span>(Degree_Centralization <span class="sc">~</span> Stage_Group, <span class="at">data =</span> direct_central)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb102"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb102-1"><a href="#cb102-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Degree Centralization Temporal Change Analysis</span></span>
+<span id="cb102-2"><a href="#cb102-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb102-3"><a href="#cb102-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Direct Co-Retweet</span></span>
+<span id="cb102-4"><a href="#cb102-4" aria-hidden="true" tabindex="-1"></a>direct_central <span class="ot">&lt;-</span> all_metrics <span class="sc">%&gt;%</span></span>
+<span id="cb102-5"><a href="#cb102-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Network_Type <span class="sc">==</span> <span class="st">&quot;Co-Retweet&quot;</span>)</span>
+<span id="cb102-6"><a href="#cb102-6" aria-hidden="true" tabindex="-1"></a><span class="fu">t.test</span>(Degree_Centralization <span class="sc">~</span> Stage_Group, <span class="at">data =</span> direct_central)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
     Welch Two Sample t-test
@@ -7687,10 +7676,10 @@ sample estimates:
 mean in group Early  mean in group Late 
             0.06070             0.00485 </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb105"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb105-1"><a href="#cb105-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Quote Path Co-Retweet</span></span>
-<span id="cb105-2"><a href="#cb105-2" aria-hidden="true" tabindex="-1"></a>quote_central <span class="ot">&lt;-</span> all_metrics <span class="sc">%&gt;%</span></span>
-<span id="cb105-3"><a href="#cb105-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Network_Type <span class="sc">==</span> <span class="st">&quot;Quote Path Co-Retweet&quot;</span>)</span>
-<span id="cb105-4"><a href="#cb105-4" aria-hidden="true" tabindex="-1"></a><span class="fu">t.test</span>(Degree_Centralization <span class="sc">~</span> Stage_Group, <span class="at">data =</span> quote_central)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb104"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb104-1"><a href="#cb104-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Quote Path Co-Retweet</span></span>
+<span id="cb104-2"><a href="#cb104-2" aria-hidden="true" tabindex="-1"></a>quote_central <span class="ot">&lt;-</span> all_metrics <span class="sc">%&gt;%</span></span>
+<span id="cb104-3"><a href="#cb104-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Network_Type <span class="sc">==</span> <span class="st">&quot;Quote Path Co-Retweet&quot;</span>)</span>
+<span id="cb104-4"><a href="#cb104-4" aria-hidden="true" tabindex="-1"></a><span class="fu">t.test</span>(Degree_Centralization <span class="sc">~</span> Stage_Group, <span class="at">data =</span> quote_central)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
     Welch Two Sample t-test
@@ -7704,10 +7693,10 @@ sample estimates:
 mean in group Early  mean in group Late 
            0.039425            0.002050 </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb107"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb107-1"><a href="#cb107-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Reply Path Co-Retweet</span></span>
-<span id="cb107-2"><a href="#cb107-2" aria-hidden="true" tabindex="-1"></a>reply_central <span class="ot">&lt;-</span> all_metrics <span class="sc">%&gt;%</span></span>
-<span id="cb107-3"><a href="#cb107-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Network_Type <span class="sc">==</span> <span class="st">&quot;Reply Path Co-Retweet&quot;</span>)</span>
-<span id="cb107-4"><a href="#cb107-4" aria-hidden="true" tabindex="-1"></a><span class="fu">t.test</span>(Degree_Centralization <span class="sc">~</span> Stage_Group, <span class="at">data =</span> reply_central)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb106"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb106-1"><a href="#cb106-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Reply Path Co-Retweet</span></span>
+<span id="cb106-2"><a href="#cb106-2" aria-hidden="true" tabindex="-1"></a>reply_central <span class="ot">&lt;-</span> all_metrics <span class="sc">%&gt;%</span></span>
+<span id="cb106-3"><a href="#cb106-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Network_Type <span class="sc">==</span> <span class="st">&quot;Reply Path Co-Retweet&quot;</span>)</span>
+<span id="cb106-4"><a href="#cb106-4" aria-hidden="true" tabindex="-1"></a><span class="fu">t.test</span>(Degree_Centralization <span class="sc">~</span> Stage_Group, <span class="at">data =</span> reply_central)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
     Welch Two Sample t-test
@@ -7763,20 +7752,20 @@ mean in group Early  mean in group Late
 <section id="average-path-length-change-over-stages" class="level5">
 <h5 class="anchored" data-anchor-id="average-path-length-change-over-stages">Average Path Length Change Over Stages</h5>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb109"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb109-1"><a href="#cb109-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Average Path Length Change Over Stages Visualization</span></span>
-<span id="cb109-2"><a href="#cb109-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(all_metrics, <span class="fu">aes</span>(<span class="at">x =</span> Stage, <span class="at">y =</span> Average_Path_Length, <span class="at">color =</span> Network_Type, <span class="at">linetype =</span> Network_Type)) <span class="sc">+</span></span>
-<span id="cb109-3"><a href="#cb109-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">size =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
-<span id="cb109-4"><a href="#cb109-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">2</span>, <span class="at">shape =</span> <span class="dv">21</span>, <span class="at">fill =</span> <span class="st">&quot;white&quot;</span>) <span class="sc">+</span> </span>
-<span id="cb109-5"><a href="#cb109-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">&quot;#E41A1C&quot;</span>, <span class="st">&quot;#377EB8&quot;</span>, <span class="st">&quot;#4DAF4A&quot;</span>)) <span class="sc">+</span></span>
-<span id="cb109-6"><a href="#cb109-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_linetype_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">&quot;solid&quot;</span>, <span class="st">&quot;dashed&quot;</span>, <span class="st">&quot;dotdash&quot;</span>)) <span class="sc">+</span> </span>
-<span id="cb109-7"><a href="#cb109-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>() <span class="sc">+</span></span>
-<span id="cb109-8"><a href="#cb109-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Average Path Length Change Over Stages&quot;</span>, </span>
-<span id="cb109-9"><a href="#cb109-9" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">&quot;Stage&quot;</span>, </span>
-<span id="cb109-10"><a href="#cb109-10" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">&quot;Average Path Length&quot;</span>) <span class="sc">+</span></span>
-<span id="cb109-11"><a href="#cb109-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
-<span id="cb109-12"><a href="#cb109-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">text =</span> <span class="fu">element_text</span>(<span class="at">family =</span> <span class="st">&quot;serif&quot;</span>),</span>
-<span id="cb109-13"><a href="#cb109-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.position =</span> <span class="st">&quot;right&quot;</span></span>
-<span id="cb109-14"><a href="#cb109-14" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb108"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb108-1"><a href="#cb108-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Average Path Length Change Over Stages Visualization</span></span>
+<span id="cb108-2"><a href="#cb108-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(all_metrics, <span class="fu">aes</span>(<span class="at">x =</span> Stage, <span class="at">y =</span> Average_Path_Length, <span class="at">color =</span> Network_Type, <span class="at">linetype =</span> Network_Type)) <span class="sc">+</span></span>
+<span id="cb108-3"><a href="#cb108-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">size =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb108-4"><a href="#cb108-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">2</span>, <span class="at">shape =</span> <span class="dv">21</span>, <span class="at">fill =</span> <span class="st">&quot;white&quot;</span>) <span class="sc">+</span> </span>
+<span id="cb108-5"><a href="#cb108-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">&quot;#E41A1C&quot;</span>, <span class="st">&quot;#377EB8&quot;</span>, <span class="st">&quot;#4DAF4A&quot;</span>)) <span class="sc">+</span></span>
+<span id="cb108-6"><a href="#cb108-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_linetype_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">&quot;solid&quot;</span>, <span class="st">&quot;dashed&quot;</span>, <span class="st">&quot;dotdash&quot;</span>)) <span class="sc">+</span> </span>
+<span id="cb108-7"><a href="#cb108-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>() <span class="sc">+</span></span>
+<span id="cb108-8"><a href="#cb108-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Average Path Length Change Over Stages&quot;</span>, </span>
+<span id="cb108-9"><a href="#cb108-9" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">&quot;Stage&quot;</span>, </span>
+<span id="cb108-10"><a href="#cb108-10" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">&quot;Average Path Length&quot;</span>) <span class="sc">+</span></span>
+<span id="cb108-11"><a href="#cb108-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb108-12"><a href="#cb108-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">text =</span> <span class="fu">element_text</span>(<span class="at">family =</span> <span class="st">&quot;serif&quot;</span>),</span>
+<span id="cb108-13"><a href="#cb108-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.position =</span> <span class="st">&quot;right&quot;</span></span>
+<span id="cb108-14"><a href="#cb108-14" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -7787,12 +7776,12 @@ mean in group Early  mean in group Late
 </div>
 <p>The line plot shows distinct temporal patterns in average path length across the three network types. All networks exhibit the highest average path lengths at Stage 2, indicating that misinformation narratives required longer dissemination chains during the peak of early amplification. Following this peak, average path lengths decrease across all network types, suggesting more direct and condensed dissemination patterns in later stages. However, direct co-retweet networks maintain slightly higher average path lengths throughout the stages, whereas quote and reply pathways demonstrate shorter and more fragmented dissemination routes in the later phases.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb110"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb110-1"><a href="#cb110-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Average Path Length Temporal Change Analysis</span></span>
-<span id="cb110-2"><a href="#cb110-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb110-3"><a href="#cb110-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Direct Co-Retweet</span></span>
-<span id="cb110-4"><a href="#cb110-4" aria-hidden="true" tabindex="-1"></a>direct_path <span class="ot">&lt;-</span> all_metrics <span class="sc">%&gt;%</span></span>
-<span id="cb110-5"><a href="#cb110-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Network_Type <span class="sc">==</span> <span class="st">&quot;Co-Retweet&quot;</span>)</span>
-<span id="cb110-6"><a href="#cb110-6" aria-hidden="true" tabindex="-1"></a><span class="fu">t.test</span>(Average_Path_Length <span class="sc">~</span> Stage_Group, <span class="at">data =</span> direct_path)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb109"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb109-1"><a href="#cb109-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Average Path Length Temporal Change Analysis</span></span>
+<span id="cb109-2"><a href="#cb109-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb109-3"><a href="#cb109-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Direct Co-Retweet</span></span>
+<span id="cb109-4"><a href="#cb109-4" aria-hidden="true" tabindex="-1"></a>direct_path <span class="ot">&lt;-</span> all_metrics <span class="sc">%&gt;%</span></span>
+<span id="cb109-5"><a href="#cb109-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Network_Type <span class="sc">==</span> <span class="st">&quot;Co-Retweet&quot;</span>)</span>
+<span id="cb109-6"><a href="#cb109-6" aria-hidden="true" tabindex="-1"></a><span class="fu">t.test</span>(Average_Path_Length <span class="sc">~</span> Stage_Group, <span class="at">data =</span> direct_path)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
     Welch Two Sample t-test
@@ -7806,10 +7795,10 @@ sample estimates:
 mean in group Early  mean in group Late 
             0.65335             0.32575 </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb112"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb112-1"><a href="#cb112-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Quote Path Co-Retweet</span></span>
-<span id="cb112-2"><a href="#cb112-2" aria-hidden="true" tabindex="-1"></a>quote_path <span class="ot">&lt;-</span> all_metrics <span class="sc">%&gt;%</span></span>
-<span id="cb112-3"><a href="#cb112-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Network_Type <span class="sc">==</span> <span class="st">&quot;Quote Path Co-Retweet&quot;</span>)</span>
-<span id="cb112-4"><a href="#cb112-4" aria-hidden="true" tabindex="-1"></a><span class="fu">t.test</span>(Average_Path_Length <span class="sc">~</span> Stage_Group, <span class="at">data =</span> quote_path)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb111"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb111-1"><a href="#cb111-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Quote Path Co-Retweet</span></span>
+<span id="cb111-2"><a href="#cb111-2" aria-hidden="true" tabindex="-1"></a>quote_path <span class="ot">&lt;-</span> all_metrics <span class="sc">%&gt;%</span></span>
+<span id="cb111-3"><a href="#cb111-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Network_Type <span class="sc">==</span> <span class="st">&quot;Quote Path Co-Retweet&quot;</span>)</span>
+<span id="cb111-4"><a href="#cb111-4" aria-hidden="true" tabindex="-1"></a><span class="fu">t.test</span>(Average_Path_Length <span class="sc">~</span> Stage_Group, <span class="at">data =</span> quote_path)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
     Welch Two Sample t-test
@@ -7823,10 +7812,10 @@ sample estimates:
 mean in group Early  mean in group Late 
            0.430025            0.124150 </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb114"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb114-1"><a href="#cb114-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Reply Path Co-Retweet</span></span>
-<span id="cb114-2"><a href="#cb114-2" aria-hidden="true" tabindex="-1"></a>reply_path <span class="ot">&lt;-</span> all_metrics <span class="sc">%&gt;%</span></span>
-<span id="cb114-3"><a href="#cb114-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Network_Type <span class="sc">==</span> <span class="st">&quot;Reply Path Co-Retweet&quot;</span>)</span>
-<span id="cb114-4"><a href="#cb114-4" aria-hidden="true" tabindex="-1"></a><span class="fu">t.test</span>(Average_Path_Length <span class="sc">~</span> Stage_Group, <span class="at">data =</span> reply_path)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb113"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb113-1"><a href="#cb113-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Reply Path Co-Retweet</span></span>
+<span id="cb113-2"><a href="#cb113-2" aria-hidden="true" tabindex="-1"></a>reply_path <span class="ot">&lt;-</span> all_metrics <span class="sc">%&gt;%</span></span>
+<span id="cb113-3"><a href="#cb113-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Network_Type <span class="sc">==</span> <span class="st">&quot;Reply Path Co-Retweet&quot;</span>)</span>
+<span id="cb113-4"><a href="#cb113-4" aria-hidden="true" tabindex="-1"></a><span class="fu">t.test</span>(Average_Path_Length <span class="sc">~</span> Stage_Group, <span class="at">data =</span> reply_path)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
     Welch Two Sample t-test
@@ -7891,50 +7880,50 @@ mean in group Early  mean in group Late
 <section id="cug-test-for-density" class="level4">
 <h4 class="anchored" data-anchor-id="cug-test-for-density">CUG Test for Density</h4>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb116"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb116-1"><a href="#cb116-1" aria-hidden="true" tabindex="-1"></a>valid_files <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
-<span id="cb116-2"><a href="#cb116-2" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;adj_matrix_stage1.csv&quot;</span>, <span class="st">&quot;adj_matrix_stage1_quote.csv&quot;</span>, <span class="st">&quot;adj_matrix_stage1_reply.csv&quot;</span>,</span>
-<span id="cb116-3"><a href="#cb116-3" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;adj_matrix_stage2.csv&quot;</span>, <span class="st">&quot;adj_matrix_stage2_quote.csv&quot;</span>, <span class="st">&quot;adj_matrix_stage2_reply.csv&quot;</span>,</span>
-<span id="cb116-4"><a href="#cb116-4" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;adj_matrix_stage3.csv&quot;</span>, <span class="st">&quot;adj_matrix_stage3_quote.csv&quot;</span>, <span class="st">&quot;adj_matrix_stage3_reply.csv&quot;</span>,</span>
-<span id="cb116-5"><a href="#cb116-5" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;adj_matrix_stage4.csv&quot;</span>, <span class="st">&quot;adj_matrix_stage4_quote.csv&quot;</span>, <span class="st">&quot;adj_matrix_stage4_reply.csv&quot;</span>,</span>
-<span id="cb116-6"><a href="#cb116-6" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;adj_matrix_stage5.csv&quot;</span>, <span class="st">&quot;adj_matrix_stage5_quote.csv&quot;</span>, <span class="st">&quot;adj_matrix_stage5_reply.csv&quot;</span>,</span>
-<span id="cb116-7"><a href="#cb116-7" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;adj_matrix_stage6.csv&quot;</span>, <span class="st">&quot;adj_matrix_stage6_quote.csv&quot;</span>, <span class="st">&quot;adj_matrix_stage6_reply.csv&quot;</span></span>
-<span id="cb116-8"><a href="#cb116-8" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb116-9"><a href="#cb116-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb116-10"><a href="#cb116-10" aria-hidden="true" tabindex="-1"></a>all_files <span class="ot">&lt;-</span> <span class="fu">list.files</span>(<span class="st">&quot;data&quot;</span>)</span>
-<span id="cb116-11"><a href="#cb116-11" aria-hidden="true" tabindex="-1"></a>target_files <span class="ot">&lt;-</span> all_files[all_files <span class="sc">%in%</span> valid_files]</span>
-<span id="cb116-12"><a href="#cb116-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb116-13"><a href="#cb116-13" aria-hidden="true" tabindex="-1"></a>info <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
-<span id="cb116-14"><a href="#cb116-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">File =</span> target_files,</span>
-<span id="cb116-15"><a href="#cb116-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">Network_Type =</span> <span class="fu">ifelse</span>(<span class="fu">grepl</span>(<span class="st">&quot;quote&quot;</span>, target_files), <span class="st">&quot;Quote Path Co-Retweet&quot;</span>,</span>
-<span id="cb116-16"><a href="#cb116-16" aria-hidden="true" tabindex="-1"></a>                        <span class="fu">ifelse</span>(<span class="fu">grepl</span>(<span class="st">&quot;reply&quot;</span>, target_files), <span class="st">&quot;Reply Path Co-Retweet&quot;</span>, <span class="st">&quot;Direct Co-Retweet&quot;</span>)),</span>
-<span id="cb116-17"><a href="#cb116-17" aria-hidden="true" tabindex="-1"></a>  <span class="at">Stage =</span> <span class="fu">as.numeric</span>(<span class="fu">gsub</span>(<span class="st">&quot;.*stage([0-9]+).*&quot;</span>, <span class="st">&quot;</span><span class="sc">\\</span><span class="st">1&quot;</span>, target_files))</span>
-<span id="cb116-18"><a href="#cb116-18" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb116-19"><a href="#cb116-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb116-20"><a href="#cb116-20" aria-hidden="true" tabindex="-1"></a>results <span class="ot">&lt;-</span> <span class="fu">data.frame</span>()</span>
-<span id="cb116-21"><a href="#cb116-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb116-22"><a href="#cb116-22" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">nrow</span>(info)) {</span>
-<span id="cb116-23"><a href="#cb116-23" aria-hidden="true" tabindex="-1"></a>  file_path <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">&quot;data/&quot;</span>, info<span class="sc">$</span>File[i])</span>
-<span id="cb116-24"><a href="#cb116-24" aria-hidden="true" tabindex="-1"></a>  adj_matrix <span class="ot">&lt;-</span> <span class="fu">as.matrix</span>(<span class="fu">read.csv</span>(file_path, <span class="at">row.names =</span> <span class="dv">1</span>))</span>
-<span id="cb116-25"><a href="#cb116-25" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb116-26"><a href="#cb116-26" aria-hidden="true" tabindex="-1"></a>  net <span class="ot">&lt;-</span> <span class="fu">network</span>(adj_matrix, <span class="at">directed =</span> <span class="cn">FALSE</span>, <span class="at">matrix.type =</span> <span class="st">&quot;adjacency&quot;</span>)</span>
-<span id="cb116-27"><a href="#cb116-27" aria-hidden="true" tabindex="-1"></a>  gden <span class="ot">&lt;-</span> <span class="fu">network.density</span>(net)</span>
-<span id="cb116-28"><a href="#cb116-28" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb116-29"><a href="#cb116-29" aria-hidden="true" tabindex="-1"></a>  <span class="co"># CUG Test (Conditioning only on Size)</span></span>
-<span id="cb116-30"><a href="#cb116-30" aria-hidden="true" tabindex="-1"></a>  cug_result <span class="ot">&lt;-</span> <span class="fu">cug.test</span>(net, gden, <span class="at">cmode =</span> <span class="st">&quot;size&quot;</span>, <span class="at">reps =</span> <span class="dv">1000</span>)</span>
-<span id="cb116-31"><a href="#cb116-31" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb116-32"><a href="#cb116-32" aria-hidden="true" tabindex="-1"></a>  p_greater_equal <span class="ot">&lt;-</span> cug_result<span class="sc">$</span>pgte  <span class="co"># Observed density higher than random</span></span>
-<span id="cb116-33"><a href="#cb116-33" aria-hidden="true" tabindex="-1"></a>  p_less_equal <span class="ot">&lt;-</span> cug_result<span class="sc">$</span>plte     <span class="co"># Observed density lower than random</span></span>
-<span id="cb116-34"><a href="#cb116-34" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb116-35"><a href="#cb116-35" aria-hidden="true" tabindex="-1"></a>  results <span class="ot">&lt;-</span> <span class="fu">rbind</span>(results, <span class="fu">data.frame</span>(</span>
-<span id="cb116-36"><a href="#cb116-36" aria-hidden="true" tabindex="-1"></a>    <span class="at">Network_Type =</span> info<span class="sc">$</span>Network_Type[i],</span>
-<span id="cb116-37"><a href="#cb116-37" aria-hidden="true" tabindex="-1"></a>    <span class="at">Stage =</span> info<span class="sc">$</span>Stage[i],</span>
-<span id="cb116-38"><a href="#cb116-38" aria-hidden="true" tabindex="-1"></a>    <span class="at">CUG_Prob_Higher =</span> p_greater_equal,</span>
-<span id="cb116-39"><a href="#cb116-39" aria-hidden="true" tabindex="-1"></a>    <span class="at">CUG_Prob_Lower =</span> p_less_equal</span>
-<span id="cb116-40"><a href="#cb116-40" aria-hidden="true" tabindex="-1"></a>  ))</span>
-<span id="cb116-41"><a href="#cb116-41" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb116-42"><a href="#cb116-42" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb116-43"><a href="#cb116-43" aria-hidden="true" tabindex="-1"></a>results <span class="ot">&lt;-</span> results[<span class="fu">order</span>(results<span class="sc">$</span>Stage, results<span class="sc">$</span>Network_Type), ]</span>
-<span id="cb116-44"><a href="#cb116-44" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(results)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb115"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb115-1"><a href="#cb115-1" aria-hidden="true" tabindex="-1"></a>valid_files <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb115-2"><a href="#cb115-2" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;adj_matrix_stage1.csv&quot;</span>, <span class="st">&quot;adj_matrix_stage1_quote.csv&quot;</span>, <span class="st">&quot;adj_matrix_stage1_reply.csv&quot;</span>,</span>
+<span id="cb115-3"><a href="#cb115-3" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;adj_matrix_stage2.csv&quot;</span>, <span class="st">&quot;adj_matrix_stage2_quote.csv&quot;</span>, <span class="st">&quot;adj_matrix_stage2_reply.csv&quot;</span>,</span>
+<span id="cb115-4"><a href="#cb115-4" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;adj_matrix_stage3.csv&quot;</span>, <span class="st">&quot;adj_matrix_stage3_quote.csv&quot;</span>, <span class="st">&quot;adj_matrix_stage3_reply.csv&quot;</span>,</span>
+<span id="cb115-5"><a href="#cb115-5" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;adj_matrix_stage4.csv&quot;</span>, <span class="st">&quot;adj_matrix_stage4_quote.csv&quot;</span>, <span class="st">&quot;adj_matrix_stage4_reply.csv&quot;</span>,</span>
+<span id="cb115-6"><a href="#cb115-6" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;adj_matrix_stage5.csv&quot;</span>, <span class="st">&quot;adj_matrix_stage5_quote.csv&quot;</span>, <span class="st">&quot;adj_matrix_stage5_reply.csv&quot;</span>,</span>
+<span id="cb115-7"><a href="#cb115-7" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;adj_matrix_stage6.csv&quot;</span>, <span class="st">&quot;adj_matrix_stage6_quote.csv&quot;</span>, <span class="st">&quot;adj_matrix_stage6_reply.csv&quot;</span></span>
+<span id="cb115-8"><a href="#cb115-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb115-9"><a href="#cb115-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb115-10"><a href="#cb115-10" aria-hidden="true" tabindex="-1"></a>all_files <span class="ot">&lt;-</span> <span class="fu">list.files</span>(<span class="st">&quot;data&quot;</span>)</span>
+<span id="cb115-11"><a href="#cb115-11" aria-hidden="true" tabindex="-1"></a>target_files <span class="ot">&lt;-</span> all_files[all_files <span class="sc">%in%</span> valid_files]</span>
+<span id="cb115-12"><a href="#cb115-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb115-13"><a href="#cb115-13" aria-hidden="true" tabindex="-1"></a>info <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb115-14"><a href="#cb115-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">File =</span> target_files,</span>
+<span id="cb115-15"><a href="#cb115-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">Network_Type =</span> <span class="fu">ifelse</span>(<span class="fu">grepl</span>(<span class="st">&quot;quote&quot;</span>, target_files), <span class="st">&quot;Quote Path Co-Retweet&quot;</span>,</span>
+<span id="cb115-16"><a href="#cb115-16" aria-hidden="true" tabindex="-1"></a>                        <span class="fu">ifelse</span>(<span class="fu">grepl</span>(<span class="st">&quot;reply&quot;</span>, target_files), <span class="st">&quot;Reply Path Co-Retweet&quot;</span>, <span class="st">&quot;Direct Co-Retweet&quot;</span>)),</span>
+<span id="cb115-17"><a href="#cb115-17" aria-hidden="true" tabindex="-1"></a>  <span class="at">Stage =</span> <span class="fu">as.numeric</span>(<span class="fu">gsub</span>(<span class="st">&quot;.*stage([0-9]+).*&quot;</span>, <span class="st">&quot;</span><span class="sc">\\</span><span class="st">1&quot;</span>, target_files))</span>
+<span id="cb115-18"><a href="#cb115-18" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb115-19"><a href="#cb115-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb115-20"><a href="#cb115-20" aria-hidden="true" tabindex="-1"></a>results <span class="ot">&lt;-</span> <span class="fu">data.frame</span>()</span>
+<span id="cb115-21"><a href="#cb115-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb115-22"><a href="#cb115-22" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">nrow</span>(info)) {</span>
+<span id="cb115-23"><a href="#cb115-23" aria-hidden="true" tabindex="-1"></a>  file_path <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">&quot;data/&quot;</span>, info<span class="sc">$</span>File[i])</span>
+<span id="cb115-24"><a href="#cb115-24" aria-hidden="true" tabindex="-1"></a>  adj_matrix <span class="ot">&lt;-</span> <span class="fu">as.matrix</span>(<span class="fu">read.csv</span>(file_path, <span class="at">row.names =</span> <span class="dv">1</span>))</span>
+<span id="cb115-25"><a href="#cb115-25" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb115-26"><a href="#cb115-26" aria-hidden="true" tabindex="-1"></a>  net <span class="ot">&lt;-</span> <span class="fu">network</span>(adj_matrix, <span class="at">directed =</span> <span class="cn">FALSE</span>, <span class="at">matrix.type =</span> <span class="st">&quot;adjacency&quot;</span>)</span>
+<span id="cb115-27"><a href="#cb115-27" aria-hidden="true" tabindex="-1"></a>  gden <span class="ot">&lt;-</span> <span class="fu">network.density</span>(net)</span>
+<span id="cb115-28"><a href="#cb115-28" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb115-29"><a href="#cb115-29" aria-hidden="true" tabindex="-1"></a>  <span class="co"># CUG Test (Conditioning only on Size)</span></span>
+<span id="cb115-30"><a href="#cb115-30" aria-hidden="true" tabindex="-1"></a>  cug_result <span class="ot">&lt;-</span> <span class="fu">cug.test</span>(net, gden, <span class="at">cmode =</span> <span class="st">&quot;size&quot;</span>, <span class="at">reps =</span> <span class="dv">1000</span>)</span>
+<span id="cb115-31"><a href="#cb115-31" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb115-32"><a href="#cb115-32" aria-hidden="true" tabindex="-1"></a>  p_greater_equal <span class="ot">&lt;-</span> cug_result<span class="sc">$</span>pgte  <span class="co"># Observed density higher than random</span></span>
+<span id="cb115-33"><a href="#cb115-33" aria-hidden="true" tabindex="-1"></a>  p_less_equal <span class="ot">&lt;-</span> cug_result<span class="sc">$</span>plte     <span class="co"># Observed density lower than random</span></span>
+<span id="cb115-34"><a href="#cb115-34" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb115-35"><a href="#cb115-35" aria-hidden="true" tabindex="-1"></a>  results <span class="ot">&lt;-</span> <span class="fu">rbind</span>(results, <span class="fu">data.frame</span>(</span>
+<span id="cb115-36"><a href="#cb115-36" aria-hidden="true" tabindex="-1"></a>    <span class="at">Network_Type =</span> info<span class="sc">$</span>Network_Type[i],</span>
+<span id="cb115-37"><a href="#cb115-37" aria-hidden="true" tabindex="-1"></a>    <span class="at">Stage =</span> info<span class="sc">$</span>Stage[i],</span>
+<span id="cb115-38"><a href="#cb115-38" aria-hidden="true" tabindex="-1"></a>    <span class="at">CUG_Prob_Higher =</span> p_greater_equal,</span>
+<span id="cb115-39"><a href="#cb115-39" aria-hidden="true" tabindex="-1"></a>    <span class="at">CUG_Prob_Lower =</span> p_less_equal</span>
+<span id="cb115-40"><a href="#cb115-40" aria-hidden="true" tabindex="-1"></a>  ))</span>
+<span id="cb115-41"><a href="#cb115-41" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb115-42"><a href="#cb115-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb115-43"><a href="#cb115-43" aria-hidden="true" tabindex="-1"></a>results <span class="ot">&lt;-</span> results[<span class="fu">order</span>(results<span class="sc">$</span>Stage, results<span class="sc">$</span>Network_Type), ]</span>
+<span id="cb115-44"><a href="#cb115-44" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(results)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>            Network_Type Stage CUG_Prob_Higher CUG_Prob_Lower
 1      Direct Co-Retweet     1               1              0
@@ -7963,64 +7952,64 @@ mean in group Early  mean in group Late
 <section id="cug-test-for-transtivity" class="level4">
 <h4 class="anchored" data-anchor-id="cug-test-for-transtivity">CUG Test for Transtivity</h4>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb118"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb118-1"><a href="#cb118-1" aria-hidden="true" tabindex="-1"></a>calculate_local_transitivity <span class="ot">&lt;-</span> <span class="cf">function</span>(adj_matrix) {</span>
-<span id="cb118-2"><a href="#cb118-2" aria-hidden="true" tabindex="-1"></a>  n <span class="ot">&lt;-</span> <span class="fu">nrow</span>(adj_matrix)</span>
-<span id="cb118-3"><a href="#cb118-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (n <span class="sc">==</span> <span class="dv">0</span>) <span class="fu">return</span>(<span class="dv">0</span>)  </span>
-<span id="cb118-4"><a href="#cb118-4" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb118-5"><a href="#cb118-5" aria-hidden="true" tabindex="-1"></a>  clustering_coeffs <span class="ot">&lt;-</span> <span class="fu">numeric</span>(n)</span>
-<span id="cb118-6"><a href="#cb118-6" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb118-7"><a href="#cb118-7" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>n) {</span>
-<span id="cb118-8"><a href="#cb118-8" aria-hidden="true" tabindex="-1"></a>    neighbors <span class="ot">&lt;-</span> <span class="fu">which</span>(adj_matrix[i, ] <span class="sc">==</span> <span class="dv">1</span>)</span>
-<span id="cb118-9"><a href="#cb118-9" aria-hidden="true" tabindex="-1"></a>    k_i <span class="ot">&lt;-</span> <span class="fu">length</span>(neighbors)</span>
-<span id="cb118-10"><a href="#cb118-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (k_i <span class="sc">&lt;</span> <span class="dv">2</span>) {</span>
-<span id="cb118-11"><a href="#cb118-11" aria-hidden="true" tabindex="-1"></a>      clustering_coeffs[i] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
-<span id="cb118-12"><a href="#cb118-12" aria-hidden="true" tabindex="-1"></a>    } <span class="cf">else</span> {</span>
-<span id="cb118-13"><a href="#cb118-13" aria-hidden="true" tabindex="-1"></a>      subgraph <span class="ot">&lt;-</span> adj_matrix[neighbors, neighbors]</span>
-<span id="cb118-14"><a href="#cb118-14" aria-hidden="true" tabindex="-1"></a>      actual_links <span class="ot">&lt;-</span> <span class="fu">sum</span>(subgraph) <span class="sc">/</span> <span class="dv">2</span>  <span class="co"># Undirected graph</span></span>
-<span id="cb118-15"><a href="#cb118-15" aria-hidden="true" tabindex="-1"></a>      possible_links <span class="ot">&lt;-</span> k_i <span class="sc">*</span> (k_i <span class="sc">-</span> <span class="dv">1</span>) <span class="sc">/</span> <span class="dv">2</span></span>
-<span id="cb118-16"><a href="#cb118-16" aria-hidden="true" tabindex="-1"></a>      clustering_coeffs[i] <span class="ot">&lt;-</span> actual_links <span class="sc">/</span> possible_links</span>
-<span id="cb118-17"><a href="#cb118-17" aria-hidden="true" tabindex="-1"></a>    }</span>
-<span id="cb118-18"><a href="#cb118-18" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb118-19"><a href="#cb118-19" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb118-20"><a href="#cb118-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mean</span>(clustering_coeffs, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb118-21"><a href="#cb118-21" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb118-22"><a href="#cb118-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb118-23"><a href="#cb118-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb118-24"><a href="#cb118-24" aria-hidden="true" tabindex="-1"></a>results <span class="ot">&lt;-</span> <span class="fu">data.frame</span>()</span>
-<span id="cb118-25"><a href="#cb118-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb118-26"><a href="#cb118-26" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">nrow</span>(info)) {</span>
-<span id="cb118-27"><a href="#cb118-27" aria-hidden="true" tabindex="-1"></a>  file_path <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">&quot;data/&quot;</span>, info<span class="sc">$</span>File[i])</span>
-<span id="cb118-28"><a href="#cb118-28" aria-hidden="true" tabindex="-1"></a>  adj_matrix <span class="ot">&lt;-</span> <span class="fu">as.matrix</span>(<span class="fu">read.csv</span>(file_path, <span class="at">row.names =</span> <span class="dv">1</span>))</span>
-<span id="cb118-29"><a href="#cb118-29" aria-hidden="true" tabindex="-1"></a>  net <span class="ot">&lt;-</span> <span class="fu">network</span>(adj_matrix, <span class="at">directed =</span> <span class="cn">FALSE</span>, <span class="at">matrix.type =</span> <span class="st">&quot;adjacency&quot;</span>)</span>
-<span id="cb118-30"><a href="#cb118-30" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb118-31"><a href="#cb118-31" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Global Transitivity</span></span>
-<span id="cb118-32"><a href="#cb118-32" aria-hidden="true" tabindex="-1"></a>  cug_global <span class="ot">&lt;-</span> <span class="fu">cug.test</span>(net, <span class="at">FUN =</span> gtrans, <span class="at">cmode =</span> <span class="st">&quot;size&quot;</span>, <span class="at">reps =</span> <span class="dv">1000</span>)</span>
-<span id="cb118-33"><a href="#cb118-33" aria-hidden="true" tabindex="-1"></a>  results <span class="ot">&lt;-</span> <span class="fu">rbind</span>(results, <span class="fu">data.frame</span>(</span>
-<span id="cb118-34"><a href="#cb118-34" aria-hidden="true" tabindex="-1"></a>    <span class="at">Network_Type =</span> info<span class="sc">$</span>Network_Type[i],</span>
-<span id="cb118-35"><a href="#cb118-35" aria-hidden="true" tabindex="-1"></a>    <span class="at">Stage =</span> info<span class="sc">$</span>Stage[i],</span>
-<span id="cb118-36"><a href="#cb118-36" aria-hidden="true" tabindex="-1"></a>    <span class="at">Metric =</span> <span class="st">&quot;Global Transitivity&quot;</span>,</span>
-<span id="cb118-37"><a href="#cb118-37" aria-hidden="true" tabindex="-1"></a>    <span class="at">CUG_Prob_Higher =</span> cug_global<span class="sc">$</span>pgte,</span>
-<span id="cb118-38"><a href="#cb118-38" aria-hidden="true" tabindex="-1"></a>    <span class="at">CUG_Prob_Lower =</span> cug_global<span class="sc">$</span>plte</span>
-<span id="cb118-39"><a href="#cb118-39" aria-hidden="true" tabindex="-1"></a>  ))</span>
-<span id="cb118-40"><a href="#cb118-40" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb118-41"><a href="#cb118-41" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Local Transitivity</span></span>
-<span id="cb118-42"><a href="#cb118-42" aria-hidden="true" tabindex="-1"></a>  cug_local <span class="ot">&lt;-</span> <span class="fu">cug.test</span>(net, <span class="at">FUN =</span> <span class="cf">function</span>(x) {</span>
-<span id="cb118-43"><a href="#cb118-43" aria-hidden="true" tabindex="-1"></a>    adj_m <span class="ot">&lt;-</span> <span class="fu">as.matrix</span>(x)</span>
-<span id="cb118-44"><a href="#cb118-44" aria-hidden="true" tabindex="-1"></a>    <span class="fu">calculate_local_transitivity</span>(adj_m)</span>
-<span id="cb118-45"><a href="#cb118-45" aria-hidden="true" tabindex="-1"></a>  }, <span class="at">cmode =</span> <span class="st">&quot;size&quot;</span>, <span class="at">reps =</span> <span class="dv">1000</span>)</span>
-<span id="cb118-46"><a href="#cb118-46" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb118-47"><a href="#cb118-47" aria-hidden="true" tabindex="-1"></a>  results <span class="ot">&lt;-</span> <span class="fu">rbind</span>(results, <span class="fu">data.frame</span>(</span>
-<span id="cb118-48"><a href="#cb118-48" aria-hidden="true" tabindex="-1"></a>    <span class="at">Network_Type =</span> info<span class="sc">$</span>Network_Type[i],</span>
-<span id="cb118-49"><a href="#cb118-49" aria-hidden="true" tabindex="-1"></a>    <span class="at">Stage =</span> info<span class="sc">$</span>Stage[i],</span>
-<span id="cb118-50"><a href="#cb118-50" aria-hidden="true" tabindex="-1"></a>    <span class="at">Metric =</span> <span class="st">&quot;Local Transitivity (Mean)&quot;</span>,</span>
-<span id="cb118-51"><a href="#cb118-51" aria-hidden="true" tabindex="-1"></a>    <span class="at">CUG_Prob_Higher =</span> cug_local<span class="sc">$</span>pgte,</span>
-<span id="cb118-52"><a href="#cb118-52" aria-hidden="true" tabindex="-1"></a>    <span class="at">CUG_Prob_Lower =</span> cug_local<span class="sc">$</span>plte</span>
-<span id="cb118-53"><a href="#cb118-53" aria-hidden="true" tabindex="-1"></a>  ))</span>
-<span id="cb118-54"><a href="#cb118-54" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb118-55"><a href="#cb118-55" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb118-56"><a href="#cb118-56" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb118-57"><a href="#cb118-57" aria-hidden="true" tabindex="-1"></a>results <span class="ot">&lt;-</span> results[<span class="fu">order</span>(results<span class="sc">$</span>Stage, results<span class="sc">$</span>Network_Type, results<span class="sc">$</span>Metric), ]</span>
-<span id="cb118-58"><a href="#cb118-58" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(results)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb117"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb117-1"><a href="#cb117-1" aria-hidden="true" tabindex="-1"></a>calculate_local_transitivity <span class="ot">&lt;-</span> <span class="cf">function</span>(adj_matrix) {</span>
+<span id="cb117-2"><a href="#cb117-2" aria-hidden="true" tabindex="-1"></a>  n <span class="ot">&lt;-</span> <span class="fu">nrow</span>(adj_matrix)</span>
+<span id="cb117-3"><a href="#cb117-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (n <span class="sc">==</span> <span class="dv">0</span>) <span class="fu">return</span>(<span class="dv">0</span>)  </span>
+<span id="cb117-4"><a href="#cb117-4" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb117-5"><a href="#cb117-5" aria-hidden="true" tabindex="-1"></a>  clustering_coeffs <span class="ot">&lt;-</span> <span class="fu">numeric</span>(n)</span>
+<span id="cb117-6"><a href="#cb117-6" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb117-7"><a href="#cb117-7" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>n) {</span>
+<span id="cb117-8"><a href="#cb117-8" aria-hidden="true" tabindex="-1"></a>    neighbors <span class="ot">&lt;-</span> <span class="fu">which</span>(adj_matrix[i, ] <span class="sc">==</span> <span class="dv">1</span>)</span>
+<span id="cb117-9"><a href="#cb117-9" aria-hidden="true" tabindex="-1"></a>    k_i <span class="ot">&lt;-</span> <span class="fu">length</span>(neighbors)</span>
+<span id="cb117-10"><a href="#cb117-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (k_i <span class="sc">&lt;</span> <span class="dv">2</span>) {</span>
+<span id="cb117-11"><a href="#cb117-11" aria-hidden="true" tabindex="-1"></a>      clustering_coeffs[i] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb117-12"><a href="#cb117-12" aria-hidden="true" tabindex="-1"></a>    } <span class="cf">else</span> {</span>
+<span id="cb117-13"><a href="#cb117-13" aria-hidden="true" tabindex="-1"></a>      subgraph <span class="ot">&lt;-</span> adj_matrix[neighbors, neighbors]</span>
+<span id="cb117-14"><a href="#cb117-14" aria-hidden="true" tabindex="-1"></a>      actual_links <span class="ot">&lt;-</span> <span class="fu">sum</span>(subgraph) <span class="sc">/</span> <span class="dv">2</span>  <span class="co"># Undirected graph</span></span>
+<span id="cb117-15"><a href="#cb117-15" aria-hidden="true" tabindex="-1"></a>      possible_links <span class="ot">&lt;-</span> k_i <span class="sc">*</span> (k_i <span class="sc">-</span> <span class="dv">1</span>) <span class="sc">/</span> <span class="dv">2</span></span>
+<span id="cb117-16"><a href="#cb117-16" aria-hidden="true" tabindex="-1"></a>      clustering_coeffs[i] <span class="ot">&lt;-</span> actual_links <span class="sc">/</span> possible_links</span>
+<span id="cb117-17"><a href="#cb117-17" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb117-18"><a href="#cb117-18" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb117-19"><a href="#cb117-19" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb117-20"><a href="#cb117-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mean</span>(clustering_coeffs, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb117-21"><a href="#cb117-21" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb117-22"><a href="#cb117-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb117-23"><a href="#cb117-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb117-24"><a href="#cb117-24" aria-hidden="true" tabindex="-1"></a>results <span class="ot">&lt;-</span> <span class="fu">data.frame</span>()</span>
+<span id="cb117-25"><a href="#cb117-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb117-26"><a href="#cb117-26" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">nrow</span>(info)) {</span>
+<span id="cb117-27"><a href="#cb117-27" aria-hidden="true" tabindex="-1"></a>  file_path <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">&quot;data/&quot;</span>, info<span class="sc">$</span>File[i])</span>
+<span id="cb117-28"><a href="#cb117-28" aria-hidden="true" tabindex="-1"></a>  adj_matrix <span class="ot">&lt;-</span> <span class="fu">as.matrix</span>(<span class="fu">read.csv</span>(file_path, <span class="at">row.names =</span> <span class="dv">1</span>))</span>
+<span id="cb117-29"><a href="#cb117-29" aria-hidden="true" tabindex="-1"></a>  net <span class="ot">&lt;-</span> <span class="fu">network</span>(adj_matrix, <span class="at">directed =</span> <span class="cn">FALSE</span>, <span class="at">matrix.type =</span> <span class="st">&quot;adjacency&quot;</span>)</span>
+<span id="cb117-30"><a href="#cb117-30" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb117-31"><a href="#cb117-31" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Global Transitivity</span></span>
+<span id="cb117-32"><a href="#cb117-32" aria-hidden="true" tabindex="-1"></a>  cug_global <span class="ot">&lt;-</span> <span class="fu">cug.test</span>(net, <span class="at">FUN =</span> gtrans, <span class="at">cmode =</span> <span class="st">&quot;size&quot;</span>, <span class="at">reps =</span> <span class="dv">1000</span>)</span>
+<span id="cb117-33"><a href="#cb117-33" aria-hidden="true" tabindex="-1"></a>  results <span class="ot">&lt;-</span> <span class="fu">rbind</span>(results, <span class="fu">data.frame</span>(</span>
+<span id="cb117-34"><a href="#cb117-34" aria-hidden="true" tabindex="-1"></a>    <span class="at">Network_Type =</span> info<span class="sc">$</span>Network_Type[i],</span>
+<span id="cb117-35"><a href="#cb117-35" aria-hidden="true" tabindex="-1"></a>    <span class="at">Stage =</span> info<span class="sc">$</span>Stage[i],</span>
+<span id="cb117-36"><a href="#cb117-36" aria-hidden="true" tabindex="-1"></a>    <span class="at">Metric =</span> <span class="st">&quot;Global Transitivity&quot;</span>,</span>
+<span id="cb117-37"><a href="#cb117-37" aria-hidden="true" tabindex="-1"></a>    <span class="at">CUG_Prob_Higher =</span> cug_global<span class="sc">$</span>pgte,</span>
+<span id="cb117-38"><a href="#cb117-38" aria-hidden="true" tabindex="-1"></a>    <span class="at">CUG_Prob_Lower =</span> cug_global<span class="sc">$</span>plte</span>
+<span id="cb117-39"><a href="#cb117-39" aria-hidden="true" tabindex="-1"></a>  ))</span>
+<span id="cb117-40"><a href="#cb117-40" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb117-41"><a href="#cb117-41" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Local Transitivity</span></span>
+<span id="cb117-42"><a href="#cb117-42" aria-hidden="true" tabindex="-1"></a>  cug_local <span class="ot">&lt;-</span> <span class="fu">cug.test</span>(net, <span class="at">FUN =</span> <span class="cf">function</span>(x) {</span>
+<span id="cb117-43"><a href="#cb117-43" aria-hidden="true" tabindex="-1"></a>    adj_m <span class="ot">&lt;-</span> <span class="fu">as.matrix</span>(x)</span>
+<span id="cb117-44"><a href="#cb117-44" aria-hidden="true" tabindex="-1"></a>    <span class="fu">calculate_local_transitivity</span>(adj_m)</span>
+<span id="cb117-45"><a href="#cb117-45" aria-hidden="true" tabindex="-1"></a>  }, <span class="at">cmode =</span> <span class="st">&quot;size&quot;</span>, <span class="at">reps =</span> <span class="dv">1000</span>)</span>
+<span id="cb117-46"><a href="#cb117-46" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb117-47"><a href="#cb117-47" aria-hidden="true" tabindex="-1"></a>  results <span class="ot">&lt;-</span> <span class="fu">rbind</span>(results, <span class="fu">data.frame</span>(</span>
+<span id="cb117-48"><a href="#cb117-48" aria-hidden="true" tabindex="-1"></a>    <span class="at">Network_Type =</span> info<span class="sc">$</span>Network_Type[i],</span>
+<span id="cb117-49"><a href="#cb117-49" aria-hidden="true" tabindex="-1"></a>    <span class="at">Stage =</span> info<span class="sc">$</span>Stage[i],</span>
+<span id="cb117-50"><a href="#cb117-50" aria-hidden="true" tabindex="-1"></a>    <span class="at">Metric =</span> <span class="st">&quot;Local Transitivity (Mean)&quot;</span>,</span>
+<span id="cb117-51"><a href="#cb117-51" aria-hidden="true" tabindex="-1"></a>    <span class="at">CUG_Prob_Higher =</span> cug_local<span class="sc">$</span>pgte,</span>
+<span id="cb117-52"><a href="#cb117-52" aria-hidden="true" tabindex="-1"></a>    <span class="at">CUG_Prob_Lower =</span> cug_local<span class="sc">$</span>plte</span>
+<span id="cb117-53"><a href="#cb117-53" aria-hidden="true" tabindex="-1"></a>  ))</span>
+<span id="cb117-54"><a href="#cb117-54" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb117-55"><a href="#cb117-55" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb117-56"><a href="#cb117-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb117-57"><a href="#cb117-57" aria-hidden="true" tabindex="-1"></a>results <span class="ot">&lt;-</span> results[<span class="fu">order</span>(results<span class="sc">$</span>Stage, results<span class="sc">$</span>Network_Type, results<span class="sc">$</span>Metric), ]</span>
+<span id="cb117-58"><a href="#cb117-58" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(results)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>            Network_Type Stage                    Metric CUG_Prob_Higher
 1      Direct Co-Retweet     1       Global Transitivity               0
@@ -8106,33 +8095,33 @@ mean in group Early  mean in group Late
 <section id="cug-test-for-degree-centralization" class="level4">
 <h4 class="anchored" data-anchor-id="cug-test-for-degree-centralization">CUG Test for Degree Centralization</h4>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb120"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb120-1"><a href="#cb120-1" aria-hidden="true" tabindex="-1"></a>results <span class="ot">&lt;-</span> <span class="fu">data.frame</span>()</span>
-<span id="cb120-2"><a href="#cb120-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb120-3"><a href="#cb120-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">nrow</span>(info)) {</span>
-<span id="cb120-4"><a href="#cb120-4" aria-hidden="true" tabindex="-1"></a>  file_path <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">&quot;data/&quot;</span>, info<span class="sc">$</span>File[i])</span>
-<span id="cb120-5"><a href="#cb120-5" aria-hidden="true" tabindex="-1"></a>  adj_matrix <span class="ot">&lt;-</span> <span class="fu">as.matrix</span>(<span class="fu">read.csv</span>(file_path, <span class="at">row.names =</span> <span class="dv">1</span>))</span>
-<span id="cb120-6"><a href="#cb120-6" aria-hidden="true" tabindex="-1"></a>  net <span class="ot">&lt;-</span> <span class="fu">network</span>(adj_matrix, <span class="at">directed =</span> <span class="cn">FALSE</span>, <span class="at">matrix.type =</span> <span class="st">&quot;adjacency&quot;</span>)</span>
-<span id="cb120-7"><a href="#cb120-7" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb120-8"><a href="#cb120-8" aria-hidden="true" tabindex="-1"></a>  <span class="co"># CUG Test for Degree Centralization</span></span>
-<span id="cb120-9"><a href="#cb120-9" aria-hidden="true" tabindex="-1"></a>  cug_degree <span class="ot">&lt;-</span> <span class="fu">cug.test</span>(</span>
-<span id="cb120-10"><a href="#cb120-10" aria-hidden="true" tabindex="-1"></a>    net,</span>
-<span id="cb120-11"><a href="#cb120-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">FUN =</span> <span class="cf">function</span>(x) <span class="fu">centralization</span>(x, <span class="at">FUN =</span> degree, <span class="at">cmode =</span> <span class="st">&quot;freeman&quot;</span>),</span>
-<span id="cb120-12"><a href="#cb120-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">cmode =</span> <span class="st">&quot;size&quot;</span>,</span>
-<span id="cb120-13"><a href="#cb120-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">reps =</span> <span class="dv">1000</span></span>
-<span id="cb120-14"><a href="#cb120-14" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb120-15"><a href="#cb120-15" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb120-16"><a href="#cb120-16" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Append Results</span></span>
-<span id="cb120-17"><a href="#cb120-17" aria-hidden="true" tabindex="-1"></a>  results <span class="ot">&lt;-</span> <span class="fu">rbind</span>(results, <span class="fu">data.frame</span>(</span>
-<span id="cb120-18"><a href="#cb120-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">Network_Type =</span> info<span class="sc">$</span>Network_Type[i],</span>
-<span id="cb120-19"><a href="#cb120-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">Stage =</span> info<span class="sc">$</span>Stage[i],</span>
-<span id="cb120-20"><a href="#cb120-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">Metric =</span> <span class="st">&quot;Degree Centralization&quot;</span>,</span>
-<span id="cb120-21"><a href="#cb120-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">CUG_Prob_Higher =</span> cug_degree<span class="sc">$</span>pgte,</span>
-<span id="cb120-22"><a href="#cb120-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">CUG_Prob_Lower =</span> cug_degree<span class="sc">$</span>plte</span>
-<span id="cb120-23"><a href="#cb120-23" aria-hidden="true" tabindex="-1"></a>  ))</span>
-<span id="cb120-24"><a href="#cb120-24" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb120-25"><a href="#cb120-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb120-26"><a href="#cb120-26" aria-hidden="true" tabindex="-1"></a>results <span class="ot">&lt;-</span> results[<span class="fu">order</span>(results<span class="sc">$</span>Stage, results<span class="sc">$</span>Network_Type), ]</span>
-<span id="cb120-27"><a href="#cb120-27" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(results)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb119"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb119-1"><a href="#cb119-1" aria-hidden="true" tabindex="-1"></a>results <span class="ot">&lt;-</span> <span class="fu">data.frame</span>()</span>
+<span id="cb119-2"><a href="#cb119-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb119-3"><a href="#cb119-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">nrow</span>(info)) {</span>
+<span id="cb119-4"><a href="#cb119-4" aria-hidden="true" tabindex="-1"></a>  file_path <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">&quot;data/&quot;</span>, info<span class="sc">$</span>File[i])</span>
+<span id="cb119-5"><a href="#cb119-5" aria-hidden="true" tabindex="-1"></a>  adj_matrix <span class="ot">&lt;-</span> <span class="fu">as.matrix</span>(<span class="fu">read.csv</span>(file_path, <span class="at">row.names =</span> <span class="dv">1</span>))</span>
+<span id="cb119-6"><a href="#cb119-6" aria-hidden="true" tabindex="-1"></a>  net <span class="ot">&lt;-</span> <span class="fu">network</span>(adj_matrix, <span class="at">directed =</span> <span class="cn">FALSE</span>, <span class="at">matrix.type =</span> <span class="st">&quot;adjacency&quot;</span>)</span>
+<span id="cb119-7"><a href="#cb119-7" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb119-8"><a href="#cb119-8" aria-hidden="true" tabindex="-1"></a>  <span class="co"># CUG Test for Degree Centralization</span></span>
+<span id="cb119-9"><a href="#cb119-9" aria-hidden="true" tabindex="-1"></a>  cug_degree <span class="ot">&lt;-</span> <span class="fu">cug.test</span>(</span>
+<span id="cb119-10"><a href="#cb119-10" aria-hidden="true" tabindex="-1"></a>    net,</span>
+<span id="cb119-11"><a href="#cb119-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">FUN =</span> <span class="cf">function</span>(x) <span class="fu">centralization</span>(x, <span class="at">FUN =</span> degree, <span class="at">cmode =</span> <span class="st">&quot;freeman&quot;</span>),</span>
+<span id="cb119-12"><a href="#cb119-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">cmode =</span> <span class="st">&quot;size&quot;</span>,</span>
+<span id="cb119-13"><a href="#cb119-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">reps =</span> <span class="dv">1000</span></span>
+<span id="cb119-14"><a href="#cb119-14" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb119-15"><a href="#cb119-15" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb119-16"><a href="#cb119-16" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Append Results</span></span>
+<span id="cb119-17"><a href="#cb119-17" aria-hidden="true" tabindex="-1"></a>  results <span class="ot">&lt;-</span> <span class="fu">rbind</span>(results, <span class="fu">data.frame</span>(</span>
+<span id="cb119-18"><a href="#cb119-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">Network_Type =</span> info<span class="sc">$</span>Network_Type[i],</span>
+<span id="cb119-19"><a href="#cb119-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">Stage =</span> info<span class="sc">$</span>Stage[i],</span>
+<span id="cb119-20"><a href="#cb119-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">Metric =</span> <span class="st">&quot;Degree Centralization&quot;</span>,</span>
+<span id="cb119-21"><a href="#cb119-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">CUG_Prob_Higher =</span> cug_degree<span class="sc">$</span>pgte,</span>
+<span id="cb119-22"><a href="#cb119-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">CUG_Prob_Lower =</span> cug_degree<span class="sc">$</span>plte</span>
+<span id="cb119-23"><a href="#cb119-23" aria-hidden="true" tabindex="-1"></a>  ))</span>
+<span id="cb119-24"><a href="#cb119-24" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb119-25"><a href="#cb119-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb119-26"><a href="#cb119-26" aria-hidden="true" tabindex="-1"></a>results <span class="ot">&lt;-</span> results[<span class="fu">order</span>(results<span class="sc">$</span>Stage, results<span class="sc">$</span>Network_Type), ]</span>
+<span id="cb119-27"><a href="#cb119-27" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(results)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>            Network_Type Stage                Metric CUG_Prob_Higher
 1      Direct Co-Retweet     1 Degree Centralization           0.000
@@ -8180,43 +8169,43 @@ mean in group Early  mean in group Late
 <section id="cug-test-for-average-path-length" class="level4">
 <h4 class="anchored" data-anchor-id="cug-test-for-average-path-length">CUG Test for Average Path Length</h4>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb122"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb122-1"><a href="#cb122-1" aria-hidden="true" tabindex="-1"></a>results <span class="ot">&lt;-</span> <span class="fu">data.frame</span>()</span>
-<span id="cb122-2"><a href="#cb122-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb122-3"><a href="#cb122-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">nrow</span>(info)) {</span>
-<span id="cb122-4"><a href="#cb122-4" aria-hidden="true" tabindex="-1"></a>  file_path <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">&quot;data/&quot;</span>, info<span class="sc">$</span>File[i])</span>
-<span id="cb122-5"><a href="#cb122-5" aria-hidden="true" tabindex="-1"></a>  adj_matrix <span class="ot">&lt;-</span> <span class="fu">as.matrix</span>(<span class="fu">read.csv</span>(file_path, <span class="at">row.names =</span> <span class="dv">1</span>))</span>
-<span id="cb122-6"><a href="#cb122-6" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb122-7"><a href="#cb122-7" aria-hidden="true" tabindex="-1"></a>  net <span class="ot">&lt;-</span> <span class="fu">network</span>(adj_matrix, <span class="at">directed =</span> <span class="cn">FALSE</span>, <span class="at">matrix.type =</span> <span class="st">&quot;adjacency&quot;</span>)</span>
-<span id="cb122-8"><a href="#cb122-8" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb122-9"><a href="#cb122-9" aria-hidden="true" tabindex="-1"></a>  apl_observed <span class="ot">&lt;-</span> <span class="fu">mean</span>(<span class="fu">geodist</span>(net)<span class="sc">$</span>gdist[<span class="fu">geodist</span>(net)<span class="sc">$</span>gdist <span class="sc">!=</span> <span class="cn">Inf</span>], <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb122-10"><a href="#cb122-10" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb122-11"><a href="#cb122-11" aria-hidden="true" tabindex="-1"></a>  <span class="co"># CUG Test for APL</span></span>
-<span id="cb122-12"><a href="#cb122-12" aria-hidden="true" tabindex="-1"></a>  cug_apl <span class="ot">&lt;-</span> <span class="fu">cug.test</span>(</span>
-<span id="cb122-13"><a href="#cb122-13" aria-hidden="true" tabindex="-1"></a>    net,</span>
-<span id="cb122-14"><a href="#cb122-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">FUN =</span> <span class="cf">function</span>(x) {</span>
-<span id="cb122-15"><a href="#cb122-15" aria-hidden="true" tabindex="-1"></a>      dists <span class="ot">&lt;-</span> <span class="fu">geodist</span>(x)<span class="sc">$</span>gdist</span>
-<span id="cb122-16"><a href="#cb122-16" aria-hidden="true" tabindex="-1"></a>      valid_dists <span class="ot">&lt;-</span> dists[dists <span class="sc">!=</span> <span class="cn">Inf</span>]</span>
-<span id="cb122-17"><a href="#cb122-17" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> (<span class="fu">length</span>(valid_dists) <span class="sc">&gt;</span> <span class="dv">0</span>) {</span>
-<span id="cb122-18"><a href="#cb122-18" aria-hidden="true" tabindex="-1"></a>        <span class="fu">return</span>(<span class="fu">mean</span>(valid_dists, <span class="at">na.rm =</span> <span class="cn">TRUE</span>))</span>
-<span id="cb122-19"><a href="#cb122-19" aria-hidden="true" tabindex="-1"></a>      } <span class="cf">else</span> {</span>
-<span id="cb122-20"><a href="#cb122-20" aria-hidden="true" tabindex="-1"></a>        <span class="fu">return</span>(<span class="cn">NA</span>)  </span>
-<span id="cb122-21"><a href="#cb122-21" aria-hidden="true" tabindex="-1"></a>      }</span>
-<span id="cb122-22"><a href="#cb122-22" aria-hidden="true" tabindex="-1"></a>    },</span>
-<span id="cb122-23"><a href="#cb122-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">cmode =</span> <span class="st">&quot;size&quot;</span>,</span>
-<span id="cb122-24"><a href="#cb122-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">reps =</span> <span class="dv">1000</span></span>
-<span id="cb122-25"><a href="#cb122-25" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb122-26"><a href="#cb122-26" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb122-27"><a href="#cb122-27" aria-hidden="true" tabindex="-1"></a>  results <span class="ot">&lt;-</span> <span class="fu">rbind</span>(results, <span class="fu">data.frame</span>(</span>
-<span id="cb122-28"><a href="#cb122-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">Network_Type =</span> info<span class="sc">$</span>Network_Type[i],</span>
-<span id="cb122-29"><a href="#cb122-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">Stage =</span> info<span class="sc">$</span>Stage[i],</span>
-<span id="cb122-30"><a href="#cb122-30" aria-hidden="true" tabindex="-1"></a>    <span class="at">Metric =</span> <span class="st">&quot;Average Path Length&quot;</span>,</span>
-<span id="cb122-31"><a href="#cb122-31" aria-hidden="true" tabindex="-1"></a>    <span class="at">CUG_Prob_Higher =</span> cug_apl<span class="sc">$</span>pgte,</span>
-<span id="cb122-32"><a href="#cb122-32" aria-hidden="true" tabindex="-1"></a>    <span class="at">CUG_Prob_Lower =</span> cug_apl<span class="sc">$</span>plte</span>
-<span id="cb122-33"><a href="#cb122-33" aria-hidden="true" tabindex="-1"></a>  ))</span>
-<span id="cb122-34"><a href="#cb122-34" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb122-35"><a href="#cb122-35" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb122-36"><a href="#cb122-36" aria-hidden="true" tabindex="-1"></a>results <span class="ot">&lt;-</span> results[<span class="fu">order</span>(results<span class="sc">$</span>Stage, results<span class="sc">$</span>Network_Type), ]</span>
-<span id="cb122-37"><a href="#cb122-37" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(results)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb121"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb121-1"><a href="#cb121-1" aria-hidden="true" tabindex="-1"></a>results <span class="ot">&lt;-</span> <span class="fu">data.frame</span>()</span>
+<span id="cb121-2"><a href="#cb121-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb121-3"><a href="#cb121-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">nrow</span>(info)) {</span>
+<span id="cb121-4"><a href="#cb121-4" aria-hidden="true" tabindex="-1"></a>  file_path <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">&quot;data/&quot;</span>, info<span class="sc">$</span>File[i])</span>
+<span id="cb121-5"><a href="#cb121-5" aria-hidden="true" tabindex="-1"></a>  adj_matrix <span class="ot">&lt;-</span> <span class="fu">as.matrix</span>(<span class="fu">read.csv</span>(file_path, <span class="at">row.names =</span> <span class="dv">1</span>))</span>
+<span id="cb121-6"><a href="#cb121-6" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb121-7"><a href="#cb121-7" aria-hidden="true" tabindex="-1"></a>  net <span class="ot">&lt;-</span> <span class="fu">network</span>(adj_matrix, <span class="at">directed =</span> <span class="cn">FALSE</span>, <span class="at">matrix.type =</span> <span class="st">&quot;adjacency&quot;</span>)</span>
+<span id="cb121-8"><a href="#cb121-8" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb121-9"><a href="#cb121-9" aria-hidden="true" tabindex="-1"></a>  apl_observed <span class="ot">&lt;-</span> <span class="fu">mean</span>(<span class="fu">geodist</span>(net)<span class="sc">$</span>gdist[<span class="fu">geodist</span>(net)<span class="sc">$</span>gdist <span class="sc">!=</span> <span class="cn">Inf</span>], <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb121-10"><a href="#cb121-10" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb121-11"><a href="#cb121-11" aria-hidden="true" tabindex="-1"></a>  <span class="co"># CUG Test for APL</span></span>
+<span id="cb121-12"><a href="#cb121-12" aria-hidden="true" tabindex="-1"></a>  cug_apl <span class="ot">&lt;-</span> <span class="fu">cug.test</span>(</span>
+<span id="cb121-13"><a href="#cb121-13" aria-hidden="true" tabindex="-1"></a>    net,</span>
+<span id="cb121-14"><a href="#cb121-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">FUN =</span> <span class="cf">function</span>(x) {</span>
+<span id="cb121-15"><a href="#cb121-15" aria-hidden="true" tabindex="-1"></a>      dists <span class="ot">&lt;-</span> <span class="fu">geodist</span>(x)<span class="sc">$</span>gdist</span>
+<span id="cb121-16"><a href="#cb121-16" aria-hidden="true" tabindex="-1"></a>      valid_dists <span class="ot">&lt;-</span> dists[dists <span class="sc">!=</span> <span class="cn">Inf</span>]</span>
+<span id="cb121-17"><a href="#cb121-17" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> (<span class="fu">length</span>(valid_dists) <span class="sc">&gt;</span> <span class="dv">0</span>) {</span>
+<span id="cb121-18"><a href="#cb121-18" aria-hidden="true" tabindex="-1"></a>        <span class="fu">return</span>(<span class="fu">mean</span>(valid_dists, <span class="at">na.rm =</span> <span class="cn">TRUE</span>))</span>
+<span id="cb121-19"><a href="#cb121-19" aria-hidden="true" tabindex="-1"></a>      } <span class="cf">else</span> {</span>
+<span id="cb121-20"><a href="#cb121-20" aria-hidden="true" tabindex="-1"></a>        <span class="fu">return</span>(<span class="cn">NA</span>)  </span>
+<span id="cb121-21"><a href="#cb121-21" aria-hidden="true" tabindex="-1"></a>      }</span>
+<span id="cb121-22"><a href="#cb121-22" aria-hidden="true" tabindex="-1"></a>    },</span>
+<span id="cb121-23"><a href="#cb121-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">cmode =</span> <span class="st">&quot;size&quot;</span>,</span>
+<span id="cb121-24"><a href="#cb121-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">reps =</span> <span class="dv">1000</span></span>
+<span id="cb121-25"><a href="#cb121-25" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb121-26"><a href="#cb121-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb121-27"><a href="#cb121-27" aria-hidden="true" tabindex="-1"></a>  results <span class="ot">&lt;-</span> <span class="fu">rbind</span>(results, <span class="fu">data.frame</span>(</span>
+<span id="cb121-28"><a href="#cb121-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">Network_Type =</span> info<span class="sc">$</span>Network_Type[i],</span>
+<span id="cb121-29"><a href="#cb121-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">Stage =</span> info<span class="sc">$</span>Stage[i],</span>
+<span id="cb121-30"><a href="#cb121-30" aria-hidden="true" tabindex="-1"></a>    <span class="at">Metric =</span> <span class="st">&quot;Average Path Length&quot;</span>,</span>
+<span id="cb121-31"><a href="#cb121-31" aria-hidden="true" tabindex="-1"></a>    <span class="at">CUG_Prob_Higher =</span> cug_apl<span class="sc">$</span>pgte,</span>
+<span id="cb121-32"><a href="#cb121-32" aria-hidden="true" tabindex="-1"></a>    <span class="at">CUG_Prob_Lower =</span> cug_apl<span class="sc">$</span>plte</span>
+<span id="cb121-33"><a href="#cb121-33" aria-hidden="true" tabindex="-1"></a>  ))</span>
+<span id="cb121-34"><a href="#cb121-34" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb121-35"><a href="#cb121-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb121-36"><a href="#cb121-36" aria-hidden="true" tabindex="-1"></a>results <span class="ot">&lt;-</span> results[<span class="fu">order</span>(results<span class="sc">$</span>Stage, results<span class="sc">$</span>Network_Type), ]</span>
+<span id="cb121-37"><a href="#cb121-37" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(results)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <table class="caption-top table">
 <colgroup>

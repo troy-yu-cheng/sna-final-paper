@@ -2936,19 +2936,6 @@ In terms of local transitivity, direct co-retweet networks also have the highest
 
 In terms of average path length, direct co-retweet networks display the shortest average path length (0.5442), in line with their broadcast-like amplification style. Quote and reply pathways have longer path lengths (0.3281 and 0.3698, respectively), indicating more layered and fragmented dissemination processes.
 
-```{r}
-
-# Helper function to load a PNG as ggplot object
-load_network_image <- function(filename) {
-  img <- png::readPNG(paste0("plot/", filename))
-}
-
-# Display Stage 1 Networks as Example
-p1 <- load_network_image("Co-Retweet-Stage1.png")
-p2 <- load_network_image("Quote-Path-Co-Retweet-Stage1.png") 
-p3 <- load_network_image("Reply-Path-Co-Retweet-Stage1.png")
-
-```
 
 ### Expected & actual findings based on hypotheses
 
